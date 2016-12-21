@@ -97,16 +97,17 @@ $html .= '<b>INVOICE</b><br>';
 $html .= 'No. '.$row["no_invoice"].'<br>';
 $html .= 'Tgl. '.$row["tgl_invoice"].'<br>';
 $html .= '&nbsp;'.'<br>';
-$html .= '<table border="0" width="75%">';
-$html .= '<tr><td>No. Order</td><td>'.$row["no_order"].'</td></tr>';
-$html .= '<tr><td>No. Referensi</td><td>'.$row["no_referensi"].'</td></tr>';
-$html .= '<tr><td>Kegiatan</td><td>'.$row["kegiatan"].'</td></tr>';
-$html .= '<tr><td>Tgl. Pelaksanaan</td><td>'.$row["tgl_pelaksanaan"].'</td></tr>';
-$html .= '<tr><td>No. Sertifikat/Laporan</td><td>'.$row["no_sertfikat"].'</td></tr>';
-$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
-$html .= '</table>';
 $html .= '<table border="0">';
-$html .= '<tr><td colspan="7">Fee :</td></tr>';
+$html .= '<tr><td width="175">No. Order</td><td width="450">: '.$row["no_order"].'</td></tr>';
+$html .= '<tr><td>No. Referensi</td><td>: '.$row["no_referensi"].'</td></tr>';
+$html .= '<tr><td>Kegiatan</td><td>: '.$row["kegiatan"].'</td></tr>';
+$html .= '<tr><td>Tgl. Pelaksanaan</td><td>: '.$row["tgl_pelaksanaan"].'</td></tr>';
+$html .= '<tr><td>No. Sertifikat/Laporan</td><td>: '.$row["no_sertfikat"].'</td></tr>';
+$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
+$html .= '<tr><td>Fee</td><td>:&nbsp;</td></tr>';
+
+//$html .= '</table>';
+//$html .= '<table border="0">';
 
 $total = $row["total"];
 $ppn = $row["ppn"];
@@ -118,25 +119,113 @@ $mquery = mysql_query($msql);
 while($row = mysql_fetch_array($mquery)) {
 	$html .= '
 	<tr>
+		<td>&nbsp;</td>
+		<td>
+			<table border="0">
+				<tr>
+					<td align="right">'.number_format($row["harga"]).'</td>
+					<td align="center">x</td>
+					<td align="right">'.$row["qty"].'</td>
+					<td> '.$row["unit"].' </td>
+					<td> '.$row["keterangan1"].' </td>
+					<td align="right">'.number_format($row["jumlah"]).'</td>
+					<td>&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	';
+	/*$html .= '
+	<tr>
 		<td align="right">'.number_format($row["harga"]).'</td>
-		<td align="center" width="25">  x  </td>
-		<td align="right" width="40">'.$row["qty"].'</td>
+		<td align="center" width="25">x</td>
+		<td align="right" width="30">'.$row["qty"].'</td>
 		<td>'.$row["unit"].'</td>
 		<td>'.$row["keterangan1"].'</td>
 		<td>  =  </td>
 		<td align="right">'.number_format($row["jumlah"]).'</td>
-	</tr>';
+	</tr>';*/
 }
 
-$html .= '<tr><td colspan="8">&nbsp;</td></tr>';
-$html .= '<tr><td colspan="6">Total</td><td align="right">'.number_format($total).'</td></tr>';
-$html .= '<tr><td>PPN</td><td colspan="2">'.$ppn.($ppn != 0 ? " %" : "").'</td><td colspan="3">&nbsp;</td><td align="right">'.($ppn != 0 ? number_format($total * $ppn/100) : 0).'</td></tr>';
-$html .= '<tr><td colspan="6">Total setelah PPN</td><td align="right">'.number_format($total_ppn).'</td></tr>';
-$html .= '</table>';
-$html .= '<table border="0" width="75%">';
+$html .= '
+	<tr>
+		<td>&nbsp;</td>
+		<td>
+			<table border="0">
+				<tr>
+					<td colspan="5"></td>
+					<td><hr></td>
+					<td>&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	';
 $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
-$html .= '<tr><td>Keterangan</td><td>'.$keterangan.'</td></tr>';
-$html .= '<tr><td>Terbilang</td><td>'.$terbilang.'</td></tr>';
+$html .= '
+	<tr>
+		<td>&nbsp;</td>
+		<td>
+			<table border="0">
+				<tr>
+					<td colspan="3"></td>
+					<td colspan="2">Total</td>
+					<td align="center">&nbsp;</td>
+					<td align="right">'.number_format($total).'</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	';
+$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
+$html .= '
+	<tr>
+		<td>&nbsp;</td>
+		<td>
+			<table border="0">
+				<tr>
+					<td colspan="3"></td>
+					<td>PPN</td>
+					<td align="right">'.$ppn.($ppn != 0 ? " %" : "").'</td>
+					<td align="center">&nbsp;</td>
+					<td align="right">'.($ppn != 0 ? number_format($total * $ppn/100) : "").'</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	';
+$html .= '
+	<tr>
+		<td>&nbsp;</td>
+		<td>
+			<table border="0">
+				<tr>
+					<td colspan="6"></td>
+					<td><hr></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	';
+$html .= '
+	<tr>
+		<td>&nbsp;</td>
+		<td>
+			<table border="0">
+				<tr>
+					<td colspan="3"></td>
+					<td colspan="2">Grand Total</td>
+					<td align="center">&nbsp;</td>
+					<td align="right">'.number_format($total_ppn).'</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	';
+$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
+$html .= '<tr><td>Keterangan</td><td>: '.$keterangan.'</td></tr>';
+$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
+$html .= '<tr><td>Terbilang</td><td>: '.$terbilang.'</td></tr>';
 $html .= '</table>';
 
 //echo $html;
