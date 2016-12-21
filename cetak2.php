@@ -1,11 +1,7 @@
 <?php 
 
 //echo "hello world";
-
-$hostname_conn = "localhost";
-$database_conn = "db_armanda"; //$database_conn = "zecorind_mitra2";
-$username_conn = "root"; //$username_conn = "zecorind_root";
-$password_conn = "admin";
+include("conn.php");
 
 mysql_connect($hostname_conn, $username_conn, $password_conn) or die ("Tidak bisa terkoneksi ke Database server");
 mysql_select_db($database_conn) or die ("Database tidak ditemukan");
