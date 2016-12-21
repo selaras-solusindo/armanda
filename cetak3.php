@@ -126,7 +126,7 @@ while($row = mysql_fetch_array($mquery)) {
 					<td align="right">'.number_format($row["harga"]).'</td>
 					<td align="center">x</td>
 					<td align="right">'.$row["qty"].'</td>
-					<td> '.$row["unit"].' </td>
+					<td> '.$row["satuan"].' </td>
 					<td> '.$row["keterangan1"].' </td>
 					<td align="right">'.number_format($row["jumlah"]).'</td>
 					<td>&nbsp;</td>
