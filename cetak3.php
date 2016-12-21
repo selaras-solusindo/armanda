@@ -98,7 +98,7 @@ $html .= 'No. '.$row["no_invoice"].'<br>';
 $html .= 'Tgl. '.$row["tgl_invoice"].'<br>';
 $html .= '&nbsp;'.'<br>';
 $html .= '<table border="0">';
-$html .= '<tr><td width="175">No. Order</td><td width="450">: '.$row["no_order"].'</td></tr>';
+$html .= '<tr><td width="175">No. Order</td><td width="550">: '.$row["no_order"].'</td></tr>';
 $html .= '<tr><td>No. Referensi</td><td>: '.$row["no_referensi"].'</td></tr>';
 $html .= '<tr><td>Kegiatan</td><td>: '.$row["kegiatan"].'</td></tr>';
 $html .= '<tr><td>Tgl. Pelaksanaan</td><td>: '.$row["tgl_pelaksanaan"].'</td></tr>';
