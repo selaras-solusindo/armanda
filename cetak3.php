@@ -97,13 +97,16 @@ $html .= '<b>INVOICE</b><br>';
 $html .= 'No. '.$row["no_invoice"].'<br>';
 $html .= 'Tgl. '.$row["tgl_invoice"].'<br>';
 $html .= '&nbsp;'.'<br>';
-$html .= 'No. Order '.$row["no_order"].'<br>';
-$html .= 'No. Referensi '.$row["no_referensi"].'<br>';
-$html .= 'Kegiatan '.$row["kegiatan"].'<br>';
-$html .= 'Tgl. Pelaksanaan '.$row["tgl_pelaksanaan"].'<br>';
-$html .= 'No. Sertifikat/Laporan '.$row["no_sertfikat"].'<br>';
-$html .= '&nbsp;'.'<br>';
-$html .= 'Fee :<br>';
+$html .= '<table border="0" width="75%">';
+$html .= '<tr><td>No. Order</td><td>'.$row["no_order"].'</td></tr>';
+$html .= '<tr><td>No. Referensi</td><td>'.$row["no_referensi"].'</td></tr>';
+$html .= '<tr><td>Kegiatan</td><td>'.$row["kegiatan"].'</td></tr>';
+$html .= '<tr><td>Tgl. Pelaksanaan</td><td>'.$row["tgl_pelaksanaan"].'</td></tr>';
+$html .= '<tr><td>No. Sertifikat/Laporan</td><td>'.$row["no_sertfikat"].'</td></tr>';
+$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
+$html .= '</table>';
+$html .= '<table border="0">';
+$html .= '<tr><td colspan="7">Fee :</td></tr>';
 
 $total = $row["total"];
 $ppn = $row["ppn"];
@@ -113,14 +116,28 @@ $terbilang = $row["terbilang"];
 
 $mquery = mysql_query($msql);
 while($row = mysql_fetch_array($mquery)) {
-	$html .= $row["harga"].'  x  '.$row["qty"].'  '.$row["unit"].'  '.$row["keterangan1"].'  =  '.$row["jumlah"].'<br>';
+	$html .= '
+	<tr>
+		<td align="right">'.number_format($row["harga"]).'</td>
+		<td align="center" width="25">  x  </td>
+		<td align="right" width="40">'.$row["qty"].'</td>
+		<td>'.$row["unit"].'</td>
+		<td>'.$row["keterangan1"].'</td>
+		<td>  =  </td>
+		<td align="right">'.number_format($row["jumlah"]).'</td>
+	</tr>';
 }
 
-$html .= 'Total '.$total.'<br>';
-$html .= 'PPN '.$ppn.'<br>';
-$html .= 'Total setelah PPN '.$total_ppn.'<br>';
-$html .= 'Keterangan '.$keterangan.'<br>';
-$html .= 'Terbilang '.$terbilang.'<br>';
+$html .= '<tr><td colspan="8">&nbsp;</td></tr>';
+$html .= '<tr><td colspan="6">Total</td><td align="right">'.number_format($total).'</td></tr>';
+$html .= '<tr><td>PPN</td><td colspan="2">'.$ppn.($ppn != 0 ? " %" : "").'</td><td colspan="3">&nbsp;</td><td align="right">'.($ppn != 0 ? number_format($total * $ppn/100) : 0).'</td></tr>';
+$html .= '<tr><td colspan="6">Total setelah PPN</td><td align="right">'.number_format($total_ppn).'</td></tr>';
+$html .= '</table>';
+$html .= '<table border="0" width="75%">';
+$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
+$html .= '<tr><td>Keterangan</td><td>'.$keterangan.'</td></tr>';
+$html .= '<tr><td>Terbilang</td><td>'.$terbilang.'</td></tr>';
+$html .= '</table>';
 
 //echo $html;
 $pdf->writeHTML($html, true, false, true, false, '');
