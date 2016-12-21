@@ -120,8 +120,7 @@ while($row = mysql_fetch_array($mquery)) {
 	$html .= '
 	<tr>
 		<td>&nbsp;</td>
-		<td>
-			<table border="0">
+		<td>: <table border="0">
 				<tr>
 					<td align="right">'.number_format($row["harga"]).'</td>
 					<td align="center">x</td>
