@@ -26,7 +26,7 @@ mysql_select_db($database_conn) or die ("Database tidak ditemukan");
 				}
 				?>
 			</select>
-			<input type="submit" name="msubmit" value="Submit">
+			<input type="submit" name="msubmit" value="Submit">&nbsp;<input type="button" name="mback" value="Back" onclick="window.location.href='.'">
 		</form>
 	</body>
 </html>
