@@ -581,10 +581,7 @@
     <!-- v2017 -->
   </global>
   <project>
-    <phrase id="footertext" value="&amp;copy;2016 e.World Technology Ltd. All rights reserved." />
-    <menu id="10011">
-      <phrase id="menutext" value="cetak2" />
-    </menu>
+    <phrase id="footertext" value="CV. Armanda Nusantara" />
     <menu id="10009">
       <phrase id="menutext" value="view 1" />
     </menu>
@@ -598,13 +595,16 @@
       <phrase id="menutext" value="products" />
     </menu>
     <menu id="4">
-      <phrase id="menutext" value="tb customer" />
+      <phrase id="menutext" value="Customer" />
     </menu>
     <menu id="5">
-      <phrase id="menutext" value="tb fee" />
+      <phrase id="menutext" value="Fee" />
     </menu>
     <menu id="6">
-      <phrase id="menutext" value="tb invoice" />
+      <phrase id="menutext" value="Invoice" />
+    </menu>
+    <menu id="10011">
+      <phrase id="menutext" value="Cetak Invoice" />
     </menu>
     <table id="option_values">
       <phrase id="tblcaption" value="option values" />
@@ -709,93 +709,93 @@
       </field>
     </table>
     <table id="tb_customer">
-      <phrase id="tblcaption" value="tb customer" />
+      <phrase id="tblcaption" value="Customer" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="ID" />
       </field>
       <field id="nama">
-        <phrase id="fldcaption" value="nama" />
+        <phrase id="fldcaption" value="Nama" />
       </field>
       <field id="alamat">
-        <phrase id="fldcaption" value="alamat" />
+        <phrase id="fldcaption" value="Alamat" />
       </field>
       <field id="kota">
-        <phrase id="fldcaption" value="kota" />
+        <phrase id="fldcaption" value="Kota" />
       </field>
       <field id="kodepos">
-        <phrase id="fldcaption" value="kodepos" />
+        <phrase id="fldcaption" value="Kode Pos" />
       </field>
       <field id="no_npwp">
-        <phrase id="fldcaption" value="no npwp" />
+        <phrase id="fldcaption" value="No. NPWP" />
       </field>
     </table>
     <table id="tb_fee">
-      <phrase id="tblcaption" value="tb fee" />
+      <phrase id="tblcaption" value="Fee" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="ID" />
       </field>
       <field id="invoice_id">
-        <phrase id="fldcaption" value="invoice id" />
+        <phrase id="fldcaption" value="No. Invoice" />
       </field>
       <field id="harga">
-        <phrase id="fldcaption" value="harga" />
+        <phrase id="fldcaption" value="Harga" />
       </field>
       <field id="qty">
-        <phrase id="fldcaption" value="qty" />
+        <phrase id="fldcaption" value="Qty." />
       </field>
       <field id="satuan">
-        <phrase id="fldcaption" value="satuan" />
+        <phrase id="fldcaption" value="Satuan" />
       </field>
       <field id="jumlah">
-        <phrase id="fldcaption" value="jumlah" />
+        <phrase id="fldcaption" value="Jumlah" />
       </field>
       <field id="keterangan">
-        <phrase id="fldcaption" value="keterangan" />
+        <phrase id="fldcaption" value="Keterangan" />
       </field>
     </table>
     <table id="tb_invoice">
-      <phrase id="tblcaption" value="tb invoice" />
+      <phrase id="tblcaption" value="Invoice" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="ID" />
       </field>
       <field id="customer_id">
-        <phrase id="fldcaption" value="customer id" />
+        <phrase id="fldcaption" value="Customer" />
       </field>
       <field id="no_invoice">
-        <phrase id="fldcaption" value="no invoice" />
+        <phrase id="fldcaption" value="No. Invoice" />
       </field>
       <field id="tgl_invoice">
-        <phrase id="fldcaption" value="tgl invoice" />
+        <phrase id="fldcaption" value="Tgl. Invoice" />
       </field>
       <field id="no_order">
-        <phrase id="fldcaption" value="no order" />
+        <phrase id="fldcaption" value="No. Order" />
       </field>
       <field id="no_referensi">
-        <phrase id="fldcaption" value="no referensi" />
+        <phrase id="fldcaption" value="No. Referensi" />
       </field>
       <field id="kegiatan">
-        <phrase id="fldcaption" value="kegiatan" />
+        <phrase id="fldcaption" value="Kegiatan" />
       </field>
       <field id="tgl_pelaksanaan">
-        <phrase id="fldcaption" value="tgl pelaksanaan" />
+        <phrase id="fldcaption" value="Tgl. Pelaksanaan" />
       </field>
       <field id="no_sertifikat">
-        <phrase id="fldcaption" value="no sertifikat" />
+        <phrase id="fldcaption" value="No. Sertifikat" />
       </field>
       <field id="keterangan">
-        <phrase id="fldcaption" value="keterangan" />
+        <phrase id="fldcaption" value="Keterangan" />
       </field>
       <field id="total">
-        <phrase id="fldcaption" value="total" />
+        <phrase id="fldcaption" value="Total" />
       </field>
       <field id="ppn">
-        <phrase id="fldcaption" value="ppn" />
+        <phrase id="fldcaption" value="PPN" />
       </field>
       <field id="total_ppn">
-        <phrase id="fldcaption" value="total ppn" />
+        <phrase id="fldcaption" value="Total PPN" />
       </field>
       <field id="terbilang">
-        <phrase id="fldcaption" value="terbilang" />
+        <phrase id="fldcaption" value="Terbilang" />
       </field>
     </table>
     <table id="view1">
@@ -874,7 +874,7 @@
       </field>
     </table>
     <table id="cetak2_php">
-      <phrase id="tblcaption" value="cetak2" />
+      <phrase id="tblcaption" value="Cetak Invoice" />
     </table>
   </project>
 </ew-language>
