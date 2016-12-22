@@ -1,11 +1,8 @@
 <?php 
-
 //echo "hello world";
 include("conn.php");
-
 mysql_connect($hostname_conn, $username_conn, $password_conn) or die ("Tidak bisa terkoneksi ke Database server");
 mysql_select_db($database_conn) or die ("Database tidak ditemukan");
-
 ?>
 
 <html>
@@ -30,5 +27,3 @@ mysql_select_db($database_conn) or die ("Database tidak ditemukan");
 		</form>
 	</body>
 </html>
-
-
