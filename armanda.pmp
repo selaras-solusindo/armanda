@@ -394,6 +394,7 @@ mysql_select_db($database_conn) or die ("Database tidak ditemukan");
 		</form>
 	</body>
 </html>
+
 ]]></CustomScript>
   <CustomScript ScriptType="Template" ScriptCodeType="Table" ScriptName="Content" ScriptCtrlID="custom" ScriptL1Key="kuitansi.php" ScriptL2Key=""><![CDATA[<?php 
 //echo "hello world";
