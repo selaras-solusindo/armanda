@@ -45,7 +45,7 @@ $pdf->setPrintFooter(false);
 $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
 // set margins
-$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+$pdf->SetMargins(PDF_MARGIN_LEFT, 10, PDF_MARGIN_RIGHT);
 
 // set auto page breaks
 $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
@@ -65,8 +65,8 @@ if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
 //$pdf->SetFont('times', 'BI', 20);
 
 // add a page
-//$pdf->AddPage("L", "A5");
-$pdf->AddPage();
+$pdf->AddPage("L", "A5");
+//$pdf->AddPage();
 
 //echo "no_invoice " . $_POST["no_invoice"];
 
@@ -129,12 +129,11 @@ $html .= '<table border="0">';
 $html .= '<tr><td width="155" align="right">Rp.</td><td> '.number_format($row["total_ppn1"]).'</td></tr>';
 $html .= '</table>';
 $html .= '<table border="0">';
-$html .= '<tr><td width="435" colspan="2">&nbsp;</td></tr>';
-$html .= '<tr><td width="435" colspan="2">&nbsp;</td></tr>';
-$html .= '<tr><td width="435" colspan="2">&nbsp;</td></tr>';
-$html .= '<tr><td width="435" colspan="2">&nbsp;</td></tr>';
-$html .= '<tr><td width="435" colspan="2">&nbsp;</td></tr>';
-$html .= '<tr><td width="435">&nbsp;</td><td>SEINDRI SUSANTI</td></tr>';
+$html .= '<tr><td width="385">&nbsp;</td><td align="center">CV. ARMANDA NUSANTARA</td></tr>';
+$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
+$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
+$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
+$html .= '<tr><td>&nbsp;</td><td align="center">SEINDRI SUSANTI</td></tr>';
 $html .= '</table>';
 
 //echo $html;
