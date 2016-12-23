@@ -619,6 +619,7 @@ class ctb_barang extends cTable {
 					if ($this->nama->Exportable) $Doc->ExportCaption($this->nama);
 				} else {
 					if ($this->barang_id->Exportable) $Doc->ExportCaption($this->barang_id);
+					if ($this->nama->Exportable) $Doc->ExportCaption($this->nama);
 				}
 				$Doc->EndExportRow();
 			}
@@ -654,6 +655,7 @@ class ctb_barang extends cTable {
 						if ($this->nama->Exportable) $Doc->ExportField($this->nama);
 					} else {
 						if ($this->barang_id->Exportable) $Doc->ExportField($this->barang_id);
+						if ($this->nama->Exportable) $Doc->ExportField($this->nama);
 					}
 					$Doc->EndExportRow();
 				}

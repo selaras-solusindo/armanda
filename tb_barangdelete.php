@@ -253,6 +253,7 @@ class ctb_barang_delete extends ctb_barang {
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 		$this->barang_id->SetVisibility();
 		$this->barang_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
+		$this->nama->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -458,10 +459,19 @@ class ctb_barang_delete extends ctb_barang {
 		$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
 		$this->barang_id->ViewCustomAttributes = "";
 
+		// nama
+		$this->nama->ViewValue = $this->nama->CurrentValue;
+		$this->nama->ViewCustomAttributes = "";
+
 			// barang_id
 			$this->barang_id->LinkCustomAttributes = "";
 			$this->barang_id->HrefValue = "";
 			$this->barang_id->TooltipValue = "";
+
+			// nama
+			$this->nama->LinkCustomAttributes = "";
+			$this->nama->HrefValue = "";
+			$this->nama->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -711,6 +721,9 @@ $tb_barang_delete->ShowMessage();
 <?php if ($tb_barang->barang_id->Visible) { // barang_id ?>
 		<th><span id="elh_tb_barang_barang_id" class="tb_barang_barang_id"><?php echo $tb_barang->barang_id->FldCaption() ?></span></th>
 <?php } ?>
+<?php if ($tb_barang->nama->Visible) { // nama ?>
+		<th><span id="elh_tb_barang_nama" class="tb_barang_nama"><?php echo $tb_barang->nama->FldCaption() ?></span></th>
+<?php } ?>
 	</tr>
 	</thead>
 	<tbody>
@@ -737,6 +750,14 @@ while (!$tb_barang_delete->Recordset->EOF) {
 <span id="el<?php echo $tb_barang_delete->RowCnt ?>_tb_barang_barang_id" class="tb_barang_barang_id">
 <span<?php echo $tb_barang->barang_id->ViewAttributes() ?>>
 <?php echo $tb_barang->barang_id->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($tb_barang->nama->Visible) { // nama ?>
+		<td<?php echo $tb_barang->nama->CellAttributes() ?>>
+<span id="el<?php echo $tb_barang_delete->RowCnt ?>_tb_barang_nama" class="tb_barang_nama">
+<span<?php echo $tb_barang->nama->ViewAttributes() ?>>
+<?php echo $tb_barang->nama->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
