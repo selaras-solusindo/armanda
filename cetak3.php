@@ -82,6 +82,22 @@ include("conn.php");
 mysql_connect($hostname_conn, $username_conn, $password_conn) or die ("Tidak bisa terkoneksi ke Database server");
 mysql_select_db($database_conn) or die ("Database tidak ditemukan");
 
+// array nama bulan
+$anamabln_ = array(
+  1 => "Januari",
+  "Februari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "Juli",
+  "Agustus",
+  "September",
+  "Oktober",
+  "November",
+  "Desember"
+  );
+
 $msql = "select * from view1 where id = '".$_POST["no_invoice"]."'"; //echo $msql;
 $mquery = mysql_query($msql);
 $row = mysql_fetch_array($mquery);
@@ -95,13 +111,15 @@ $html .= '&nbsp;'.'<br>';
 $html .= '&nbsp;'.'<br>';
 $html .= '<h2><b>INVOICE</b></h2><br>';
 $html .= 'No. '.$row["no_invoice"].'<br>';
-$html .= 'Tgl. '.date("d-m-Y", strtotime($row["tgl_invoice"])).'<br>';
+$tgl_invoice = strtotime($row["tgl_invoice"]);
+$html .= 'Tgl. '.date("d", $tgl_invoice).' '.$anamabln_[date("m", $tgl_invoice)].' '.date("Y", $tgl_invoice).'<br>';
 $html .= '&nbsp;'.'<br>';
 $html .= '<table border="0">';
 $html .= '<tr><td width="155">No. Order</td><td width="485">: '.$row["no_order"].'</td></tr>';
 $html .= '<tr><td>No. Referensi</td><td>: '.$row["no_referensi"].'</td></tr>';
 $html .= '<tr><td>Kegiatan</td><td>: '.$row["kegiatan"].'</td></tr>';
-$html .= '<tr><td>Tgl. Pelaksanaan</td><td>: '.date("d-m-Y", strtotime($row["tgl_pelaksanaan"])).'</td></tr>';
+$tgl_pelaksanaan = strtotime($row["tgl_invoice"]);
+$html .= '<tr><td>Tgl. Pelaksanaan</td><td>: '.date("d", $tgl_pelaksanaan).' '.$anamabln_[date("m", $tgl_pelaksanaan)].' '.date("Y", $tgl_pelaksanaan).'</td></tr>';
 $html .= '<tr><td>No. Sertifikat/Laporan</td><td>: '.$row["no_sertfikat"].'</td></tr>';
 $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 $html .= '<tr><td>Fee</td><td>:&nbsp;</td></tr>';
