@@ -117,7 +117,7 @@ $html .= '<tr><td width="155">&nbsp;</td><td>No. Invoice : '.$row["no_invoice"].
 $html .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 $html .= '<tr><td width="155">&nbsp;</td><td>No. Sertifikat : '.$row["no_sertifikat"].'</td></tr>';
 $html .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
-$html .= '<tr><td width="155">&nbsp;</td><td>NO. ACC. CV. ARMADA NUSANTARA</td></tr>';
+$html .= '<tr><td width="155">&nbsp;</td><td>NO. ACC. CV. ARMANDA NUSANTARA</td></tr>';
 $html .= '<tr><td width="155">&nbsp;</td><td>512 - 015691 - 0  BANK BCA CABANG PRAPEN</td></tr>';
 $html .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 $html .= '</table>';
