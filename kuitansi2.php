@@ -127,6 +127,15 @@ $html .= '<tr><td width="435">&nbsp;</td><td>Surabaya, '.date("d", $tgl_invoice)
 $html .= '</table>';
 $html .= '<table border="0">';
 $html .= '<tr><td width="155" align="right">Rp.</td><td> '.number_format($row["total_ppn1"]).'</td></tr>';
+$html .= '</table>';
+$html .= '<table border="0">';
+$html .= '<tr><td width="435" colspan="2">&nbsp;</td></tr>';
+$html .= '<tr><td width="435" colspan="2">&nbsp;</td></tr>';
+$html .= '<tr><td width="435" colspan="2">&nbsp;</td></tr>';
+$html .= '<tr><td width="435" colspan="2">&nbsp;</td></tr>';
+$html .= '<tr><td width="435" colspan="2">&nbsp;</td></tr>';
+$html .= '<tr><td width="435">&nbsp;</td><td>SEINDRI SUSANTI</td></tr>';
+$html .= '</table>';
 
 //echo $html;
 $pdf->writeHTML($html, true, false, true, false, '');
