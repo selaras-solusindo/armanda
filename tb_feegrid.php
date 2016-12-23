@@ -432,9 +432,9 @@ $tb_fee->barang_id->EditAttrs["onchange"] = "";
 <input type="hidden" data-table="tb_fee" data-field="x_barang_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $tb_fee->barang_id->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
 <input type="hidden" name="q_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="q_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(true) ?>">
 <script type="text/javascript">
-ftb_feegrid.CreateAutoSuggest({"id":"x<?php echo $tb_fee_grid->RowIndex ?>_barang_id","forceSelect":false});
+ftb_feegrid.CreateAutoSuggest({"id":"x<?php echo $tb_fee_grid->RowIndex ?>_barang_id","forceSelect":true});
 </script>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_fee->barang_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $tb_fee_grid->RowIndex ?>_barang_id',m:0,n:10,srch:true});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_fee->barang_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $tb_fee_grid->RowIndex ?>_barang_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="s_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(false) ?>">
 </span>
 <input type="hidden" data-table="tb_fee" data-field="x_barang_id" name="o<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="o<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->OldValue) ?>">
@@ -452,9 +452,9 @@ $tb_fee->barang_id->EditAttrs["onchange"] = "";
 <input type="hidden" data-table="tb_fee" data-field="x_barang_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $tb_fee->barang_id->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
 <input type="hidden" name="q_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="q_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(true) ?>">
 <script type="text/javascript">
-ftb_feegrid.CreateAutoSuggest({"id":"x<?php echo $tb_fee_grid->RowIndex ?>_barang_id","forceSelect":false});
+ftb_feegrid.CreateAutoSuggest({"id":"x<?php echo $tb_fee_grid->RowIndex ?>_barang_id","forceSelect":true});
 </script>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_fee->barang_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $tb_fee_grid->RowIndex ?>_barang_id',m:0,n:10,srch:true});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_fee->barang_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $tb_fee_grid->RowIndex ?>_barang_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="s_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(false) ?>">
 </span>
 <?php } ?>
@@ -707,9 +707,9 @@ $tb_fee->barang_id->EditAttrs["onchange"] = "";
 <input type="hidden" data-table="tb_fee" data-field="x_barang_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $tb_fee->barang_id->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
 <input type="hidden" name="q_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="q_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(true) ?>">
 <script type="text/javascript">
-ftb_feegrid.CreateAutoSuggest({"id":"x<?php echo $tb_fee_grid->RowIndex ?>_barang_id","forceSelect":false});
+ftb_feegrid.CreateAutoSuggest({"id":"x<?php echo $tb_fee_grid->RowIndex ?>_barang_id","forceSelect":true});
 </script>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_fee->barang_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $tb_fee_grid->RowIndex ?>_barang_id',m:0,n:10,srch:true});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_fee->barang_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $tb_fee_grid->RowIndex ?>_barang_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="s_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(false) ?>">
 </span>
 <?php } else { ?>

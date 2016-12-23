@@ -1453,6 +1453,26 @@ class ctb_fee_grid extends ctb_fee {
 			$this->barang_id->EditAttrs["class"] = "form-control";
 			$this->barang_id->EditCustomAttributes = "";
 			$this->barang_id->EditValue = ew_HtmlEncode($this->barang_id->CurrentValue);
+			if (strval($this->barang_id->CurrentValue) <> "") {
+				$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
+			$sWhereWrk = "";
+			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = Conn()->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$arwrk = array();
+					$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
+					$this->barang_id->EditValue = $this->barang_id->DisplayValue($arwrk);
+					$rswrk->Close();
+				} else {
+					$this->barang_id->EditValue = ew_HtmlEncode($this->barang_id->CurrentValue);
+				}
+			} else {
+				$this->barang_id->EditValue = NULL;
+			}
 			$this->barang_id->PlaceHolder = ew_RemoveHtml($this->barang_id->FldCaption());
 
 			// harga
@@ -1551,6 +1571,26 @@ class ctb_fee_grid extends ctb_fee {
 			$this->barang_id->EditAttrs["class"] = "form-control";
 			$this->barang_id->EditCustomAttributes = "";
 			$this->barang_id->EditValue = ew_HtmlEncode($this->barang_id->CurrentValue);
+			if (strval($this->barang_id->CurrentValue) <> "") {
+				$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
+			$sWhereWrk = "";
+			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = Conn()->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$arwrk = array();
+					$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
+					$this->barang_id->EditValue = $this->barang_id->DisplayValue($arwrk);
+					$rswrk->Close();
+				} else {
+					$this->barang_id->EditValue = ew_HtmlEncode($this->barang_id->CurrentValue);
+				}
+			} else {
+				$this->barang_id->EditValue = NULL;
+			}
 			$this->barang_id->PlaceHolder = ew_RemoveHtml($this->barang_id->FldCaption());
 
 			// harga

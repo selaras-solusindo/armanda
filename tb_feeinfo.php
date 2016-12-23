@@ -59,7 +59,7 @@ class ctb_fee extends cTable {
 		$this->fields['invoice_id'] = &$this->invoice_id;
 
 		// barang_id
-		$this->barang_id = new cField('tb_fee', 'tb_fee', 'x_barang_id', 'barang_id', '`barang_id`', '`barang_id`', 3, -1, FALSE, '`EV__barang_id`', TRUE, FALSE, TRUE, 'FORMATTED TEXT', 'TEXT');
+		$this->barang_id = new cField('tb_fee', 'tb_fee', 'x_barang_id', 'barang_id', '`barang_id`', '`barang_id`', 3, -1, FALSE, '`EV__barang_id`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'TEXT');
 		$this->barang_id->Sortable = TRUE; // Allow sort
 		$this->barang_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['barang_id'] = &$this->barang_id;
