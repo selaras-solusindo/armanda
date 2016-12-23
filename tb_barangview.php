@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "tb_customerinfo.php" ?>
+<?php include_once "tb_baranginfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -13,9 +13,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$tb_customer_view = NULL; // Initialize page object first
+$tb_barang_view = NULL; // Initialize page object first
 
-class ctb_customer_view extends ctb_customer {
+class ctb_barang_view extends ctb_barang {
 
 	// Page ID
 	var $PageID = 'view';
@@ -24,10 +24,10 @@ class ctb_customer_view extends ctb_customer {
 	var $ProjectID = "{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}";
 
 	// Table name
-	var $TableName = 'tb_customer';
+	var $TableName = 'tb_barang';
 
 	// Page object name
-	var $PageObjName = 'tb_customer_view';
+	var $PageObjName = 'tb_barang_view';
 
 	// Page name
 	function PageName() {
@@ -256,15 +256,15 @@ class ctb_customer_view extends ctb_customer {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (tb_customer)
-		if (!isset($GLOBALS["tb_customer"]) || get_class($GLOBALS["tb_customer"]) == "ctb_customer") {
-			$GLOBALS["tb_customer"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["tb_customer"];
+		// Table object (tb_barang)
+		if (!isset($GLOBALS["tb_barang"]) || get_class($GLOBALS["tb_barang"]) == "ctb_barang") {
+			$GLOBALS["tb_barang"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["tb_barang"];
 		}
 		$KeyUrl = "";
-		if (@$_GET["id"] <> "") {
-			$this->RecKey["id"] = $_GET["id"];
-			$KeyUrl .= "&amp;id=" . urlencode($this->RecKey["id"]);
+		if (@$_GET["barang_id"] <> "") {
+			$this->RecKey["barang_id"] = $_GET["barang_id"];
+			$KeyUrl .= "&amp;barang_id=" . urlencode($this->RecKey["barang_id"]);
 		}
 		$this->ExportPrintUrl = $this->PageUrl() . "export=print" . $KeyUrl;
 		$this->ExportHtmlUrl = $this->PageUrl() . "export=html" . $KeyUrl;
@@ -280,7 +280,7 @@ class ctb_customer_view extends ctb_customer {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'tb_customer', TRUE);
+			define("EW_TABLE_NAME", 'tb_barang', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -308,13 +308,9 @@ class ctb_customer_view extends ctb_customer {
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->id->SetVisibility();
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
+		$this->barang_id->SetVisibility();
+		$this->barang_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->nama->SetVisibility();
-		$this->alamat->SetVisibility();
-		$this->kota->SetVisibility();
-		$this->kodepos->SetVisibility();
-		$this->no_npwp->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -346,13 +342,13 @@ class ctb_customer_view extends ctb_customer {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $tb_customer;
+		global $EW_EXPORT, $tb_barang;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($tb_customer);
+				$doc = new $class($tb_barang);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -411,14 +407,14 @@ class ctb_customer_view extends ctb_customer {
 		$sReturnUrl = "";
 		$bMatchRecord = FALSE;
 		if ($this->IsPageRequest()) { // Validate request
-			if (@$_GET["id"] <> "") {
-				$this->id->setQueryStringValue($_GET["id"]);
-				$this->RecKey["id"] = $this->id->QueryStringValue;
-			} elseif (@$_POST["id"] <> "") {
-				$this->id->setFormValue($_POST["id"]);
-				$this->RecKey["id"] = $this->id->FormValue;
+			if (@$_GET["barang_id"] <> "") {
+				$this->barang_id->setQueryStringValue($_GET["barang_id"]);
+				$this->RecKey["barang_id"] = $this->barang_id->QueryStringValue;
+			} elseif (@$_POST["barang_id"] <> "") {
+				$this->barang_id->setFormValue($_POST["barang_id"]);
+				$this->RecKey["barang_id"] = $this->barang_id->FormValue;
 			} else {
-				$sReturnUrl = "tb_customerlist.php"; // Return to list
+				$sReturnUrl = "tb_baranglist.php"; // Return to list
 			}
 
 			// Get action
@@ -428,11 +424,11 @@ class ctb_customer_view extends ctb_customer {
 					if (!$this->LoadRow()) { // Load record based on key
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$sReturnUrl = "tb_customerlist.php"; // No matching record, return to list
+						$sReturnUrl = "tb_baranglist.php"; // No matching record, return to list
 					}
 			}
 		} else {
-			$sReturnUrl = "tb_customerlist.php"; // Not page request, return to list
+			$sReturnUrl = "tb_baranglist.php"; // Not page request, return to list
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
@@ -564,24 +560,16 @@ class ctb_customer_view extends ctb_customer {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->id->setDbValue($rs->fields('id'));
+		$this->barang_id->setDbValue($rs->fields('barang_id'));
 		$this->nama->setDbValue($rs->fields('nama'));
-		$this->alamat->setDbValue($rs->fields('alamat'));
-		$this->kota->setDbValue($rs->fields('kota'));
-		$this->kodepos->setDbValue($rs->fields('kodepos'));
-		$this->no_npwp->setDbValue($rs->fields('no_npwp'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->id->DbValue = $row['id'];
+		$this->barang_id->DbValue = $row['barang_id'];
 		$this->nama->DbValue = $row['nama'];
-		$this->alamat->DbValue = $row['alamat'];
-		$this->kota->DbValue = $row['kota'];
-		$this->kodepos->DbValue = $row['kodepos'];
-		$this->no_npwp->DbValue = $row['no_npwp'];
 	}
 
 	// Render row values based on field settings
@@ -600,68 +588,28 @@ class ctb_customer_view extends ctb_customer {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// id
+		// barang_id
 		// nama
-		// alamat
-		// kota
-		// kodepos
-		// no_npwp
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// id
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
+		// barang_id
+		$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
+		$this->barang_id->ViewCustomAttributes = "";
 
 		// nama
 		$this->nama->ViewValue = $this->nama->CurrentValue;
 		$this->nama->ViewCustomAttributes = "";
 
-		// alamat
-		$this->alamat->ViewValue = $this->alamat->CurrentValue;
-		$this->alamat->ViewCustomAttributes = "";
-
-		// kota
-		$this->kota->ViewValue = $this->kota->CurrentValue;
-		$this->kota->ViewCustomAttributes = "";
-
-		// kodepos
-		$this->kodepos->ViewValue = $this->kodepos->CurrentValue;
-		$this->kodepos->ViewCustomAttributes = "";
-
-		// no_npwp
-		$this->no_npwp->ViewValue = $this->no_npwp->CurrentValue;
-		$this->no_npwp->ViewCustomAttributes = "";
-
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
+			// barang_id
+			$this->barang_id->LinkCustomAttributes = "";
+			$this->barang_id->HrefValue = "";
+			$this->barang_id->TooltipValue = "";
 
 			// nama
 			$this->nama->LinkCustomAttributes = "";
 			$this->nama->HrefValue = "";
 			$this->nama->TooltipValue = "";
-
-			// alamat
-			$this->alamat->LinkCustomAttributes = "";
-			$this->alamat->HrefValue = "";
-			$this->alamat->TooltipValue = "";
-
-			// kota
-			$this->kota->LinkCustomAttributes = "";
-			$this->kota->HrefValue = "";
-			$this->kota->TooltipValue = "";
-
-			// kodepos
-			$this->kodepos->LinkCustomAttributes = "";
-			$this->kodepos->HrefValue = "";
-			$this->kodepos->TooltipValue = "";
-
-			// no_npwp
-			$this->no_npwp->LinkCustomAttributes = "";
-			$this->no_npwp->HrefValue = "";
-			$this->no_npwp->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -674,7 +622,7 @@ class ctb_customer_view extends ctb_customer {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("tb_customerlist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("tb_baranglist.php"), "", $this->TableVar, TRUE);
 		$PageId = "view";
 		$Breadcrumb->Add("view", $PageId, $url);
 	}
@@ -786,29 +734,29 @@ class ctb_customer_view extends ctb_customer {
 <?php
 
 // Create page object
-if (!isset($tb_customer_view)) $tb_customer_view = new ctb_customer_view();
+if (!isset($tb_barang_view)) $tb_barang_view = new ctb_barang_view();
 
 // Page init
-$tb_customer_view->Page_Init();
+$tb_barang_view->Page_Init();
 
 // Page main
-$tb_customer_view->Page_Main();
+$tb_barang_view->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$tb_customer_view->Page_Render();
+$tb_barang_view->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "view";
-var CurrentForm = ftb_customerview = new ew_Form("ftb_customerview", "view");
+var CurrentForm = ftb_barangview = new ew_Form("ftb_barangview", "view");
 
 // Form_CustomValidate event
-ftb_customerview.Form_CustomValidate = 
+ftb_barangview.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -817,9 +765,9 @@ ftb_customerview.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ftb_customerview.ValidateRequired = true;
+ftb_barangview.ValidateRequired = true;
 <?php } else { ?>
-ftb_customerview.ValidateRequired = false; 
+ftb_barangview.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
@@ -831,94 +779,50 @@ ftb_customerview.ValidateRequired = false;
 // Write your client script here, no need to add script tags.
 </script>
 <div class="ewToolbar">
-<?php if (!$tb_customer_view->IsModal) { ?>
+<?php if (!$tb_barang_view->IsModal) { ?>
 <?php $Breadcrumb->Render(); ?>
 <?php } ?>
-<?php $tb_customer_view->ExportOptions->Render("body") ?>
+<?php $tb_barang_view->ExportOptions->Render("body") ?>
 <?php
-	foreach ($tb_customer_view->OtherOptions as &$option)
+	foreach ($tb_barang_view->OtherOptions as &$option)
 		$option->Render("body");
 ?>
-<?php if (!$tb_customer_view->IsModal) { ?>
+<?php if (!$tb_barang_view->IsModal) { ?>
 <?php echo $Language->SelectionForm(); ?>
 <?php } ?>
 <div class="clearfix"></div>
 </div>
-<?php $tb_customer_view->ShowPageHeader(); ?>
+<?php $tb_barang_view->ShowPageHeader(); ?>
 <?php
-$tb_customer_view->ShowMessage();
+$tb_barang_view->ShowMessage();
 ?>
-<form name="ftb_customerview" id="ftb_customerview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($tb_customer_view->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_customer_view->Token ?>">
+<form name="ftb_barangview" id="ftb_barangview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($tb_barang_view->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_barang_view->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="tb_customer">
-<?php if ($tb_customer_view->IsModal) { ?>
+<input type="hidden" name="t" value="tb_barang">
+<?php if ($tb_barang_view->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <table class="table table-bordered table-striped ewViewTable">
-<?php if ($tb_customer->id->Visible) { // id ?>
-	<tr id="r_id">
-		<td><span id="elh_tb_customer_id"><?php echo $tb_customer->id->FldCaption() ?></span></td>
-		<td data-name="id"<?php echo $tb_customer->id->CellAttributes() ?>>
-<span id="el_tb_customer_id">
-<span<?php echo $tb_customer->id->ViewAttributes() ?>>
-<?php echo $tb_customer->id->ViewValue ?></span>
+<?php if ($tb_barang->barang_id->Visible) { // barang_id ?>
+	<tr id="r_barang_id">
+		<td><span id="elh_tb_barang_barang_id"><?php echo $tb_barang->barang_id->FldCaption() ?></span></td>
+		<td data-name="barang_id"<?php echo $tb_barang->barang_id->CellAttributes() ?>>
+<span id="el_tb_barang_barang_id">
+<span<?php echo $tb_barang->barang_id->ViewAttributes() ?>>
+<?php echo $tb_barang->barang_id->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($tb_customer->nama->Visible) { // nama ?>
+<?php if ($tb_barang->nama->Visible) { // nama ?>
 	<tr id="r_nama">
-		<td><span id="elh_tb_customer_nama"><?php echo $tb_customer->nama->FldCaption() ?></span></td>
-		<td data-name="nama"<?php echo $tb_customer->nama->CellAttributes() ?>>
-<span id="el_tb_customer_nama">
-<span<?php echo $tb_customer->nama->ViewAttributes() ?>>
-<?php echo $tb_customer->nama->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($tb_customer->alamat->Visible) { // alamat ?>
-	<tr id="r_alamat">
-		<td><span id="elh_tb_customer_alamat"><?php echo $tb_customer->alamat->FldCaption() ?></span></td>
-		<td data-name="alamat"<?php echo $tb_customer->alamat->CellAttributes() ?>>
-<span id="el_tb_customer_alamat">
-<span<?php echo $tb_customer->alamat->ViewAttributes() ?>>
-<?php echo $tb_customer->alamat->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($tb_customer->kota->Visible) { // kota ?>
-	<tr id="r_kota">
-		<td><span id="elh_tb_customer_kota"><?php echo $tb_customer->kota->FldCaption() ?></span></td>
-		<td data-name="kota"<?php echo $tb_customer->kota->CellAttributes() ?>>
-<span id="el_tb_customer_kota">
-<span<?php echo $tb_customer->kota->ViewAttributes() ?>>
-<?php echo $tb_customer->kota->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($tb_customer->kodepos->Visible) { // kodepos ?>
-	<tr id="r_kodepos">
-		<td><span id="elh_tb_customer_kodepos"><?php echo $tb_customer->kodepos->FldCaption() ?></span></td>
-		<td data-name="kodepos"<?php echo $tb_customer->kodepos->CellAttributes() ?>>
-<span id="el_tb_customer_kodepos">
-<span<?php echo $tb_customer->kodepos->ViewAttributes() ?>>
-<?php echo $tb_customer->kodepos->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($tb_customer->no_npwp->Visible) { // no_npwp ?>
-	<tr id="r_no_npwp">
-		<td><span id="elh_tb_customer_no_npwp"><?php echo $tb_customer->no_npwp->FldCaption() ?></span></td>
-		<td data-name="no_npwp"<?php echo $tb_customer->no_npwp->CellAttributes() ?>>
-<span id="el_tb_customer_no_npwp">
-<span<?php echo $tb_customer->no_npwp->ViewAttributes() ?>>
-<?php echo $tb_customer->no_npwp->ViewValue ?></span>
+		<td><span id="elh_tb_barang_nama"><?php echo $tb_barang->nama->FldCaption() ?></span></td>
+		<td data-name="nama"<?php echo $tb_barang->nama->CellAttributes() ?>>
+<span id="el_tb_barang_nama">
+<span<?php echo $tb_barang->nama->ViewAttributes() ?>>
+<?php echo $tb_barang->nama->ViewValue ?></span>
 </span>
 </td>
 	</tr>
@@ -926,10 +830,10 @@ $tb_customer_view->ShowMessage();
 </table>
 </form>
 <script type="text/javascript">
-ftb_customerview.Init();
+ftb_barangview.Init();
 </script>
 <?php
-$tb_customer_view->ShowPageFooter();
+$tb_barang_view->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -941,5 +845,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$tb_customer_view->Page_Terminate();
+$tb_barang_view->Page_Terminate();
 ?>

@@ -287,6 +287,7 @@ class ctb_fee_grid extends ctb_fee {
 		$this->id->SetVisibility();
 		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->invoice_id->SetVisibility();
+		$this->barang_id->SetVisibility();
 		$this->harga->SetVisibility();
 		$this->qty->SetVisibility();
 		$this->satuan->SetVisibility();
@@ -750,6 +751,8 @@ class ctb_fee_grid extends ctb_fee {
 		global $objForm;
 		if ($objForm->HasValue("x_invoice_id") && $objForm->HasValue("o_invoice_id") && $this->invoice_id->CurrentValue <> $this->invoice_id->OldValue)
 			return FALSE;
+		if ($objForm->HasValue("x_barang_id") && $objForm->HasValue("o_barang_id") && $this->barang_id->CurrentValue <> $this->barang_id->OldValue)
+			return FALSE;
 		if ($objForm->HasValue("x_harga") && $objForm->HasValue("o_harga") && $this->harga->CurrentValue <> $this->harga->OldValue)
 			return FALSE;
 		if ($objForm->HasValue("x_qty") && $objForm->HasValue("o_qty") && $this->qty->CurrentValue <> $this->qty->OldValue)
@@ -874,6 +877,7 @@ class ctb_fee_grid extends ctb_fee {
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
+				$this->setSessionOrderByList($sOrderBy);
 			}
 
 			// Reset start position
@@ -1117,6 +1121,8 @@ class ctb_fee_grid extends ctb_fee {
 		$this->id->OldValue = $this->id->CurrentValue;
 		$this->invoice_id->CurrentValue = NULL;
 		$this->invoice_id->OldValue = $this->invoice_id->CurrentValue;
+		$this->barang_id->CurrentValue = NULL;
+		$this->barang_id->OldValue = $this->barang_id->CurrentValue;
 		$this->harga->CurrentValue = NULL;
 		$this->harga->OldValue = $this->harga->CurrentValue;
 		$this->qty->CurrentValue = NULL;
@@ -1141,6 +1147,10 @@ class ctb_fee_grid extends ctb_fee {
 			$this->invoice_id->setFormValue($objForm->GetValue("x_invoice_id"));
 		}
 		$this->invoice_id->setOldValue($objForm->GetValue("o_invoice_id"));
+		if (!$this->barang_id->FldIsDetailKey) {
+			$this->barang_id->setFormValue($objForm->GetValue("x_barang_id"));
+		}
+		$this->barang_id->setOldValue($objForm->GetValue("o_barang_id"));
 		if (!$this->harga->FldIsDetailKey) {
 			$this->harga->setFormValue($objForm->GetValue("x_harga"));
 		}
@@ -1169,6 +1179,7 @@ class ctb_fee_grid extends ctb_fee {
 		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
 			$this->id->CurrentValue = $this->id->FormValue;
 		$this->invoice_id->CurrentValue = $this->invoice_id->FormValue;
+		$this->barang_id->CurrentValue = $this->barang_id->FormValue;
 		$this->harga->CurrentValue = $this->harga->FormValue;
 		$this->qty->CurrentValue = $this->qty->FormValue;
 		$this->satuan->CurrentValue = $this->satuan->FormValue;
@@ -1188,7 +1199,7 @@ class ctb_fee_grid extends ctb_fee {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -1233,6 +1244,12 @@ class ctb_fee_grid extends ctb_fee {
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->invoice_id->setDbValue($rs->fields('invoice_id'));
+		$this->barang_id->setDbValue($rs->fields('barang_id'));
+		if (array_key_exists('EV__barang_id', $rs->fields)) {
+			$this->barang_id->VirtualValue = $rs->fields('EV__barang_id'); // Set up virtual field value
+		} else {
+			$this->barang_id->VirtualValue = ""; // Clear value
+		}
 		$this->harga->setDbValue($rs->fields('harga'));
 		$this->qty->setDbValue($rs->fields('qty'));
 		$this->satuan->setDbValue($rs->fields('satuan'));
@@ -1246,6 +1263,7 @@ class ctb_fee_grid extends ctb_fee {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
 		$this->invoice_id->DbValue = $row['invoice_id'];
+		$this->barang_id->DbValue = $row['barang_id'];
 		$this->harga->DbValue = $row['harga'];
 		$this->qty->DbValue = $row['qty'];
 		$this->satuan->DbValue = $row['satuan'];
@@ -1306,6 +1324,7 @@ class ctb_fee_grid extends ctb_fee {
 		// Common render codes for all row types
 		// id
 		// invoice_id
+		// barang_id
 		// harga
 		// qty
 		// satuan
@@ -1321,6 +1340,34 @@ class ctb_fee_grid extends ctb_fee {
 		// invoice_id
 		$this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
 		$this->invoice_id->ViewCustomAttributes = "";
+
+		// barang_id
+		if ($this->barang_id->VirtualValue <> "") {
+			$this->barang_id->ViewValue = $this->barang_id->VirtualValue;
+		} else {
+			$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
+		if (strval($this->barang_id->CurrentValue) <> "") {
+			$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
+		$sWhereWrk = "";
+		$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->barang_id->ViewValue = $this->barang_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
+			}
+		} else {
+			$this->barang_id->ViewValue = NULL;
+		}
+		}
+		$this->barang_id->ViewCustomAttributes = "";
 
 		// harga
 		$this->harga->ViewValue = $this->harga->CurrentValue;
@@ -1355,6 +1402,11 @@ class ctb_fee_grid extends ctb_fee {
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
 			$this->invoice_id->TooltipValue = "";
+
+			// barang_id
+			$this->barang_id->LinkCustomAttributes = "";
+			$this->barang_id->HrefValue = "";
+			$this->barang_id->TooltipValue = "";
 
 			// harga
 			$this->harga->LinkCustomAttributes = "";
@@ -1396,6 +1448,12 @@ class ctb_fee_grid extends ctb_fee {
 			$this->invoice_id->EditValue = ew_HtmlEncode($this->invoice_id->CurrentValue);
 			$this->invoice_id->PlaceHolder = ew_RemoveHtml($this->invoice_id->FldCaption());
 			}
+
+			// barang_id
+			$this->barang_id->EditAttrs["class"] = "form-control";
+			$this->barang_id->EditCustomAttributes = "";
+			$this->barang_id->EditValue = ew_HtmlEncode($this->barang_id->CurrentValue);
+			$this->barang_id->PlaceHolder = ew_RemoveHtml($this->barang_id->FldCaption());
 
 			// harga
 			$this->harga->EditAttrs["class"] = "form-control";
@@ -1445,6 +1503,10 @@ class ctb_fee_grid extends ctb_fee {
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
 
+			// barang_id
+			$this->barang_id->LinkCustomAttributes = "";
+			$this->barang_id->HrefValue = "";
+
 			// harga
 			$this->harga->LinkCustomAttributes = "";
 			$this->harga->HrefValue = "";
@@ -1484,6 +1546,12 @@ class ctb_fee_grid extends ctb_fee {
 			$this->invoice_id->EditValue = ew_HtmlEncode($this->invoice_id->CurrentValue);
 			$this->invoice_id->PlaceHolder = ew_RemoveHtml($this->invoice_id->FldCaption());
 			}
+
+			// barang_id
+			$this->barang_id->EditAttrs["class"] = "form-control";
+			$this->barang_id->EditCustomAttributes = "";
+			$this->barang_id->EditValue = ew_HtmlEncode($this->barang_id->CurrentValue);
+			$this->barang_id->PlaceHolder = ew_RemoveHtml($this->barang_id->FldCaption());
 
 			// harga
 			$this->harga->EditAttrs["class"] = "form-control";
@@ -1533,6 +1601,10 @@ class ctb_fee_grid extends ctb_fee {
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
 
+			// barang_id
+			$this->barang_id->LinkCustomAttributes = "";
+			$this->barang_id->HrefValue = "";
+
 			// harga
 			$this->harga->LinkCustomAttributes = "";
 			$this->harga->HrefValue = "";
@@ -1573,6 +1645,9 @@ class ctb_fee_grid extends ctb_fee {
 			return ($gsFormError == "");
 		if (!ew_CheckInteger($this->invoice_id->FormValue)) {
 			ew_AddMessage($gsFormError, $this->invoice_id->FldErrMsg());
+		}
+		if (!$this->barang_id->FldIsDetailKey && !is_null($this->barang_id->FormValue) && $this->barang_id->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->barang_id->FldCaption(), $this->barang_id->ReqErrMsg));
 		}
 		if (!ew_CheckNumber($this->harga->FormValue)) {
 			ew_AddMessage($gsFormError, $this->harga->FldErrMsg());
@@ -1698,6 +1773,9 @@ class ctb_fee_grid extends ctb_fee {
 			// invoice_id
 			$this->invoice_id->SetDbValueDef($rsnew, $this->invoice_id->CurrentValue, NULL, $this->invoice_id->ReadOnly);
 
+			// barang_id
+			$this->barang_id->SetDbValueDef($rsnew, $this->barang_id->CurrentValue, 0, $this->barang_id->ReadOnly);
+
 			// harga
 			$this->harga->SetDbValueDef($rsnew, $this->harga->CurrentValue, NULL, $this->harga->ReadOnly);
 
@@ -1763,6 +1841,9 @@ class ctb_fee_grid extends ctb_fee {
 
 		// invoice_id
 		$this->invoice_id->SetDbValueDef($rsnew, $this->invoice_id->CurrentValue, NULL, FALSE);
+
+		// barang_id
+		$this->barang_id->SetDbValueDef($rsnew, $this->barang_id->CurrentValue, 0, FALSE);
 
 		// harga
 		$this->harga->SetDbValueDef($rsnew, $this->harga->CurrentValue, NULL, FALSE);
@@ -1831,6 +1912,18 @@ class ctb_fee_grid extends ctb_fee {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_barang_id":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `barang_id` AS `LinkFld`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
+			$sWhereWrk = "{filter}";
+			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`barang_id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 
@@ -1839,6 +1932,19 @@ class ctb_fee_grid extends ctb_fee {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_barang_id":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld` FROM `tb_barang`";
+			$sWhereWrk = "`nama` LIKE '{query_value}%'";
+			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$sSqlWrk .= " LIMIT " . EW_AUTO_SUGGEST_MAX_ENTRIES;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 

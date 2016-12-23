@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "tb_customerinfo.php" ?>
+<?php include_once "tb_baranginfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -13,21 +13,21 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$tb_customer_view = NULL; // Initialize page object first
+$tb_barang_edit = NULL; // Initialize page object first
 
-class ctb_customer_view extends ctb_customer {
+class ctb_barang_edit extends ctb_barang {
 
 	// Page ID
-	var $PageID = 'view';
+	var $PageID = 'edit';
 
 	// Project ID
 	var $ProjectID = "{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}";
 
 	// Table name
-	var $TableName = 'tb_customer';
+	var $TableName = 'tb_barang';
 
 	// Page object name
-	var $PageObjName = 'tb_customer_view';
+	var $PageObjName = 'tb_barang_edit';
 
 	// Page name
 	function PageName() {
@@ -40,38 +40,6 @@ class ctb_customer_view extends ctb_customer {
 		if ($this->UseTokenInUrl) $PageUrl .= "t=" . $this->TableVar . "&"; // Add page token
 		return $PageUrl;
 	}
-
-	// Page URLs
-	var $AddUrl;
-	var $EditUrl;
-	var $CopyUrl;
-	var $DeleteUrl;
-	var $ViewUrl;
-	var $ListUrl;
-
-	// Export URLs
-	var $ExportPrintUrl;
-	var $ExportHtmlUrl;
-	var $ExportExcelUrl;
-	var $ExportWordUrl;
-	var $ExportXmlUrl;
-	var $ExportCsvUrl;
-	var $ExportPdfUrl;
-
-	// Custom export
-	var $ExportExcelCustom = FALSE;
-	var $ExportWordCustom = FALSE;
-	var $ExportPdfCustom = FALSE;
-	var $ExportEmailCustom = FALSE;
-
-	// Update URLs
-	var $InlineAddUrl;
-	var $InlineCopyUrl;
-	var $InlineEditUrl;
-	var $GridAddUrl;
-	var $GridEditUrl;
-	var $MultiDeleteUrl;
-	var $MultiUpdateUrl;
 
 	// Message
 	function getMessage() {
@@ -256,50 +224,25 @@ class ctb_customer_view extends ctb_customer {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (tb_customer)
-		if (!isset($GLOBALS["tb_customer"]) || get_class($GLOBALS["tb_customer"]) == "ctb_customer") {
-			$GLOBALS["tb_customer"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["tb_customer"];
+		// Table object (tb_barang)
+		if (!isset($GLOBALS["tb_barang"]) || get_class($GLOBALS["tb_barang"]) == "ctb_barang") {
+			$GLOBALS["tb_barang"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["tb_barang"];
 		}
-		$KeyUrl = "";
-		if (@$_GET["id"] <> "") {
-			$this->RecKey["id"] = $_GET["id"];
-			$KeyUrl .= "&amp;id=" . urlencode($this->RecKey["id"]);
-		}
-		$this->ExportPrintUrl = $this->PageUrl() . "export=print" . $KeyUrl;
-		$this->ExportHtmlUrl = $this->PageUrl() . "export=html" . $KeyUrl;
-		$this->ExportExcelUrl = $this->PageUrl() . "export=excel" . $KeyUrl;
-		$this->ExportWordUrl = $this->PageUrl() . "export=word" . $KeyUrl;
-		$this->ExportXmlUrl = $this->PageUrl() . "export=xml" . $KeyUrl;
-		$this->ExportCsvUrl = $this->PageUrl() . "export=csv" . $KeyUrl;
-		$this->ExportPdfUrl = $this->PageUrl() . "export=pdf" . $KeyUrl;
 
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
-			define("EW_PAGE_ID", 'view', TRUE);
+			define("EW_PAGE_ID", 'edit', TRUE);
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'tb_customer', TRUE);
+			define("EW_TABLE_NAME", 'tb_barang', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
 
 		// Open connection
 		if (!isset($conn)) $conn = ew_Connect($this->DBID);
-
-		// Export options
-		$this->ExportOptions = new cListOptions();
-		$this->ExportOptions->Tag = "div";
-		$this->ExportOptions->TagClassName = "ewExportOption";
-
-		// Other options
-		$this->OtherOptions['action'] = new cListOptions();
-		$this->OtherOptions['action']->Tag = "div";
-		$this->OtherOptions['action']->TagClassName = "ewActionOption";
-		$this->OtherOptions['detail'] = new cListOptions();
-		$this->OtherOptions['detail']->Tag = "div";
-		$this->OtherOptions['detail']->TagClassName = "ewDetailOption";
 	}
 
 	//
@@ -307,14 +250,13 @@ class ctb_customer_view extends ctb_customer {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Create form object
+		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->id->SetVisibility();
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
+		$this->barang_id->SetVisibility();
+		$this->barang_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->nama->SetVisibility();
-		$this->alamat->SetVisibility();
-		$this->kota->SetVisibility();
-		$this->kodepos->SetVisibility();
-		$this->no_npwp->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -327,6 +269,20 @@ class ctb_customer_view extends ctb_customer {
 			echo $Language->Phrase("InvalidPostRequest");
 			$this->Page_Terminate();
 			exit();
+		}
+
+		// Process auto fill
+		if (@$_POST["ajax"] == "autofill") {
+			$results = $this->GetAutoFill(@$_POST["name"], @$_POST["q"]);
+			if ($results) {
+
+				// Clean output buffer
+				if (!EW_DEBUG_ENABLED && ob_get_length())
+					ob_end_clean();
+				echo $results;
+				$this->Page_Terminate();
+				exit();
+			}
 		}
 
 		// Create Token
@@ -346,13 +302,13 @@ class ctb_customer_view extends ctb_customer {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $tb_customer;
+		global $EW_EXPORT, $tb_barang;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($tb_customer);
+				$doc = new $class($tb_barang);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -383,120 +339,81 @@ class ctb_customer_view extends ctb_customer {
 		}
 		exit();
 	}
-	var $ExportOptions; // Export options
-	var $OtherOptions = array(); // Other options
-	var $DisplayRecs = 1;
+	var $FormClassName = "form-horizontal ewForm ewEditForm";
+	var $IsModal = FALSE;
 	var $DbMasterFilter;
 	var $DbDetailFilter;
-	var $StartRec;
-	var $StopRec;
-	var $TotalRecs = 0;
-	var $RecRange = 10;
-	var $RecCnt;
-	var $RecKey = array();
-	var $IsModal = FALSE;
-	var $Recordset;
 
-	//
+	// 
 	// Page main
 	//
 	function Page_Main() {
-		global $Language;
+		global $objForm, $Language, $gsFormError;
 		global $gbSkipHeaderFooter;
 
 		// Check modal
 		$this->IsModal = (@$_GET["modal"] == "1" || @$_POST["modal"] == "1");
 		if ($this->IsModal)
 			$gbSkipHeaderFooter = TRUE;
-		$sReturnUrl = "";
-		$bMatchRecord = FALSE;
-		if ($this->IsPageRequest()) { // Validate request
-			if (@$_GET["id"] <> "") {
-				$this->id->setQueryStringValue($_GET["id"]);
-				$this->RecKey["id"] = $this->id->QueryStringValue;
-			} elseif (@$_POST["id"] <> "") {
-				$this->id->setFormValue($_POST["id"]);
-				$this->RecKey["id"] = $this->id->FormValue;
-			} else {
-				$sReturnUrl = "tb_customerlist.php"; // Return to list
-			}
 
-			// Get action
-			$this->CurrentAction = "I"; // Display form
-			switch ($this->CurrentAction) {
-				case "I": // Get a record to display
-					if (!$this->LoadRow()) { // Load record based on key
-						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
-							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$sReturnUrl = "tb_customerlist.php"; // No matching record, return to list
-					}
-			}
-		} else {
-			$sReturnUrl = "tb_customerlist.php"; // Not page request, return to list
+		// Load key from QueryString
+		if (@$_GET["barang_id"] <> "") {
+			$this->barang_id->setQueryStringValue($_GET["barang_id"]);
 		}
-		if ($sReturnUrl <> "")
-			$this->Page_Terminate($sReturnUrl);
+
+		// Process form if post back
+		if (@$_POST["a_edit"] <> "") {
+			$this->CurrentAction = $_POST["a_edit"]; // Get action code
+			$this->LoadFormValues(); // Get form values
+		} else {
+			$this->CurrentAction = "I"; // Default action is display
+		}
+
+		// Check if valid key
+		if ($this->barang_id->CurrentValue == "") {
+			$this->Page_Terminate("tb_baranglist.php"); // Invalid key, return to list
+		}
+
+		// Validate form if post back
+		if (@$_POST["a_edit"] <> "") {
+			if (!$this->ValidateForm()) {
+				$this->CurrentAction = ""; // Form error, reset action
+				$this->setFailureMessage($gsFormError);
+				$this->EventCancelled = TRUE; // Event cancelled
+				$this->RestoreFormValues();
+			}
+		}
+		switch ($this->CurrentAction) {
+			case "I": // Get a record to display
+				if (!$this->LoadRow()) { // Load record based on key
+					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
+					$this->Page_Terminate("tb_baranglist.php"); // No matching record, return to list
+				}
+				break;
+			Case "U": // Update
+				$sReturnUrl = $this->getReturnUrl();
+				if (ew_GetPageName($sReturnUrl) == "tb_baranglist.php")
+					$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to list page with correct master key if necessary
+				$this->SendEmail = TRUE; // Send email on update success
+				if ($this->EditRow()) { // Update record based on key
+					if ($this->getSuccessMessage() == "")
+						$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Update success
+					$this->Page_Terminate($sReturnUrl); // Return to caller
+				} elseif ($this->getFailureMessage() == $Language->Phrase("NoRecord")) {
+					$this->Page_Terminate($sReturnUrl); // Return to caller
+				} else {
+					$this->EventCancelled = TRUE; // Event cancelled
+					$this->RestoreFormValues(); // Restore form values if update failed
+				}
+		}
 
 		// Set up Breadcrumb
-		if ($this->Export == "")
-			$this->SetupBreadcrumb();
+		$this->SetupBreadcrumb();
 
-		// Render row
-		$this->RowType = EW_ROWTYPE_VIEW;
+		// Render the record
+		$this->RowType = EW_ROWTYPE_EDIT; // Render as Edit
 		$this->ResetAttrs();
 		$this->RenderRow();
-	}
-
-	// Set up other options
-	function SetupOtherOptions() {
-		global $Language, $Security;
-		$options = &$this->OtherOptions;
-		$option = &$options["action"];
-
-		// Add
-		$item = &$option->Add("add");
-		$addcaption = ew_HtmlTitle($Language->Phrase("ViewPageAddLink"));
-		if ($this->IsModal) // Modal
-			$item->Body = "<a class=\"ewAction ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"javascript:void(0);\" onclick=\"ew_ModalDialogShow({lnk:this,url:'" . ew_HtmlEncode($this->AddUrl) . "',caption:'" . $addcaption . "'});\">" . $Language->Phrase("ViewPageAddLink") . "</a>";
-		else
-			$item->Body = "<a class=\"ewAction ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("ViewPageAddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "");
-
-		// Edit
-		$item = &$option->Add("edit");
-		$editcaption = ew_HtmlTitle($Language->Phrase("ViewPageEditLink"));
-		if ($this->IsModal) // Modal
-			$item->Body = "<a class=\"ewAction ewEdit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"javascript:void(0);\" onclick=\"ew_ModalDialogShow({lnk:this,url:'" . ew_HtmlEncode($this->EditUrl) . "',caption:'" . $editcaption . "'});\">" . $Language->Phrase("ViewPageEditLink") . "</a>";
-		else
-			$item->Body = "<a class=\"ewAction ewEdit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("ViewPageEditLink") . "</a>";
-		$item->Visible = ($this->EditUrl <> "");
-
-		// Copy
-		$item = &$option->Add("copy");
-		$copycaption = ew_HtmlTitle($Language->Phrase("ViewPageCopyLink"));
-		if ($this->IsModal) // Modal
-			$item->Body = "<a class=\"ewAction ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"javascript:void(0);\" onclick=\"ew_ModalDialogShow({lnk:this,url:'" . ew_HtmlEncode($this->CopyUrl) . "',caption:'" . $copycaption . "'});\">" . $Language->Phrase("ViewPageCopyLink") . "</a>";
-		else
-			$item->Body = "<a class=\"ewAction ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("ViewPageCopyLink") . "</a>";
-		$item->Visible = ($this->CopyUrl <> "");
-
-		// Delete
-		$item = &$option->Add("delete");
-		if ($this->IsModal) // Handle as inline delete
-			$item->Body = "<a onclick=\"return ew_ConfirmDelete(this);\" class=\"ewAction ewDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("ViewPageDeleteLink")) . "\" href=\"" . ew_HtmlEncode(ew_AddQueryStringToUrl($this->DeleteUrl, "a_delete=1")) . "\">" . $Language->Phrase("ViewPageDeleteLink") . "</a>";
-		else
-			$item->Body = "<a class=\"ewAction ewDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("ViewPageDeleteLink")) . "\" href=\"" . ew_HtmlEncode($this->DeleteUrl) . "\">" . $Language->Phrase("ViewPageDeleteLink") . "</a>";
-		$item->Visible = ($this->DeleteUrl <> "");
-
-		// Set up action default
-		$option = &$options["action"];
-		$option->DropDownButtonPhrase = $Language->Phrase("ButtonActions");
-		$option->UseImageAndText = TRUE;
-		$option->UseDropDownButton = FALSE;
-		$option->UseButtonGroup = TRUE;
-		$item = &$option->Add($option->GroupOptionName);
-		$item->Body = "";
-		$item->Visible = FALSE;
 	}
 
 	// Set up starting record parameters
@@ -535,6 +452,33 @@ class ctb_customer_view extends ctb_customer {
 		}
 	}
 
+	// Get upload files
+	function GetUploadFiles() {
+		global $objForm, $Language;
+
+		// Get upload data
+	}
+
+	// Load form values
+	function LoadFormValues() {
+
+		// Load from form
+		global $objForm;
+		if (!$this->barang_id->FldIsDetailKey)
+			$this->barang_id->setFormValue($objForm->GetValue("x_barang_id"));
+		if (!$this->nama->FldIsDetailKey) {
+			$this->nama->setFormValue($objForm->GetValue("x_nama"));
+		}
+	}
+
+	// Restore form values
+	function RestoreFormValues() {
+		global $objForm;
+		$this->LoadRow();
+		$this->barang_id->CurrentValue = $this->barang_id->FormValue;
+		$this->nama->CurrentValue = $this->nama->FormValue;
+	}
+
 	// Load row based on key values
 	function LoadRow() {
 		global $Security, $Language;
@@ -564,24 +508,16 @@ class ctb_customer_view extends ctb_customer {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->id->setDbValue($rs->fields('id'));
+		$this->barang_id->setDbValue($rs->fields('barang_id'));
 		$this->nama->setDbValue($rs->fields('nama'));
-		$this->alamat->setDbValue($rs->fields('alamat'));
-		$this->kota->setDbValue($rs->fields('kota'));
-		$this->kodepos->setDbValue($rs->fields('kodepos'));
-		$this->no_npwp->setDbValue($rs->fields('no_npwp'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->id->DbValue = $row['id'];
+		$this->barang_id->DbValue = $row['barang_id'];
 		$this->nama->DbValue = $row['nama'];
-		$this->alamat->DbValue = $row['alamat'];
-		$this->kota->DbValue = $row['kota'];
-		$this->kodepos->DbValue = $row['kodepos'];
-		$this->no_npwp->DbValue = $row['no_npwp'];
 	}
 
 	// Render row values based on field settings
@@ -589,79 +525,61 @@ class ctb_customer_view extends ctb_customer {
 		global $Security, $Language, $gsLanguage;
 
 		// Initialize URLs
-		$this->AddUrl = $this->GetAddUrl();
-		$this->EditUrl = $this->GetEditUrl();
-		$this->CopyUrl = $this->GetCopyUrl();
-		$this->DeleteUrl = $this->GetDeleteUrl();
-		$this->ListUrl = $this->GetListUrl();
-		$this->SetupOtherOptions();
-
 		// Call Row_Rendering event
+
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// id
+		// barang_id
 		// nama
-		// alamat
-		// kota
-		// kodepos
-		// no_npwp
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// id
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
+		// barang_id
+		$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
+		$this->barang_id->ViewCustomAttributes = "";
 
 		// nama
 		$this->nama->ViewValue = $this->nama->CurrentValue;
 		$this->nama->ViewCustomAttributes = "";
 
-		// alamat
-		$this->alamat->ViewValue = $this->alamat->CurrentValue;
-		$this->alamat->ViewCustomAttributes = "";
-
-		// kota
-		$this->kota->ViewValue = $this->kota->CurrentValue;
-		$this->kota->ViewCustomAttributes = "";
-
-		// kodepos
-		$this->kodepos->ViewValue = $this->kodepos->CurrentValue;
-		$this->kodepos->ViewCustomAttributes = "";
-
-		// no_npwp
-		$this->no_npwp->ViewValue = $this->no_npwp->CurrentValue;
-		$this->no_npwp->ViewCustomAttributes = "";
-
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
+			// barang_id
+			$this->barang_id->LinkCustomAttributes = "";
+			$this->barang_id->HrefValue = "";
+			$this->barang_id->TooltipValue = "";
 
 			// nama
 			$this->nama->LinkCustomAttributes = "";
 			$this->nama->HrefValue = "";
 			$this->nama->TooltipValue = "";
+		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
-			// alamat
-			$this->alamat->LinkCustomAttributes = "";
-			$this->alamat->HrefValue = "";
-			$this->alamat->TooltipValue = "";
+			// barang_id
+			$this->barang_id->EditAttrs["class"] = "form-control";
+			$this->barang_id->EditCustomAttributes = "";
+			$this->barang_id->EditValue = $this->barang_id->CurrentValue;
+			$this->barang_id->ViewCustomAttributes = "";
 
-			// kota
-			$this->kota->LinkCustomAttributes = "";
-			$this->kota->HrefValue = "";
-			$this->kota->TooltipValue = "";
+			// nama
+			$this->nama->EditAttrs["class"] = "form-control";
+			$this->nama->EditCustomAttributes = "";
+			$this->nama->EditValue = ew_HtmlEncode($this->nama->CurrentValue);
+			$this->nama->PlaceHolder = ew_RemoveHtml($this->nama->FldCaption());
 
-			// kodepos
-			$this->kodepos->LinkCustomAttributes = "";
-			$this->kodepos->HrefValue = "";
-			$this->kodepos->TooltipValue = "";
+			// Edit refer script
+			// barang_id
 
-			// no_npwp
-			$this->no_npwp->LinkCustomAttributes = "";
-			$this->no_npwp->HrefValue = "";
-			$this->no_npwp->TooltipValue = "";
+			$this->barang_id->LinkCustomAttributes = "";
+			$this->barang_id->HrefValue = "";
+
+			// nama
+			$this->nama->LinkCustomAttributes = "";
+			$this->nama->HrefValue = "";
+		}
+		if ($this->RowType == EW_ROWTYPE_ADD ||
+			$this->RowType == EW_ROWTYPE_EDIT ||
+			$this->RowType == EW_ROWTYPE_SEARCH) { // Add / Edit / Search row
+			$this->SetupFieldTitles();
 		}
 
 		// Call Row Rendered event
@@ -669,14 +587,98 @@ class ctb_customer_view extends ctb_customer {
 			$this->Row_Rendered();
 	}
 
+	// Validate form
+	function ValidateForm() {
+		global $Language, $gsFormError;
+
+		// Initialize form error message
+		$gsFormError = "";
+
+		// Check if validation required
+		if (!EW_SERVER_VALIDATE)
+			return ($gsFormError == "");
+		if (!$this->nama->FldIsDetailKey && !is_null($this->nama->FormValue) && $this->nama->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->nama->FldCaption(), $this->nama->ReqErrMsg));
+		}
+
+		// Return validate result
+		$ValidateForm = ($gsFormError == "");
+
+		// Call Form_CustomValidate event
+		$sFormCustomError = "";
+		$ValidateForm = $ValidateForm && $this->Form_CustomValidate($sFormCustomError);
+		if ($sFormCustomError <> "") {
+			ew_AddMessage($gsFormError, $sFormCustomError);
+		}
+		return $ValidateForm;
+	}
+
+	// Update record based on key values
+	function EditRow() {
+		global $Security, $Language;
+		$sFilter = $this->KeyFilter();
+		$sFilter = $this->ApplyUserIDFilters($sFilter);
+		$conn = &$this->Connection();
+		$this->CurrentFilter = $sFilter;
+		$sSql = $this->SQL();
+		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+		$rs = $conn->Execute($sSql);
+		$conn->raiseErrorFn = '';
+		if ($rs === FALSE)
+			return FALSE;
+		if ($rs->EOF) {
+			$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
+			$EditRow = FALSE; // Update Failed
+		} else {
+
+			// Save old values
+			$rsold = &$rs->fields;
+			$this->LoadDbValues($rsold);
+			$rsnew = array();
+
+			// nama
+			$this->nama->SetDbValueDef($rsnew, $this->nama->CurrentValue, "", $this->nama->ReadOnly);
+
+			// Call Row Updating event
+			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
+			if ($bUpdateRow) {
+				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+				if (count($rsnew) > 0)
+					$EditRow = $this->Update($rsnew, "", $rsold);
+				else
+					$EditRow = TRUE; // No field to update
+				$conn->raiseErrorFn = '';
+				if ($EditRow) {
+				}
+			} else {
+				if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
+
+					// Use the message, do nothing
+				} elseif ($this->CancelMessage <> "") {
+					$this->setFailureMessage($this->CancelMessage);
+					$this->CancelMessage = "";
+				} else {
+					$this->setFailureMessage($Language->Phrase("UpdateCancelled"));
+				}
+				$EditRow = FALSE;
+			}
+		}
+
+		// Call Row_Updated event
+		if ($EditRow)
+			$this->Row_Updated($rsold, $rsnew);
+		$rs->Close();
+		return $EditRow;
+	}
+
 	// Set up Breadcrumb
 	function SetupBreadcrumb() {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("tb_customerlist.php"), "", $this->TableVar, TRUE);
-		$PageId = "view";
-		$Breadcrumb->Add("view", $PageId, $url);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("tb_baranglist.php"), "", $this->TableVar, TRUE);
+		$PageId = "edit";
+		$Breadcrumb->Add("edit", $PageId, $url);
 	}
 
 	// Setup lookup filters of a field
@@ -755,30 +757,11 @@ class ctb_customer_view extends ctb_customer {
 
 	}
 
-	// Page Exporting event
-	// $this->ExportDoc = export document object
-	function Page_Exporting() {
+	// Form Custom Validate event
+	function Form_CustomValidate(&$CustomError) {
 
-		//$this->ExportDoc->Text = "my header"; // Export header
-		//return FALSE; // Return FALSE to skip default export and use Row_Export event
-
-		return TRUE; // Return TRUE to use default export and skip Row_Export event
-	}
-
-	// Row Export event
-	// $this->ExportDoc = export document object
-	function Row_Export($rs) {
-
-		//$this->ExportDoc->Text .= "my content"; // Build HTML with field value: $rs["MyField"] or $this->MyField->ViewValue
-	}
-
-	// Page Exported event
-	// $this->ExportDoc = export document object
-	function Page_Exported() {
-
-		//$this->ExportDoc->Text .= "my footer"; // Export footer
-		//echo $this->ExportDoc->Text;
-
+		// Return error message in CustomError
+		return TRUE;
 	}
 }
 ?>
@@ -786,29 +769,64 @@ class ctb_customer_view extends ctb_customer {
 <?php
 
 // Create page object
-if (!isset($tb_customer_view)) $tb_customer_view = new ctb_customer_view();
+if (!isset($tb_barang_edit)) $tb_barang_edit = new ctb_barang_edit();
 
 // Page init
-$tb_customer_view->Page_Init();
+$tb_barang_edit->Page_Init();
 
 // Page main
-$tb_customer_view->Page_Main();
+$tb_barang_edit->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$tb_customer_view->Page_Render();
+$tb_barang_edit->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
-var CurrentPageID = EW_PAGE_ID = "view";
-var CurrentForm = ftb_customerview = new ew_Form("ftb_customerview", "view");
+var CurrentPageID = EW_PAGE_ID = "edit";
+var CurrentForm = ftb_barangedit = new ew_Form("ftb_barangedit", "edit");
+
+// Validate form
+ftb_barangedit.Validate = function() {
+	if (!this.ValidateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
+	if ($fobj.find("#a_confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.FormKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = $fobj.find("#a_list").val() == "gridinsert";
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+			elm = this.GetElements("x" + infix + "_nama");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $tb_barang->nama->FldCaption(), $tb_barang->nama->ReqErrMsg)) ?>");
+
+			// Fire Form_CustomValidate event
+			if (!this.Form_CustomValidate(fobj))
+				return false;
+	}
+
+	// Process detail forms
+	var dfs = $fobj.find("input[name='detailpage']").get();
+	for (var i = 0; i < dfs.length; i++) {
+		var df = dfs[i], val = df.value;
+		if (val && ewForms[val])
+			if (!ewForms[val].Validate())
+				return false;
+	}
+	return true;
+}
 
 // Form_CustomValidate event
-ftb_customerview.Form_CustomValidate = 
+ftb_barangedit.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -817,9 +835,9 @@ ftb_customerview.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ftb_customerview.ValidateRequired = true;
+ftb_barangedit.ValidateRequired = true;
 <?php } else { ?>
-ftb_customerview.ValidateRequired = false; 
+ftb_barangedit.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
@@ -830,106 +848,64 @@ ftb_customerview.ValidateRequired = false;
 
 // Write your client script here, no need to add script tags.
 </script>
+<?php if (!$tb_barang_edit->IsModal) { ?>
 <div class="ewToolbar">
-<?php if (!$tb_customer_view->IsModal) { ?>
 <?php $Breadcrumb->Render(); ?>
-<?php } ?>
-<?php $tb_customer_view->ExportOptions->Render("body") ?>
-<?php
-	foreach ($tb_customer_view->OtherOptions as &$option)
-		$option->Render("body");
-?>
-<?php if (!$tb_customer_view->IsModal) { ?>
 <?php echo $Language->SelectionForm(); ?>
-<?php } ?>
 <div class="clearfix"></div>
 </div>
-<?php $tb_customer_view->ShowPageHeader(); ?>
-<?php
-$tb_customer_view->ShowMessage();
-?>
-<form name="ftb_customerview" id="ftb_customerview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($tb_customer_view->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_customer_view->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="tb_customer">
-<?php if ($tb_customer_view->IsModal) { ?>
+<?php $tb_barang_edit->ShowPageHeader(); ?>
+<?php
+$tb_barang_edit->ShowMessage();
+?>
+<form name="ftb_barangedit" id="ftb_barangedit" class="<?php echo $tb_barang_edit->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($tb_barang_edit->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_barang_edit->Token ?>">
+<?php } ?>
+<input type="hidden" name="t" value="tb_barang">
+<input type="hidden" name="a_edit" id="a_edit" value="U">
+<?php if ($tb_barang_edit->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<table class="table table-bordered table-striped ewViewTable">
-<?php if ($tb_customer->id->Visible) { // id ?>
-	<tr id="r_id">
-		<td><span id="elh_tb_customer_id"><?php echo $tb_customer->id->FldCaption() ?></span></td>
-		<td data-name="id"<?php echo $tb_customer->id->CellAttributes() ?>>
-<span id="el_tb_customer_id">
-<span<?php echo $tb_customer->id->ViewAttributes() ?>>
-<?php echo $tb_customer->id->ViewValue ?></span>
+<div>
+<?php if ($tb_barang->barang_id->Visible) { // barang_id ?>
+	<div id="r_barang_id" class="form-group">
+		<label id="elh_tb_barang_barang_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_barang->barang_id->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $tb_barang->barang_id->CellAttributes() ?>>
+<span id="el_tb_barang_barang_id">
+<span<?php echo $tb_barang->barang_id->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $tb_barang->barang_id->EditValue ?></p></span>
 </span>
-</td>
-	</tr>
+<input type="hidden" data-table="tb_barang" data-field="x_barang_id" name="x_barang_id" id="x_barang_id" value="<?php echo ew_HtmlEncode($tb_barang->barang_id->CurrentValue) ?>">
+<?php echo $tb_barang->barang_id->CustomMsg ?></div></div>
+	</div>
 <?php } ?>
-<?php if ($tb_customer->nama->Visible) { // nama ?>
-	<tr id="r_nama">
-		<td><span id="elh_tb_customer_nama"><?php echo $tb_customer->nama->FldCaption() ?></span></td>
-		<td data-name="nama"<?php echo $tb_customer->nama->CellAttributes() ?>>
-<span id="el_tb_customer_nama">
-<span<?php echo $tb_customer->nama->ViewAttributes() ?>>
-<?php echo $tb_customer->nama->ViewValue ?></span>
+<?php if ($tb_barang->nama->Visible) { // nama ?>
+	<div id="r_nama" class="form-group">
+		<label id="elh_tb_barang_nama" for="x_nama" class="col-sm-2 control-label ewLabel"><?php echo $tb_barang->nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $tb_barang->nama->CellAttributes() ?>>
+<span id="el_tb_barang_nama">
+<textarea data-table="tb_barang" data-field="x_nama" name="x_nama" id="x_nama" cols="35" rows="4" placeholder="<?php echo ew_HtmlEncode($tb_barang->nama->getPlaceHolder()) ?>"<?php echo $tb_barang->nama->EditAttributes() ?>><?php echo $tb_barang->nama->EditValue ?></textarea>
 </span>
-</td>
-	</tr>
+<?php echo $tb_barang->nama->CustomMsg ?></div></div>
+	</div>
 <?php } ?>
-<?php if ($tb_customer->alamat->Visible) { // alamat ?>
-	<tr id="r_alamat">
-		<td><span id="elh_tb_customer_alamat"><?php echo $tb_customer->alamat->FldCaption() ?></span></td>
-		<td data-name="alamat"<?php echo $tb_customer->alamat->CellAttributes() ?>>
-<span id="el_tb_customer_alamat">
-<span<?php echo $tb_customer->alamat->ViewAttributes() ?>>
-<?php echo $tb_customer->alamat->ViewValue ?></span>
-</span>
-</td>
-	</tr>
+</div>
+<?php if (!$tb_barang_edit->IsModal) { ?>
+<div class="form-group">
+	<div class="col-sm-offset-2 col-sm-10">
+<button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("SaveBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $tb_barang_edit->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+	</div>
+</div>
 <?php } ?>
-<?php if ($tb_customer->kota->Visible) { // kota ?>
-	<tr id="r_kota">
-		<td><span id="elh_tb_customer_kota"><?php echo $tb_customer->kota->FldCaption() ?></span></td>
-		<td data-name="kota"<?php echo $tb_customer->kota->CellAttributes() ?>>
-<span id="el_tb_customer_kota">
-<span<?php echo $tb_customer->kota->ViewAttributes() ?>>
-<?php echo $tb_customer->kota->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($tb_customer->kodepos->Visible) { // kodepos ?>
-	<tr id="r_kodepos">
-		<td><span id="elh_tb_customer_kodepos"><?php echo $tb_customer->kodepos->FldCaption() ?></span></td>
-		<td data-name="kodepos"<?php echo $tb_customer->kodepos->CellAttributes() ?>>
-<span id="el_tb_customer_kodepos">
-<span<?php echo $tb_customer->kodepos->ViewAttributes() ?>>
-<?php echo $tb_customer->kodepos->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($tb_customer->no_npwp->Visible) { // no_npwp ?>
-	<tr id="r_no_npwp">
-		<td><span id="elh_tb_customer_no_npwp"><?php echo $tb_customer->no_npwp->FldCaption() ?></span></td>
-		<td data-name="no_npwp"<?php echo $tb_customer->no_npwp->CellAttributes() ?>>
-<span id="el_tb_customer_no_npwp">
-<span<?php echo $tb_customer->no_npwp->ViewAttributes() ?>>
-<?php echo $tb_customer->no_npwp->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-</table>
 </form>
 <script type="text/javascript">
-ftb_customerview.Init();
+ftb_barangedit.Init();
 </script>
 <?php
-$tb_customer_view->ShowPageFooter();
+$tb_barang_edit->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -941,5 +917,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$tb_customer_view->Page_Terminate();
+$tb_barang_edit->Page_Terminate();
 ?>

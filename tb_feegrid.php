@@ -43,6 +43,9 @@ ftb_feegrid.Validate = function() {
 			elm = this.GetElements("x" + infix + "_invoice_id");
 			if (elm && !ew_CheckInteger(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($tb_fee->invoice_id->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_barang_id");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $tb_fee->barang_id->FldCaption(), $tb_fee->barang_id->ReqErrMsg)) ?>");
 			elm = this.GetElements("x" + infix + "_harga");
 			if (elm && !ew_CheckNumber(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($tb_fee->harga->FldErrMsg()) ?>");
@@ -65,6 +68,7 @@ ftb_feegrid.Validate = function() {
 ftb_feegrid.EmptyRow = function(infix) {
 	var fobj = this.Form;
 	if (ew_ValueChanged(fobj, infix, "invoice_id", false)) return false;
+	if (ew_ValueChanged(fobj, infix, "barang_id", false)) return false;
 	if (ew_ValueChanged(fobj, infix, "harga", false)) return false;
 	if (ew_ValueChanged(fobj, infix, "qty", false)) return false;
 	if (ew_ValueChanged(fobj, infix, "satuan", false)) return false;
@@ -89,8 +93,9 @@ ftb_feegrid.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+ftb_feegrid.Lists["x_barang_id"] = {"LinkField":"x_barang_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"tb_barang"};
 
+// Form object for search
 </script>
 <?php } ?>
 <?php
@@ -175,6 +180,15 @@ $tb_fee_grid->ListOptions->Render("header", "left");
 	<?php } else { ?>
 		<th data-name="invoice_id"><div><div id="elh_tb_fee_invoice_id" class="tb_fee_invoice_id">
 			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_fee->invoice_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($tb_fee->invoice_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_fee->invoice_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($tb_fee->barang_id->Visible) { // barang_id ?>
+	<?php if ($tb_fee->SortUrl($tb_fee->barang_id) == "") { ?>
+		<th data-name="barang_id"><div id="elh_tb_fee_barang_id" class="tb_fee_barang_id"><div class="ewTableHeaderCaption"><?php echo $tb_fee->barang_id->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="barang_id"><div><div id="elh_tb_fee_barang_id" class="tb_fee_barang_id">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_fee->barang_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($tb_fee->barang_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_fee->barang_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
@@ -349,8 +363,13 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowCnt);
 <span<?php echo $tb_fee->id->ViewAttributes() ?>>
 <?php echo $tb_fee->id->ListViewValue() ?></span>
 </span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_fee" data-field="x_id" name="x<?php echo $tb_fee_grid->RowIndex ?>_id" id="x<?php echo $tb_fee_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($tb_fee->id->FormValue) ?>">
 <input type="hidden" data-table="tb_fee" data-field="x_id" name="o<?php echo $tb_fee_grid->RowIndex ?>_id" id="o<?php echo $tb_fee_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($tb_fee->id->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_id" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_id" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($tb_fee->id->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_id" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_id" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($tb_fee->id->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 <a id="<?php echo $tb_fee_grid->PageObjName . "_row_" . $tb_fee_grid->RowCnt ?>"></a></td>
 	<?php } ?>
@@ -388,8 +407,69 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowCnt);
 <span<?php echo $tb_fee->invoice_id->ViewAttributes() ?>>
 <?php echo $tb_fee->invoice_id->ListViewValue() ?></span>
 </span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_fee" data-field="x_invoice_id" name="x<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" id="x<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" value="<?php echo ew_HtmlEncode($tb_fee->invoice_id->FormValue) ?>">
 <input type="hidden" data-table="tb_fee" data-field="x_invoice_id" name="o<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" id="o<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" value="<?php echo ew_HtmlEncode($tb_fee->invoice_id->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_invoice_id" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" value="<?php echo ew_HtmlEncode($tb_fee->invoice_id->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_invoice_id" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" value="<?php echo ew_HtmlEncode($tb_fee->invoice_id->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+	<?php } ?>
+	<?php if ($tb_fee->barang_id->Visible) { // barang_id ?>
+		<td data-name="barang_id"<?php echo $tb_fee->barang_id->CellAttributes() ?>>
+<?php if ($tb_fee->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<span id="el<?php echo $tb_fee_grid->RowCnt ?>_tb_fee_barang_id" class="form-group tb_fee_barang_id">
+<?php
+$wrkonchange = trim(" " . @$tb_fee->barang_id->EditAttrs["onchange"]);
+if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
+$tb_fee->barang_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" style="white-space: nowrap; z-index: <?php echo (9000 - $tb_fee_grid->RowCnt * 10) ?>">
+	<input type="text" name="sv_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="sv_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($tb_fee->barang_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($tb_fee->barang_id->getPlaceHolder()) ?>"<?php echo $tb_fee->barang_id->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="tb_fee" data-field="x_barang_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $tb_fee->barang_id->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
+<input type="hidden" name="q_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="q_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(true) ?>">
+<script type="text/javascript">
+ftb_feegrid.CreateAutoSuggest({"id":"x<?php echo $tb_fee_grid->RowIndex ?>_barang_id","forceSelect":false});
+</script>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_fee->barang_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $tb_fee_grid->RowIndex ?>_barang_id',m:0,n:10,srch:true});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<input type="hidden" name="s_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="s_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(false) ?>">
+</span>
+<input type="hidden" data-table="tb_fee" data-field="x_barang_id" name="o<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="o<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->OldValue) ?>">
+<?php } ?>
+<?php if ($tb_fee->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $tb_fee_grid->RowCnt ?>_tb_fee_barang_id" class="form-group tb_fee_barang_id">
+<?php
+$wrkonchange = trim(" " . @$tb_fee->barang_id->EditAttrs["onchange"]);
+if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
+$tb_fee->barang_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" style="white-space: nowrap; z-index: <?php echo (9000 - $tb_fee_grid->RowCnt * 10) ?>">
+	<input type="text" name="sv_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="sv_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($tb_fee->barang_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($tb_fee->barang_id->getPlaceHolder()) ?>"<?php echo $tb_fee->barang_id->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="tb_fee" data-field="x_barang_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $tb_fee->barang_id->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
+<input type="hidden" name="q_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="q_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(true) ?>">
+<script type="text/javascript">
+ftb_feegrid.CreateAutoSuggest({"id":"x<?php echo $tb_fee_grid->RowIndex ?>_barang_id","forceSelect":false});
+</script>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_fee->barang_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $tb_fee_grid->RowIndex ?>_barang_id',m:0,n:10,srch:true});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<input type="hidden" name="s_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="s_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(false) ?>">
+</span>
+<?php } ?>
+<?php if ($tb_fee->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $tb_fee_grid->RowCnt ?>_tb_fee_barang_id" class="tb_fee_barang_id">
+<span<?php echo $tb_fee->barang_id->ViewAttributes() ?>>
+<?php echo $tb_fee->barang_id->ListViewValue() ?></span>
+</span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_barang_id" name="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_barang_id" name="o<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="o<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_barang_id" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_barang_id" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 </td>
 	<?php } ?>
@@ -411,8 +491,13 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowCnt);
 <span<?php echo $tb_fee->harga->ViewAttributes() ?>>
 <?php echo $tb_fee->harga->ListViewValue() ?></span>
 </span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_fee" data-field="x_harga" name="x<?php echo $tb_fee_grid->RowIndex ?>_harga" id="x<?php echo $tb_fee_grid->RowIndex ?>_harga" value="<?php echo ew_HtmlEncode($tb_fee->harga->FormValue) ?>">
 <input type="hidden" data-table="tb_fee" data-field="x_harga" name="o<?php echo $tb_fee_grid->RowIndex ?>_harga" id="o<?php echo $tb_fee_grid->RowIndex ?>_harga" value="<?php echo ew_HtmlEncode($tb_fee->harga->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_harga" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_harga" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_harga" value="<?php echo ew_HtmlEncode($tb_fee->harga->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_harga" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_harga" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_harga" value="<?php echo ew_HtmlEncode($tb_fee->harga->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 </td>
 	<?php } ?>
@@ -434,8 +519,13 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowCnt);
 <span<?php echo $tb_fee->qty->ViewAttributes() ?>>
 <?php echo $tb_fee->qty->ListViewValue() ?></span>
 </span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_fee" data-field="x_qty" name="x<?php echo $tb_fee_grid->RowIndex ?>_qty" id="x<?php echo $tb_fee_grid->RowIndex ?>_qty" value="<?php echo ew_HtmlEncode($tb_fee->qty->FormValue) ?>">
 <input type="hidden" data-table="tb_fee" data-field="x_qty" name="o<?php echo $tb_fee_grid->RowIndex ?>_qty" id="o<?php echo $tb_fee_grid->RowIndex ?>_qty" value="<?php echo ew_HtmlEncode($tb_fee->qty->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_qty" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_qty" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_qty" value="<?php echo ew_HtmlEncode($tb_fee->qty->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_qty" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_qty" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_qty" value="<?php echo ew_HtmlEncode($tb_fee->qty->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 </td>
 	<?php } ?>
@@ -457,8 +547,13 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowCnt);
 <span<?php echo $tb_fee->satuan->ViewAttributes() ?>>
 <?php echo $tb_fee->satuan->ListViewValue() ?></span>
 </span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_fee" data-field="x_satuan" name="x<?php echo $tb_fee_grid->RowIndex ?>_satuan" id="x<?php echo $tb_fee_grid->RowIndex ?>_satuan" value="<?php echo ew_HtmlEncode($tb_fee->satuan->FormValue) ?>">
 <input type="hidden" data-table="tb_fee" data-field="x_satuan" name="o<?php echo $tb_fee_grid->RowIndex ?>_satuan" id="o<?php echo $tb_fee_grid->RowIndex ?>_satuan" value="<?php echo ew_HtmlEncode($tb_fee->satuan->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_satuan" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_satuan" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_satuan" value="<?php echo ew_HtmlEncode($tb_fee->satuan->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_satuan" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_satuan" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_satuan" value="<?php echo ew_HtmlEncode($tb_fee->satuan->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 </td>
 	<?php } ?>
@@ -480,8 +575,13 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowCnt);
 <span<?php echo $tb_fee->jumlah->ViewAttributes() ?>>
 <?php echo $tb_fee->jumlah->ListViewValue() ?></span>
 </span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_fee" data-field="x_jumlah" name="x<?php echo $tb_fee_grid->RowIndex ?>_jumlah" id="x<?php echo $tb_fee_grid->RowIndex ?>_jumlah" value="<?php echo ew_HtmlEncode($tb_fee->jumlah->FormValue) ?>">
 <input type="hidden" data-table="tb_fee" data-field="x_jumlah" name="o<?php echo $tb_fee_grid->RowIndex ?>_jumlah" id="o<?php echo $tb_fee_grid->RowIndex ?>_jumlah" value="<?php echo ew_HtmlEncode($tb_fee->jumlah->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_jumlah" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_jumlah" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_jumlah" value="<?php echo ew_HtmlEncode($tb_fee->jumlah->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_jumlah" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_jumlah" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_jumlah" value="<?php echo ew_HtmlEncode($tb_fee->jumlah->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 </td>
 	<?php } ?>
@@ -503,8 +603,13 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowCnt);
 <span<?php echo $tb_fee->keterangan->ViewAttributes() ?>>
 <?php echo $tb_fee->keterangan->ListViewValue() ?></span>
 </span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_fee" data-field="x_keterangan" name="x<?php echo $tb_fee_grid->RowIndex ?>_keterangan" id="x<?php echo $tb_fee_grid->RowIndex ?>_keterangan" value="<?php echo ew_HtmlEncode($tb_fee->keterangan->FormValue) ?>">
 <input type="hidden" data-table="tb_fee" data-field="x_keterangan" name="o<?php echo $tb_fee_grid->RowIndex ?>_keterangan" id="o<?php echo $tb_fee_grid->RowIndex ?>_keterangan" value="<?php echo ew_HtmlEncode($tb_fee->keterangan->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_keterangan" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_keterangan" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_keterangan" value="<?php echo ew_HtmlEncode($tb_fee->keterangan->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_keterangan" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_keterangan" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_keterangan" value="<?php echo ew_HtmlEncode($tb_fee->keterangan->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 </td>
 	<?php } ?>
@@ -585,6 +690,36 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowIndex);
 <input type="hidden" data-table="tb_fee" data-field="x_invoice_id" name="x<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" id="x<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" value="<?php echo ew_HtmlEncode($tb_fee->invoice_id->FormValue) ?>">
 <?php } ?>
 <input type="hidden" data-table="tb_fee" data-field="x_invoice_id" name="o<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" id="o<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" value="<?php echo ew_HtmlEncode($tb_fee->invoice_id->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($tb_fee->barang_id->Visible) { // barang_id ?>
+		<td data-name="barang_id">
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
+<span id="el$rowindex$_tb_fee_barang_id" class="form-group tb_fee_barang_id">
+<?php
+$wrkonchange = trim(" " . @$tb_fee->barang_id->EditAttrs["onchange"]);
+if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
+$tb_fee->barang_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" style="white-space: nowrap; z-index: <?php echo (9000 - $tb_fee_grid->RowCnt * 10) ?>">
+	<input type="text" name="sv_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="sv_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($tb_fee->barang_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($tb_fee->barang_id->getPlaceHolder()) ?>"<?php echo $tb_fee->barang_id->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="tb_fee" data-field="x_barang_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $tb_fee->barang_id->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
+<input type="hidden" name="q_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="q_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(true) ?>">
+<script type="text/javascript">
+ftb_feegrid.CreateAutoSuggest({"id":"x<?php echo $tb_fee_grid->RowIndex ?>_barang_id","forceSelect":false});
+</script>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_fee->barang_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $tb_fee_grid->RowIndex ?>_barang_id',m:0,n:10,srch:true});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<input type="hidden" name="s_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="s_x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(false) ?>">
+</span>
+<?php } else { ?>
+<span id="el$rowindex$_tb_fee_barang_id" class="form-group tb_fee_barang_id">
+<span<?php echo $tb_fee->barang_id->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $tb_fee->barang_id->ViewValue ?></p></span>
+</span>
+<input type="hidden" data-table="tb_fee" data-field="x_barang_id" name="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="tb_fee" data-field="x_barang_id" name="o<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="o<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->OldValue) ?>">
 </td>
 	<?php } ?>
 	<?php if ($tb_fee->harga->Visible) { // harga ?>

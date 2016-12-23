@@ -349,6 +349,7 @@ class ctb_fee_list extends ctb_fee {
 		$this->id->SetVisibility();
 		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->invoice_id->SetVisibility();
+		$this->barang_id->SetVisibility();
 		$this->harga->SetVisibility();
 		$this->qty->SetVisibility();
 		$this->satuan->SetVisibility();
@@ -695,6 +696,7 @@ class ctb_fee_list extends ctb_fee {
 		$sFilterList = "";
 		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJSON(), ","); // Field id
 		$sFilterList = ew_Concat($sFilterList, $this->invoice_id->AdvancedSearch->ToJSON(), ","); // Field invoice_id
+		$sFilterList = ew_Concat($sFilterList, $this->barang_id->AdvancedSearch->ToJSON(), ","); // Field barang_id
 		$sFilterList = ew_Concat($sFilterList, $this->harga->AdvancedSearch->ToJSON(), ","); // Field harga
 		$sFilterList = ew_Concat($sFilterList, $this->qty->AdvancedSearch->ToJSON(), ","); // Field qty
 		$sFilterList = ew_Concat($sFilterList, $this->satuan->AdvancedSearch->ToJSON(), ","); // Field satuan
@@ -720,9 +722,16 @@ class ctb_fee_list extends ctb_fee {
 	// Process filter list
 	function ProcessFilterList() {
 		global $UserProfile;
-		if (@$_POST["cmd"] == "savefilters") {
+		if (@$_POST["ajax"] == "savefilters") { // Save filter request (Ajax)
 			$filters = ew_StripSlashes(@$_POST["filters"]);
 			$UserProfile->SetSearchFilters(CurrentUserName(), "ftb_feelistsrch", $filters);
+
+			// Clean output buffer
+			if (!EW_DEBUG_ENABLED && ob_get_length())
+				ob_end_clean();
+			echo ew_ArrayToJson(array(array("success" => TRUE))); // Success
+			$this->Page_Terminate();
+			exit();
 		} elseif (@$_POST["cmd"] == "resetfilter") {
 			$this->RestoreFilterList();
 		}
@@ -752,6 +761,14 @@ class ctb_fee_list extends ctb_fee {
 		$this->invoice_id->AdvancedSearch->SearchValue2 = @$filter["y_invoice_id"];
 		$this->invoice_id->AdvancedSearch->SearchOperator2 = @$filter["w_invoice_id"];
 		$this->invoice_id->AdvancedSearch->Save();
+
+		// Field barang_id
+		$this->barang_id->AdvancedSearch->SearchValue = @$filter["x_barang_id"];
+		$this->barang_id->AdvancedSearch->SearchOperator = @$filter["z_barang_id"];
+		$this->barang_id->AdvancedSearch->SearchCondition = @$filter["v_barang_id"];
+		$this->barang_id->AdvancedSearch->SearchValue2 = @$filter["y_barang_id"];
+		$this->barang_id->AdvancedSearch->SearchOperator2 = @$filter["w_barang_id"];
+		$this->barang_id->AdvancedSearch->Save();
 
 		// Field harga
 		$this->harga->AdvancedSearch->SearchValue = @$filter["x_harga"];
@@ -805,7 +822,7 @@ class ctb_fee_list extends ctb_fee {
 	}
 
 	// Build basic search SQL
-	function BuildBasicSearchSql(&$Where, &$Fld, $arKeywords, $type) {
+	function BuildBasicSearchSQL(&$Where, &$Fld, $arKeywords, $type) {
 		$sDefCond = ($type == "OR") ? "OR" : "AND";
 		$arSQL = array(); // Array for SQL parts
 		$arCond = array(); // Array for search conditions
@@ -830,7 +847,7 @@ class ctb_fee_list extends ctb_fee {
 						$sWrk = $Fld->FldExpression . " IS NULL";
 					} elseif ($Keyword == EW_NOT_NULL_VALUE) {
 						$sWrk = $Fld->FldExpression . " IS NOT NULL";
-					} elseif ($Fld->FldIsVirtual && $Fld->FldVirtualSearch) {
+					} elseif ($Fld->FldIsVirtual) {
 						$sWrk = $Fld->FldVirtualExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
 					} elseif ($Fld->FldDataType != EW_DATATYPE_NUMBER || is_numeric($Keyword)) {
 						$sWrk = $Fld->FldBasicSearchExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
@@ -966,6 +983,7 @@ class ctb_fee_list extends ctb_fee {
 			$this->CurrentOrderType = @$_GET["ordertype"];
 			$this->UpdateSort($this->id); // id
 			$this->UpdateSort($this->invoice_id); // invoice_id
+			$this->UpdateSort($this->barang_id); // barang_id
 			$this->UpdateSort($this->harga); // harga
 			$this->UpdateSort($this->qty); // qty
 			$this->UpdateSort($this->satuan); // satuan
@@ -1011,8 +1029,10 @@ class ctb_fee_list extends ctb_fee {
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
+				$this->setSessionOrderByList($sOrderBy);
 				$this->id->setSort("");
 				$this->invoice_id->setSort("");
+				$this->barang_id->setSort("");
 				$this->harga->setSort("");
 				$this->qty->setSort("");
 				$this->satuan->setSort("");
@@ -1416,7 +1436,7 @@ class ctb_fee_list extends ctb_fee {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -1461,6 +1481,12 @@ class ctb_fee_list extends ctb_fee {
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->invoice_id->setDbValue($rs->fields('invoice_id'));
+		$this->barang_id->setDbValue($rs->fields('barang_id'));
+		if (array_key_exists('EV__barang_id', $rs->fields)) {
+			$this->barang_id->VirtualValue = $rs->fields('EV__barang_id'); // Set up virtual field value
+		} else {
+			$this->barang_id->VirtualValue = ""; // Clear value
+		}
 		$this->harga->setDbValue($rs->fields('harga'));
 		$this->qty->setDbValue($rs->fields('qty'));
 		$this->satuan->setDbValue($rs->fields('satuan'));
@@ -1474,6 +1500,7 @@ class ctb_fee_list extends ctb_fee {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
 		$this->invoice_id->DbValue = $row['invoice_id'];
+		$this->barang_id->DbValue = $row['barang_id'];
 		$this->harga->DbValue = $row['harga'];
 		$this->qty->DbValue = $row['qty'];
 		$this->satuan->DbValue = $row['satuan'];
@@ -1530,6 +1557,7 @@ class ctb_fee_list extends ctb_fee {
 		// Common render codes for all row types
 		// id
 		// invoice_id
+		// barang_id
 		// harga
 		// qty
 		// satuan
@@ -1545,6 +1573,34 @@ class ctb_fee_list extends ctb_fee {
 		// invoice_id
 		$this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
 		$this->invoice_id->ViewCustomAttributes = "";
+
+		// barang_id
+		if ($this->barang_id->VirtualValue <> "") {
+			$this->barang_id->ViewValue = $this->barang_id->VirtualValue;
+		} else {
+			$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
+		if (strval($this->barang_id->CurrentValue) <> "") {
+			$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
+		$sWhereWrk = "";
+		$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->barang_id->ViewValue = $this->barang_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
+			}
+		} else {
+			$this->barang_id->ViewValue = NULL;
+		}
+		}
+		$this->barang_id->ViewCustomAttributes = "";
 
 		// harga
 		$this->harga->ViewValue = $this->harga->CurrentValue;
@@ -1579,6 +1635,11 @@ class ctb_fee_list extends ctb_fee {
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
 			$this->invoice_id->TooltipValue = "";
+
+			// barang_id
+			$this->barang_id->LinkCustomAttributes = "";
+			$this->barang_id->HrefValue = "";
+			$this->barang_id->TooltipValue = "";
 
 			// harga
 			$this->harga->LinkCustomAttributes = "";
@@ -1864,8 +1925,9 @@ ftb_feelist.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+ftb_feelist.Lists["x_barang_id"] = {"LinkField":"x_barang_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"tb_barang"};
 
+// Form object for search
 var CurrentSearchForm = ftb_feelistsrch = new ew_Form("ftb_feelistsrch");
 </script>
 <script type="text/javascript">
@@ -2000,6 +2062,15 @@ $tb_fee_list->ListOptions->Render("header", "left");
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
+<?php if ($tb_fee->barang_id->Visible) { // barang_id ?>
+	<?php if ($tb_fee->SortUrl($tb_fee->barang_id) == "") { ?>
+		<th data-name="barang_id"><div id="elh_tb_fee_barang_id" class="tb_fee_barang_id"><div class="ewTableHeaderCaption"><?php echo $tb_fee->barang_id->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="barang_id"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_fee->SortUrl($tb_fee->barang_id) ?>',1);"><div id="elh_tb_fee_barang_id" class="tb_fee_barang_id">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_fee->barang_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($tb_fee->barang_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_fee->barang_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
 <?php if ($tb_fee->harga->Visible) { // harga ?>
 	<?php if ($tb_fee->SortUrl($tb_fee->harga) == "") { ?>
 		<th data-name="harga"><div id="elh_tb_fee_harga" class="tb_fee_harga"><div class="ewTableHeaderCaption"><?php echo $tb_fee->harga->FldCaption() ?></div></div></th>
@@ -2123,6 +2194,14 @@ $tb_fee_list->ListOptions->Render("body", "left", $tb_fee_list->RowCnt);
 <span id="el<?php echo $tb_fee_list->RowCnt ?>_tb_fee_invoice_id" class="tb_fee_invoice_id">
 <span<?php echo $tb_fee->invoice_id->ViewAttributes() ?>>
 <?php echo $tb_fee->invoice_id->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($tb_fee->barang_id->Visible) { // barang_id ?>
+		<td data-name="barang_id"<?php echo $tb_fee->barang_id->CellAttributes() ?>>
+<span id="el<?php echo $tb_fee_list->RowCnt ?>_tb_fee_barang_id" class="tb_fee_barang_id">
+<span<?php echo $tb_fee->barang_id->ViewAttributes() ?>>
+<?php echo $tb_fee->barang_id->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>

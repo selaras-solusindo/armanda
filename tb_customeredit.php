@@ -365,9 +365,6 @@ class ctb_customer_edit extends ctb_customer {
 			$this->id->setQueryStringValue($_GET["id"]);
 		}
 
-		// Set up Breadcrumb
-		$this->SetupBreadcrumb();
-
 		// Process form if post back
 		if (@$_POST["a_edit"] <> "") {
 			$this->CurrentAction = $_POST["a_edit"]; // Get action code
@@ -413,6 +410,9 @@ class ctb_customer_edit extends ctb_customer {
 					$this->RestoreFormValues(); // Restore form values if update failed
 				}
 		}
+
+		// Set up Breadcrumb
+		$this->SetupBreadcrumb();
 
 		// Render the record
 		$this->RowType = EW_ROWTYPE_EDIT; // Render as Edit

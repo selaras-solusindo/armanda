@@ -259,6 +259,7 @@ class ctb_fee_add extends ctb_fee {
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 		$this->invoice_id->SetVisibility();
+		$this->barang_id->SetVisibility();
 		$this->harga->SetVisibility();
 		$this->qty->SetVisibility();
 		$this->satuan->SetVisibility();
@@ -454,6 +455,8 @@ class ctb_fee_add extends ctb_fee {
 	function LoadDefaultValues() {
 		$this->invoice_id->CurrentValue = NULL;
 		$this->invoice_id->OldValue = $this->invoice_id->CurrentValue;
+		$this->barang_id->CurrentValue = NULL;
+		$this->barang_id->OldValue = $this->barang_id->CurrentValue;
 		$this->harga->CurrentValue = NULL;
 		$this->harga->OldValue = $this->harga->CurrentValue;
 		$this->qty->CurrentValue = NULL;
@@ -471,6 +474,9 @@ class ctb_fee_add extends ctb_fee {
 		global $objForm;
 		if (!$this->invoice_id->FldIsDetailKey) {
 			$this->invoice_id->setFormValue($objForm->GetValue("x_invoice_id"));
+		}
+		if (!$this->barang_id->FldIsDetailKey) {
+			$this->barang_id->setFormValue($objForm->GetValue("x_barang_id"));
 		}
 		if (!$this->harga->FldIsDetailKey) {
 			$this->harga->setFormValue($objForm->GetValue("x_harga"));
@@ -491,6 +497,7 @@ class ctb_fee_add extends ctb_fee {
 		global $objForm;
 		$this->LoadOldRecord();
 		$this->invoice_id->CurrentValue = $this->invoice_id->FormValue;
+		$this->barang_id->CurrentValue = $this->barang_id->FormValue;
 		$this->harga->CurrentValue = $this->harga->FormValue;
 		$this->qty->CurrentValue = $this->qty->FormValue;
 		$this->satuan->CurrentValue = $this->satuan->FormValue;
@@ -528,6 +535,12 @@ class ctb_fee_add extends ctb_fee {
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->invoice_id->setDbValue($rs->fields('invoice_id'));
+		$this->barang_id->setDbValue($rs->fields('barang_id'));
+		if (array_key_exists('EV__barang_id', $rs->fields)) {
+			$this->barang_id->VirtualValue = $rs->fields('EV__barang_id'); // Set up virtual field value
+		} else {
+			$this->barang_id->VirtualValue = ""; // Clear value
+		}
 		$this->harga->setDbValue($rs->fields('harga'));
 		$this->qty->setDbValue($rs->fields('qty'));
 		$this->satuan->setDbValue($rs->fields('satuan'));
@@ -541,6 +554,7 @@ class ctb_fee_add extends ctb_fee {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
 		$this->invoice_id->DbValue = $row['invoice_id'];
+		$this->barang_id->DbValue = $row['barang_id'];
 		$this->harga->DbValue = $row['harga'];
 		$this->qty->DbValue = $row['qty'];
 		$this->satuan->DbValue = $row['satuan'];
@@ -587,6 +601,7 @@ class ctb_fee_add extends ctb_fee {
 		// Common render codes for all row types
 		// id
 		// invoice_id
+		// barang_id
 		// harga
 		// qty
 		// satuan
@@ -602,6 +617,34 @@ class ctb_fee_add extends ctb_fee {
 		// invoice_id
 		$this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
 		$this->invoice_id->ViewCustomAttributes = "";
+
+		// barang_id
+		if ($this->barang_id->VirtualValue <> "") {
+			$this->barang_id->ViewValue = $this->barang_id->VirtualValue;
+		} else {
+			$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
+		if (strval($this->barang_id->CurrentValue) <> "") {
+			$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
+		$sWhereWrk = "";
+		$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->barang_id->ViewValue = $this->barang_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
+			}
+		} else {
+			$this->barang_id->ViewValue = NULL;
+		}
+		}
+		$this->barang_id->ViewCustomAttributes = "";
 
 		// harga
 		$this->harga->ViewValue = $this->harga->CurrentValue;
@@ -631,6 +674,11 @@ class ctb_fee_add extends ctb_fee {
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
 			$this->invoice_id->TooltipValue = "";
+
+			// barang_id
+			$this->barang_id->LinkCustomAttributes = "";
+			$this->barang_id->HrefValue = "";
+			$this->barang_id->TooltipValue = "";
 
 			// harga
 			$this->harga->LinkCustomAttributes = "";
@@ -665,6 +713,12 @@ class ctb_fee_add extends ctb_fee {
 			$this->invoice_id->PlaceHolder = ew_RemoveHtml($this->invoice_id->FldCaption());
 			}
 
+			// barang_id
+			$this->barang_id->EditAttrs["class"] = "form-control";
+			$this->barang_id->EditCustomAttributes = "";
+			$this->barang_id->EditValue = ew_HtmlEncode($this->barang_id->CurrentValue);
+			$this->barang_id->PlaceHolder = ew_RemoveHtml($this->barang_id->FldCaption());
+
 			// harga
 			$this->harga->EditAttrs["class"] = "form-control";
 			$this->harga->EditCustomAttributes = "";
@@ -695,6 +749,10 @@ class ctb_fee_add extends ctb_fee {
 
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
+
+			// barang_id
+			$this->barang_id->LinkCustomAttributes = "";
+			$this->barang_id->HrefValue = "";
 
 			// harga
 			$this->harga->LinkCustomAttributes = "";
@@ -736,6 +794,9 @@ class ctb_fee_add extends ctb_fee {
 		if (!ew_CheckInteger($this->invoice_id->FormValue)) {
 			ew_AddMessage($gsFormError, $this->invoice_id->FldErrMsg());
 		}
+		if (!$this->barang_id->FldIsDetailKey && !is_null($this->barang_id->FormValue) && $this->barang_id->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->barang_id->FldCaption(), $this->barang_id->ReqErrMsg));
+		}
 		if (!ew_CheckNumber($this->harga->FormValue)) {
 			ew_AddMessage($gsFormError, $this->harga->FldErrMsg());
 		}
@@ -768,6 +829,9 @@ class ctb_fee_add extends ctb_fee {
 
 		// invoice_id
 		$this->invoice_id->SetDbValueDef($rsnew, $this->invoice_id->CurrentValue, NULL, FALSE);
+
+		// barang_id
+		$this->barang_id->SetDbValueDef($rsnew, $this->barang_id->CurrentValue, 0, FALSE);
 
 		// harga
 		$this->harga->SetDbValueDef($rsnew, $this->harga->CurrentValue, NULL, FALSE);
@@ -890,6 +954,18 @@ class ctb_fee_add extends ctb_fee {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_barang_id":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `barang_id` AS `LinkFld`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
+			$sWhereWrk = "{filter}";
+			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`barang_id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 
@@ -898,6 +974,19 @@ class ctb_fee_add extends ctb_fee {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_barang_id":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld` FROM `tb_barang`";
+			$sWhereWrk = "`nama` LIKE '{query_value}%'";
+			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$sSqlWrk .= " LIMIT " . EW_AUTO_SUGGEST_MAX_ENTRIES;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 
@@ -1012,6 +1101,9 @@ ftb_feeadd.Validate = function() {
 			elm = this.GetElements("x" + infix + "_invoice_id");
 			if (elm && !ew_CheckInteger(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($tb_fee->invoice_id->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_barang_id");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $tb_fee->barang_id->FldCaption(), $tb_fee->barang_id->ReqErrMsg)) ?>");
 			elm = this.GetElements("x" + infix + "_harga");
 			if (elm && !ew_CheckNumber(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($tb_fee->harga->FldErrMsg()) ?>");
@@ -1051,8 +1143,9 @@ ftb_feeadd.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+ftb_feeadd.Lists["x_barang_id"] = {"LinkField":"x_barang_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"tb_barang"};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
@@ -1099,6 +1192,30 @@ $tb_fee_add->ShowMessage();
 </span>
 <?php } ?>
 <?php echo $tb_fee->invoice_id->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($tb_fee->barang_id->Visible) { // barang_id ?>
+	<div id="r_barang_id" class="form-group">
+		<label id="elh_tb_fee_barang_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_fee->barang_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $tb_fee->barang_id->CellAttributes() ?>>
+<span id="el_tb_fee_barang_id">
+<?php
+$wrkonchange = trim(" " . @$tb_fee->barang_id->EditAttrs["onchange"]);
+if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
+$tb_fee->barang_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x_barang_id" style="white-space: nowrap; z-index: 8970">
+	<input type="text" name="sv_x_barang_id" id="sv_x_barang_id" value="<?php echo $tb_fee->barang_id->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($tb_fee->barang_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($tb_fee->barang_id->getPlaceHolder()) ?>"<?php echo $tb_fee->barang_id->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="tb_fee" data-field="x_barang_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $tb_fee->barang_id->DisplayValueSeparatorAttribute() ?>" name="x_barang_id" id="x_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
+<input type="hidden" name="q_x_barang_id" id="q_x_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(true) ?>">
+<script type="text/javascript">
+ftb_feeadd.CreateAutoSuggest({"id":"x_barang_id","forceSelect":false});
+</script>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_fee->barang_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_barang_id',m:0,n:10,srch:true});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<input type="hidden" name="s_x_barang_id" id="s_x_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(false) ?>">
+</span>
+<?php echo $tb_fee->barang_id->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 <?php if ($tb_fee->harga->Visible) { // harga ?>

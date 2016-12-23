@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "tb_customerinfo.php" ?>
+<?php include_once "tb_baranginfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -13,9 +13,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$tb_customer_list = NULL; // Initialize page object first
+$tb_barang_list = NULL; // Initialize page object first
 
-class ctb_customer_list extends ctb_customer {
+class ctb_barang_list extends ctb_barang {
 
 	// Page ID
 	var $PageID = 'list';
@@ -24,13 +24,13 @@ class ctb_customer_list extends ctb_customer {
 	var $ProjectID = "{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}";
 
 	// Table name
-	var $TableName = 'tb_customer';
+	var $TableName = 'tb_barang';
 
 	// Page object name
-	var $PageObjName = 'tb_customer_list';
+	var $PageObjName = 'tb_barang_list';
 
 	// Grid form hidden field names
-	var $FormName = 'ftb_customerlist';
+	var $FormName = 'ftb_baranglist';
 	var $FormActionName = 'k_action';
 	var $FormKeyName = 'k_key';
 	var $FormOldKeyName = 'k_oldkey';
@@ -264,10 +264,10 @@ class ctb_customer_list extends ctb_customer {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (tb_customer)
-		if (!isset($GLOBALS["tb_customer"]) || get_class($GLOBALS["tb_customer"]) == "ctb_customer") {
-			$GLOBALS["tb_customer"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["tb_customer"];
+		// Table object (tb_barang)
+		if (!isset($GLOBALS["tb_barang"]) || get_class($GLOBALS["tb_barang"]) == "ctb_barang") {
+			$GLOBALS["tb_barang"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["tb_barang"];
 		}
 
 		// Initialize URLs
@@ -278,12 +278,12 @@ class ctb_customer_list extends ctb_customer {
 		$this->ExportXmlUrl = $this->PageUrl() . "export=xml";
 		$this->ExportCsvUrl = $this->PageUrl() . "export=csv";
 		$this->ExportPdfUrl = $this->PageUrl() . "export=pdf";
-		$this->AddUrl = "tb_customeradd.php";
+		$this->AddUrl = "tb_barangadd.php";
 		$this->InlineAddUrl = $this->PageUrl() . "a=add";
 		$this->GridAddUrl = $this->PageUrl() . "a=gridadd";
 		$this->GridEditUrl = $this->PageUrl() . "a=gridedit";
-		$this->MultiDeleteUrl = "tb_customerdelete.php";
-		$this->MultiUpdateUrl = "tb_customerupdate.php";
+		$this->MultiDeleteUrl = "tb_barangdelete.php";
+		$this->MultiUpdateUrl = "tb_barangupdate.php";
 
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
@@ -291,7 +291,7 @@ class ctb_customer_list extends ctb_customer {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'tb_customer', TRUE);
+			define("EW_TABLE_NAME", 'tb_barang', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -322,7 +322,7 @@ class ctb_customer_list extends ctb_customer {
 		// Filter options
 		$this->FilterOptions = new cListOptions();
 		$this->FilterOptions->Tag = "div";
-		$this->FilterOptions->TagClassName = "ewFilterOption ftb_customerlistsrch";
+		$this->FilterOptions->TagClassName = "ewFilterOption ftb_baranglistsrch";
 
 		// List actions
 		$this->ListActions = new cListActions();
@@ -342,13 +342,8 @@ class ctb_customer_list extends ctb_customer {
 
 		// Set up list options
 		$this->SetupListOptions();
-		$this->id->SetVisibility();
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
-		$this->nama->SetVisibility();
-		$this->alamat->SetVisibility();
-		$this->kota->SetVisibility();
-		$this->kodepos->SetVisibility();
-		$this->no_npwp->SetVisibility();
+		$this->barang_id->SetVisibility();
+		$this->barang_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -409,13 +404,13 @@ class ctb_customer_list extends ctb_customer {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $tb_customer;
+		global $EW_EXPORT, $tb_barang;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($tb_customer);
+				$doc = new $class($tb_barang);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -531,28 +526,8 @@ class ctb_customer_list extends ctb_customer {
 					$option->HideAllOptions();
 			}
 
-			// Get default search criteria
-			ew_AddFilter($this->DefaultSearchWhere, $this->BasicSearchWhere(TRUE));
-
-			// Get basic search values
-			$this->LoadBasicSearchValues();
-
-			// Process filter list
-			$this->ProcessFilterList();
-
-			// Restore search parms from Session if not searching / reset / export
-			if (($this->Export <> "" || $this->Command <> "search" && $this->Command <> "reset" && $this->Command <> "resetall") && $this->CheckSearchParms())
-				$this->RestoreSearchParms();
-
-			// Call Recordset SearchValidated event
-			$this->Recordset_SearchValidated();
-
 			// Set up sorting order
 			$this->SetUpSortOrder();
-
-			// Get basic search criteria
-			if ($gsSearchError == "")
-				$sSrchBasic = $this->BasicSearchWhere();
 		}
 
 		// Restore display records
@@ -564,31 +539,6 @@ class ctb_customer_list extends ctb_customer {
 
 		// Load Sorting Order
 		$this->LoadSortOrder();
-
-		// Load search default if no existing search criteria
-		if (!$this->CheckSearchParms()) {
-
-			// Load basic search from default
-			$this->BasicSearch->LoadDefault();
-			if ($this->BasicSearch->Keyword != "")
-				$sSrchBasic = $this->BasicSearchWhere();
-		}
-
-		// Build search criteria
-		ew_AddFilter($this->SearchWhere, $sSrchAdvanced);
-		ew_AddFilter($this->SearchWhere, $sSrchBasic);
-
-		// Call Recordset_Searching event
-		$this->Recordset_Searching($this->SearchWhere);
-
-		// Save search criteria
-		if ($this->Command == "search" && !$this->RestoreSearch) {
-			$this->setSearchWhere($this->SearchWhere); // Save to Session
-			$this->StartRec = 1; // Reset start record counter
-			$this->setStartRecordNumber($this->StartRec);
-		} else {
-			$this->SearchWhere = $this->getSearchWhere();
-		}
 
 		// Build filter
 		$sFilter = "";
@@ -645,289 +595,11 @@ class ctb_customer_list extends ctb_customer {
 	function SetupKeyValues($key) {
 		$arrKeyFlds = explode($GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"], $key);
 		if (count($arrKeyFlds) >= 1) {
-			$this->id->setFormValue($arrKeyFlds[0]);
-			if (!is_numeric($this->id->FormValue))
+			$this->barang_id->setFormValue($arrKeyFlds[0]);
+			if (!is_numeric($this->barang_id->FormValue))
 				return FALSE;
 		}
 		return TRUE;
-	}
-
-	// Get list of filters
-	function GetFilterList() {
-		global $UserProfile;
-
-		// Load server side filters
-		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ftb_customerlistsrch");
-		} else {
-			$sSavedFilterList = "";
-		}
-
-		// Initialize
-		$sFilterList = "";
-		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJSON(), ","); // Field id
-		$sFilterList = ew_Concat($sFilterList, $this->nama->AdvancedSearch->ToJSON(), ","); // Field nama
-		$sFilterList = ew_Concat($sFilterList, $this->alamat->AdvancedSearch->ToJSON(), ","); // Field alamat
-		$sFilterList = ew_Concat($sFilterList, $this->kota->AdvancedSearch->ToJSON(), ","); // Field kota
-		$sFilterList = ew_Concat($sFilterList, $this->kodepos->AdvancedSearch->ToJSON(), ","); // Field kodepos
-		$sFilterList = ew_Concat($sFilterList, $this->no_npwp->AdvancedSearch->ToJSON(), ","); // Field no_npwp
-		if ($this->BasicSearch->Keyword <> "") {
-			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
-			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
-		}
-		$sFilterList = preg_replace('/,$/', "", $sFilterList);
-
-		// Return filter list in json
-		if ($sFilterList <> "")
-			$sFilterList = "\"data\":{" . $sFilterList . "}";
-		if ($sSavedFilterList <> "") {
-			if ($sFilterList <> "")
-				$sFilterList .= ",";
-			$sFilterList .= "\"filters\":" . $sSavedFilterList;
-		}
-		return ($sFilterList <> "") ? "{" . $sFilterList . "}" : "null";
-	}
-
-	// Process filter list
-	function ProcessFilterList() {
-		global $UserProfile;
-		if (@$_POST["ajax"] == "savefilters") { // Save filter request (Ajax)
-			$filters = ew_StripSlashes(@$_POST["filters"]);
-			$UserProfile->SetSearchFilters(CurrentUserName(), "ftb_customerlistsrch", $filters);
-
-			// Clean output buffer
-			if (!EW_DEBUG_ENABLED && ob_get_length())
-				ob_end_clean();
-			echo ew_ArrayToJson(array(array("success" => TRUE))); // Success
-			$this->Page_Terminate();
-			exit();
-		} elseif (@$_POST["cmd"] == "resetfilter") {
-			$this->RestoreFilterList();
-		}
-	}
-
-	// Restore list of filters
-	function RestoreFilterList() {
-
-		// Return if not reset filter
-		if (@$_POST["cmd"] <> "resetfilter")
-			return FALSE;
-		$filter = json_decode(ew_StripSlashes(@$_POST["filter"]), TRUE);
-		$this->Command = "search";
-
-		// Field id
-		$this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
-		$this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
-		$this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
-		$this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
-		$this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
-		$this->id->AdvancedSearch->Save();
-
-		// Field nama
-		$this->nama->AdvancedSearch->SearchValue = @$filter["x_nama"];
-		$this->nama->AdvancedSearch->SearchOperator = @$filter["z_nama"];
-		$this->nama->AdvancedSearch->SearchCondition = @$filter["v_nama"];
-		$this->nama->AdvancedSearch->SearchValue2 = @$filter["y_nama"];
-		$this->nama->AdvancedSearch->SearchOperator2 = @$filter["w_nama"];
-		$this->nama->AdvancedSearch->Save();
-
-		// Field alamat
-		$this->alamat->AdvancedSearch->SearchValue = @$filter["x_alamat"];
-		$this->alamat->AdvancedSearch->SearchOperator = @$filter["z_alamat"];
-		$this->alamat->AdvancedSearch->SearchCondition = @$filter["v_alamat"];
-		$this->alamat->AdvancedSearch->SearchValue2 = @$filter["y_alamat"];
-		$this->alamat->AdvancedSearch->SearchOperator2 = @$filter["w_alamat"];
-		$this->alamat->AdvancedSearch->Save();
-
-		// Field kota
-		$this->kota->AdvancedSearch->SearchValue = @$filter["x_kota"];
-		$this->kota->AdvancedSearch->SearchOperator = @$filter["z_kota"];
-		$this->kota->AdvancedSearch->SearchCondition = @$filter["v_kota"];
-		$this->kota->AdvancedSearch->SearchValue2 = @$filter["y_kota"];
-		$this->kota->AdvancedSearch->SearchOperator2 = @$filter["w_kota"];
-		$this->kota->AdvancedSearch->Save();
-
-		// Field kodepos
-		$this->kodepos->AdvancedSearch->SearchValue = @$filter["x_kodepos"];
-		$this->kodepos->AdvancedSearch->SearchOperator = @$filter["z_kodepos"];
-		$this->kodepos->AdvancedSearch->SearchCondition = @$filter["v_kodepos"];
-		$this->kodepos->AdvancedSearch->SearchValue2 = @$filter["y_kodepos"];
-		$this->kodepos->AdvancedSearch->SearchOperator2 = @$filter["w_kodepos"];
-		$this->kodepos->AdvancedSearch->Save();
-
-		// Field no_npwp
-		$this->no_npwp->AdvancedSearch->SearchValue = @$filter["x_no_npwp"];
-		$this->no_npwp->AdvancedSearch->SearchOperator = @$filter["z_no_npwp"];
-		$this->no_npwp->AdvancedSearch->SearchCondition = @$filter["v_no_npwp"];
-		$this->no_npwp->AdvancedSearch->SearchValue2 = @$filter["y_no_npwp"];
-		$this->no_npwp->AdvancedSearch->SearchOperator2 = @$filter["w_no_npwp"];
-		$this->no_npwp->AdvancedSearch->Save();
-		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
-		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
-	}
-
-	// Return basic search SQL
-	function BasicSearchSQL($arKeywords, $type) {
-		$sWhere = "";
-		$this->BuildBasicSearchSQL($sWhere, $this->nama, $arKeywords, $type);
-		$this->BuildBasicSearchSQL($sWhere, $this->alamat, $arKeywords, $type);
-		$this->BuildBasicSearchSQL($sWhere, $this->kota, $arKeywords, $type);
-		$this->BuildBasicSearchSQL($sWhere, $this->kodepos, $arKeywords, $type);
-		$this->BuildBasicSearchSQL($sWhere, $this->no_npwp, $arKeywords, $type);
-		return $sWhere;
-	}
-
-	// Build basic search SQL
-	function BuildBasicSearchSQL(&$Where, &$Fld, $arKeywords, $type) {
-		$sDefCond = ($type == "OR") ? "OR" : "AND";
-		$arSQL = array(); // Array for SQL parts
-		$arCond = array(); // Array for search conditions
-		$cnt = count($arKeywords);
-		$j = 0; // Number of SQL parts
-		for ($i = 0; $i < $cnt; $i++) {
-			$Keyword = $arKeywords[$i];
-			$Keyword = trim($Keyword);
-			if (EW_BASIC_SEARCH_IGNORE_PATTERN <> "") {
-				$Keyword = preg_replace(EW_BASIC_SEARCH_IGNORE_PATTERN, "\\", $Keyword);
-				$ar = explode("\\", $Keyword);
-			} else {
-				$ar = array($Keyword);
-			}
-			foreach ($ar as $Keyword) {
-				if ($Keyword <> "") {
-					$sWrk = "";
-					if ($Keyword == "OR" && $type == "") {
-						if ($j > 0)
-							$arCond[$j-1] = "OR";
-					} elseif ($Keyword == EW_NULL_VALUE) {
-						$sWrk = $Fld->FldExpression . " IS NULL";
-					} elseif ($Keyword == EW_NOT_NULL_VALUE) {
-						$sWrk = $Fld->FldExpression . " IS NOT NULL";
-					} elseif ($Fld->FldIsVirtual) {
-						$sWrk = $Fld->FldVirtualExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
-					} elseif ($Fld->FldDataType != EW_DATATYPE_NUMBER || is_numeric($Keyword)) {
-						$sWrk = $Fld->FldBasicSearchExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
-					}
-					if ($sWrk <> "") {
-						$arSQL[$j] = $sWrk;
-						$arCond[$j] = $sDefCond;
-						$j += 1;
-					}
-				}
-			}
-		}
-		$cnt = count($arSQL);
-		$bQuoted = FALSE;
-		$sSql = "";
-		if ($cnt > 0) {
-			for ($i = 0; $i < $cnt-1; $i++) {
-				if ($arCond[$i] == "OR") {
-					if (!$bQuoted) $sSql .= "(";
-					$bQuoted = TRUE;
-				}
-				$sSql .= $arSQL[$i];
-				if ($bQuoted && $arCond[$i] <> "OR") {
-					$sSql .= ")";
-					$bQuoted = FALSE;
-				}
-				$sSql .= " " . $arCond[$i] . " ";
-			}
-			$sSql .= $arSQL[$cnt-1];
-			if ($bQuoted)
-				$sSql .= ")";
-		}
-		if ($sSql <> "") {
-			if ($Where <> "") $Where .= " OR ";
-			$Where .=  "(" . $sSql . ")";
-		}
-	}
-
-	// Return basic search WHERE clause based on search keyword and type
-	function BasicSearchWhere($Default = FALSE) {
-		global $Security;
-		$sSearchStr = "";
-		$sSearchKeyword = ($Default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
-		$sSearchType = ($Default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
-		if ($sSearchKeyword <> "") {
-			$sSearch = trim($sSearchKeyword);
-			if ($sSearchType <> "=") {
-				$ar = array();
-
-				// Match quoted keywords (i.e.: "...")
-				if (preg_match_all('/"([^"]*)"/i', $sSearch, $matches, PREG_SET_ORDER)) {
-					foreach ($matches as $match) {
-						$p = strpos($sSearch, $match[0]);
-						$str = substr($sSearch, 0, $p);
-						$sSearch = substr($sSearch, $p + strlen($match[0]));
-						if (strlen(trim($str)) > 0)
-							$ar = array_merge($ar, explode(" ", trim($str)));
-						$ar[] = $match[1]; // Save quoted keyword
-					}
-				}
-
-				// Match individual keywords
-				if (strlen(trim($sSearch)) > 0)
-					$ar = array_merge($ar, explode(" ", trim($sSearch)));
-
-				// Search keyword in any fields
-				if (($sSearchType == "OR" || $sSearchType == "AND") && $this->BasicSearch->BasicSearchAnyFields) {
-					foreach ($ar as $sKeyword) {
-						if ($sKeyword <> "") {
-							if ($sSearchStr <> "") $sSearchStr .= " " . $sSearchType . " ";
-							$sSearchStr .= "(" . $this->BasicSearchSQL(array($sKeyword), $sSearchType) . ")";
-						}
-					}
-				} else {
-					$sSearchStr = $this->BasicSearchSQL($ar, $sSearchType);
-				}
-			} else {
-				$sSearchStr = $this->BasicSearchSQL(array($sSearch), $sSearchType);
-			}
-			if (!$Default) $this->Command = "search";
-		}
-		if (!$Default && $this->Command == "search") {
-			$this->BasicSearch->setKeyword($sSearchKeyword);
-			$this->BasicSearch->setType($sSearchType);
-		}
-		return $sSearchStr;
-	}
-
-	// Check if search parm exists
-	function CheckSearchParms() {
-
-		// Check basic search
-		if ($this->BasicSearch->IssetSession())
-			return TRUE;
-		return FALSE;
-	}
-
-	// Clear all search parameters
-	function ResetSearchParms() {
-
-		// Clear search WHERE clause
-		$this->SearchWhere = "";
-		$this->setSearchWhere($this->SearchWhere);
-
-		// Clear basic search parameters
-		$this->ResetBasicSearchParms();
-	}
-
-	// Load advanced search default values
-	function LoadAdvancedSearchDefault() {
-		return FALSE;
-	}
-
-	// Clear all basic search parameters
-	function ResetBasicSearchParms() {
-		$this->BasicSearch->UnsetSession();
-	}
-
-	// Restore all search parameters
-	function RestoreSearchParms() {
-		$this->RestoreSearch = TRUE;
-
-		// Restore basic search values
-		$this->BasicSearch->Load();
 	}
 
 	// Set up sort parameters
@@ -937,12 +609,7 @@ class ctb_customer_list extends ctb_customer {
 		if (@$_GET["order"] <> "") {
 			$this->CurrentOrder = ew_StripSlashes(@$_GET["order"]);
 			$this->CurrentOrderType = @$_GET["ordertype"];
-			$this->UpdateSort($this->id); // id
-			$this->UpdateSort($this->nama); // nama
-			$this->UpdateSort($this->alamat); // alamat
-			$this->UpdateSort($this->kota); // kota
-			$this->UpdateSort($this->kodepos); // kodepos
-			$this->UpdateSort($this->no_npwp); // no_npwp
+			$this->UpdateSort($this->barang_id); // barang_id
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -967,20 +634,11 @@ class ctb_customer_list extends ctb_customer {
 		// Check if reset command
 		if (substr($this->Command,0,5) == "reset") {
 
-			// Reset search criteria
-			if ($this->Command == "reset" || $this->Command == "resetall")
-				$this->ResetSearchParms();
-
 			// Reset sorting order
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
-				$this->id->setSort("");
-				$this->nama->setSort("");
-				$this->alamat->setSort("");
-				$this->kota->setSort("");
-				$this->kodepos->setSort("");
-				$this->no_npwp->setSort("");
+				$this->barang_id->setSort("");
 			}
 
 			// Reset start position
@@ -1125,7 +783,7 @@ class ctb_customer_list extends ctb_customer {
 
 		// "checkbox"
 		$oListOpt = &$this->ListOptions->Items["checkbox"];
-		$oListOpt->Body = "<input type=\"checkbox\" name=\"key_m[]\" value=\"" . ew_HtmlEncode($this->id->CurrentValue) . "\" onclick='ew_ClickMultiCheckbox(event);'>";
+		$oListOpt->Body = "<input type=\"checkbox\" name=\"key_m[]\" value=\"" . ew_HtmlEncode($this->barang_id->CurrentValue) . "\" onclick='ew_ClickMultiCheckbox(event);'>";
 		$this->RenderListOptionsExt();
 
 		// Call ListOptions_Rendered event
@@ -1161,11 +819,11 @@ class ctb_customer_list extends ctb_customer {
 
 		// Filter button
 		$item = &$this->FilterOptions->Add("savecurrentfilter");
-		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ftb_customerlistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
-		$item->Visible = TRUE;
+		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ftb_baranglistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
+		$item->Visible = FALSE;
 		$item = &$this->FilterOptions->Add("deletefilter");
-		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ftb_customerlistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
-		$item->Visible = TRUE;
+		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ftb_baranglistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
+		$item->Visible = FALSE;
 		$this->FilterOptions->UseDropDownButton = TRUE;
 		$this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
 		$this->FilterOptions->DropDownButtonPhrase = $Language->Phrase("Filters");
@@ -1188,7 +846,7 @@ class ctb_customer_list extends ctb_customer {
 					$item = &$option->Add("custom_" . $listaction->Action);
 					$caption = $listaction->Caption;
 					$icon = ($listaction->Icon <> "") ? "<span class=\"" . ew_HtmlEncode($listaction->Icon) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\"></span> " : $caption;
-					$item->Body = "<a class=\"ewAction ewListAction\" title=\"" . ew_HtmlEncode($caption) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\" href=\"\" onclick=\"ew_SubmitAction(event,jQuery.extend({f:document.ftb_customerlist}," . $listaction->ToJson(TRUE) . "));return false;\">" . $icon . "</a>";
+					$item->Body = "<a class=\"ewAction ewListAction\" title=\"" . ew_HtmlEncode($caption) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\" href=\"\" onclick=\"ew_SubmitAction(event,jQuery.extend({f:document.ftb_baranglist}," . $listaction->ToJson(TRUE) . "));return false;\">" . $icon . "</a>";
 					$item->Visible = $listaction->Allow;
 				}
 			}
@@ -1289,17 +947,6 @@ class ctb_customer_list extends ctb_customer {
 		$this->SearchOptions->Tag = "div";
 		$this->SearchOptions->TagClassName = "ewSearchOption";
 
-		// Search button
-		$item = &$this->SearchOptions->Add("searchtoggle");
-		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : " active";
-		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ftb_customerlistsrch\">" . $Language->Phrase("SearchBtn") . "</button>";
-		$item->Visible = TRUE;
-
-		// Show all button
-		$item = &$this->SearchOptions->Add("showall");
-		$item->Body = "<a class=\"btn btn-default ewShowAll\" title=\"" . $Language->Phrase("ShowAll") . "\" data-caption=\"" . $Language->Phrase("ShowAll") . "\" href=\"" . $this->PageUrl() . "cmd=reset\">" . $Language->Phrase("ShowAllBtn") . "</a>";
-		$item->Visible = ($this->SearchWhere <> $this->DefaultSearchWhere && $this->SearchWhere <> "0=101");
-
 		// Button group for search
 		$this->SearchOptions->UseDropDownButton = FALSE;
 		$this->SearchOptions->UseImageAndText = TRUE;
@@ -1360,13 +1007,6 @@ class ctb_customer_list extends ctb_customer {
 		}
 	}
 
-	// Load basic search values
-	function LoadBasicSearchValues() {
-		$this->BasicSearch->Keyword = @$_GET[EW_TABLE_BASIC_SEARCH];
-		if ($this->BasicSearch->Keyword <> "") $this->Command = "search";
-		$this->BasicSearch->Type = @$_GET[EW_TABLE_BASIC_SEARCH_TYPE];
-	}
-
 	// Load recordset
 	function LoadRecordset($offset = -1, $rowcnt = -1) {
 
@@ -1422,24 +1062,16 @@ class ctb_customer_list extends ctb_customer {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->id->setDbValue($rs->fields('id'));
+		$this->barang_id->setDbValue($rs->fields('barang_id'));
 		$this->nama->setDbValue($rs->fields('nama'));
-		$this->alamat->setDbValue($rs->fields('alamat'));
-		$this->kota->setDbValue($rs->fields('kota'));
-		$this->kodepos->setDbValue($rs->fields('kodepos'));
-		$this->no_npwp->setDbValue($rs->fields('no_npwp'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->id->DbValue = $row['id'];
+		$this->barang_id->DbValue = $row['barang_id'];
 		$this->nama->DbValue = $row['nama'];
-		$this->alamat->DbValue = $row['alamat'];
-		$this->kota->DbValue = $row['kota'];
-		$this->kodepos->DbValue = $row['kodepos'];
-		$this->no_npwp->DbValue = $row['no_npwp'];
 	}
 
 	// Load old record
@@ -1447,8 +1079,8 @@ class ctb_customer_list extends ctb_customer {
 
 		// Load key values from Session
 		$bValidKey = TRUE;
-		if (strval($this->getKey("id")) <> "")
-			$this->id->CurrentValue = $this->getKey("id"); // id
+		if (strval($this->getKey("barang_id")) <> "")
+			$this->barang_id->CurrentValue = $this->getKey("barang_id"); // barang_id
 		else
 			$bValidKey = FALSE;
 
@@ -1481,68 +1113,19 @@ class ctb_customer_list extends ctb_customer {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// id
+		// barang_id
 		// nama
-		// alamat
-		// kota
-		// kodepos
-		// no_npwp
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// id
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
+		// barang_id
+		$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
+		$this->barang_id->ViewCustomAttributes = "";
 
-		// nama
-		$this->nama->ViewValue = $this->nama->CurrentValue;
-		$this->nama->ViewCustomAttributes = "";
-
-		// alamat
-		$this->alamat->ViewValue = $this->alamat->CurrentValue;
-		$this->alamat->ViewCustomAttributes = "";
-
-		// kota
-		$this->kota->ViewValue = $this->kota->CurrentValue;
-		$this->kota->ViewCustomAttributes = "";
-
-		// kodepos
-		$this->kodepos->ViewValue = $this->kodepos->CurrentValue;
-		$this->kodepos->ViewCustomAttributes = "";
-
-		// no_npwp
-		$this->no_npwp->ViewValue = $this->no_npwp->CurrentValue;
-		$this->no_npwp->ViewCustomAttributes = "";
-
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
-
-			// nama
-			$this->nama->LinkCustomAttributes = "";
-			$this->nama->HrefValue = "";
-			$this->nama->TooltipValue = "";
-
-			// alamat
-			$this->alamat->LinkCustomAttributes = "";
-			$this->alamat->HrefValue = "";
-			$this->alamat->TooltipValue = "";
-
-			// kota
-			$this->kota->LinkCustomAttributes = "";
-			$this->kota->HrefValue = "";
-			$this->kota->TooltipValue = "";
-
-			// kodepos
-			$this->kodepos->LinkCustomAttributes = "";
-			$this->kodepos->HrefValue = "";
-			$this->kodepos->TooltipValue = "";
-
-			// no_npwp
-			$this->no_npwp->LinkCustomAttributes = "";
-			$this->no_npwp->HrefValue = "";
-			$this->no_npwp->TooltipValue = "";
+			// barang_id
+			$this->barang_id->LinkCustomAttributes = "";
+			$this->barang_id->HrefValue = "";
+			$this->barang_id->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1699,30 +1282,30 @@ class ctb_customer_list extends ctb_customer {
 <?php
 
 // Create page object
-if (!isset($tb_customer_list)) $tb_customer_list = new ctb_customer_list();
+if (!isset($tb_barang_list)) $tb_barang_list = new ctb_barang_list();
 
 // Page init
-$tb_customer_list->Page_Init();
+$tb_barang_list->Page_Init();
 
 // Page main
-$tb_customer_list->Page_Main();
+$tb_barang_list->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$tb_customer_list->Page_Render();
+$tb_barang_list->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "list";
-var CurrentForm = ftb_customerlist = new ew_Form("ftb_customerlist", "list");
-ftb_customerlist.FormKeyCountName = '<?php echo $tb_customer_list->FormKeyCountName ?>';
+var CurrentForm = ftb_baranglist = new ew_Form("ftb_baranglist", "list");
+ftb_baranglist.FormKeyCountName = '<?php echo $tb_barang_list->FormKeyCountName ?>';
 
 // Form_CustomValidate event
-ftb_customerlist.Form_CustomValidate = 
+ftb_baranglist.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -1731,15 +1314,14 @@ ftb_customerlist.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ftb_customerlist.ValidateRequired = true;
+ftb_baranglist.ValidateRequired = true;
 <?php } else { ?>
-ftb_customerlist.ValidateRequired = false; 
+ftb_baranglist.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
 // Form object for search
 
-var CurrentSearchForm = ftb_customerlistsrch = new ew_Form("ftb_customerlistsrch");
 </script>
 <script type="text/javascript">
 
@@ -1747,282 +1329,164 @@ var CurrentSearchForm = ftb_customerlistsrch = new ew_Form("ftb_customerlistsrch
 </script>
 <div class="ewToolbar">
 <?php $Breadcrumb->Render(); ?>
-<?php if ($tb_customer_list->TotalRecs > 0 && $tb_customer_list->ExportOptions->Visible()) { ?>
-<?php $tb_customer_list->ExportOptions->Render("body") ?>
-<?php } ?>
-<?php if ($tb_customer_list->SearchOptions->Visible()) { ?>
-<?php $tb_customer_list->SearchOptions->Render("body") ?>
-<?php } ?>
-<?php if ($tb_customer_list->FilterOptions->Visible()) { ?>
-<?php $tb_customer_list->FilterOptions->Render("body") ?>
+<?php if ($tb_barang_list->TotalRecs > 0 && $tb_barang_list->ExportOptions->Visible()) { ?>
+<?php $tb_barang_list->ExportOptions->Render("body") ?>
 <?php } ?>
 <?php echo $Language->SelectionForm(); ?>
 <div class="clearfix"></div>
 </div>
 <?php
-	$bSelectLimit = $tb_customer_list->UseSelectLimit;
+	$bSelectLimit = $tb_barang_list->UseSelectLimit;
 	if ($bSelectLimit) {
-		if ($tb_customer_list->TotalRecs <= 0)
-			$tb_customer_list->TotalRecs = $tb_customer->SelectRecordCount();
+		if ($tb_barang_list->TotalRecs <= 0)
+			$tb_barang_list->TotalRecs = $tb_barang->SelectRecordCount();
 	} else {
-		if (!$tb_customer_list->Recordset && ($tb_customer_list->Recordset = $tb_customer_list->LoadRecordset()))
-			$tb_customer_list->TotalRecs = $tb_customer_list->Recordset->RecordCount();
+		if (!$tb_barang_list->Recordset && ($tb_barang_list->Recordset = $tb_barang_list->LoadRecordset()))
+			$tb_barang_list->TotalRecs = $tb_barang_list->Recordset->RecordCount();
 	}
-	$tb_customer_list->StartRec = 1;
-	if ($tb_customer_list->DisplayRecs <= 0 || ($tb_customer->Export <> "" && $tb_customer->ExportAll)) // Display all records
-		$tb_customer_list->DisplayRecs = $tb_customer_list->TotalRecs;
-	if (!($tb_customer->Export <> "" && $tb_customer->ExportAll))
-		$tb_customer_list->SetUpStartRec(); // Set up start record position
+	$tb_barang_list->StartRec = 1;
+	if ($tb_barang_list->DisplayRecs <= 0 || ($tb_barang->Export <> "" && $tb_barang->ExportAll)) // Display all records
+		$tb_barang_list->DisplayRecs = $tb_barang_list->TotalRecs;
+	if (!($tb_barang->Export <> "" && $tb_barang->ExportAll))
+		$tb_barang_list->SetUpStartRec(); // Set up start record position
 	if ($bSelectLimit)
-		$tb_customer_list->Recordset = $tb_customer_list->LoadRecordset($tb_customer_list->StartRec-1, $tb_customer_list->DisplayRecs);
+		$tb_barang_list->Recordset = $tb_barang_list->LoadRecordset($tb_barang_list->StartRec-1, $tb_barang_list->DisplayRecs);
 
 	// Set no record found message
-	if ($tb_customer->CurrentAction == "" && $tb_customer_list->TotalRecs == 0) {
-		if ($tb_customer_list->SearchWhere == "0=101")
-			$tb_customer_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
+	if ($tb_barang->CurrentAction == "" && $tb_barang_list->TotalRecs == 0) {
+		if ($tb_barang_list->SearchWhere == "0=101")
+			$tb_barang_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
-			$tb_customer_list->setWarningMessage($Language->Phrase("NoRecord"));
+			$tb_barang_list->setWarningMessage($Language->Phrase("NoRecord"));
 	}
-$tb_customer_list->RenderOtherOptions();
+$tb_barang_list->RenderOtherOptions();
 ?>
-<?php if ($tb_customer->Export == "" && $tb_customer->CurrentAction == "") { ?>
-<form name="ftb_customerlistsrch" id="ftb_customerlistsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
-<?php $SearchPanelClass = ($tb_customer_list->SearchWhere <> "") ? " in" : " in"; ?>
-<div id="ftb_customerlistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
-<input type="hidden" name="cmd" value="search">
-<input type="hidden" name="t" value="tb_customer">
-	<div class="ewBasicSearch">
-<div id="xsr_1" class="ewRow">
-	<div class="ewQuickSearch input-group">
-	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="form-control" value="<?php echo ew_HtmlEncode($tb_customer_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo ew_HtmlEncode($Language->Phrase("Search")) ?>">
-	<input type="hidden" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" id="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="<?php echo ew_HtmlEncode($tb_customer_list->BasicSearch->getType()) ?>">
-	<div class="input-group-btn">
-		<button type="button" data-toggle="dropdown" class="btn btn-default"><span id="searchtype"><?php echo $tb_customer_list->BasicSearch->getTypeNameShort() ?></span><span class="caret"></span></button>
-		<ul class="dropdown-menu pull-right" role="menu">
-			<li<?php if ($tb_customer_list->BasicSearch->getType() == "") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this)"><?php echo $Language->Phrase("QuickSearchAuto") ?></a></li>
-			<li<?php if ($tb_customer_list->BasicSearch->getType() == "=") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'=')"><?php echo $Language->Phrase("QuickSearchExact") ?></a></li>
-			<li<?php if ($tb_customer_list->BasicSearch->getType() == "AND") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'AND')"><?php echo $Language->Phrase("QuickSearchAll") ?></a></li>
-			<li<?php if ($tb_customer_list->BasicSearch->getType() == "OR") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'OR')"><?php echo $Language->Phrase("QuickSearchAny") ?></a></li>
-		</ul>
-	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit"><?php echo $Language->Phrase("QuickSearchBtn") ?></button>
-	</div>
-	</div>
-</div>
-	</div>
-</div>
-</form>
-<?php } ?>
-<?php $tb_customer_list->ShowPageHeader(); ?>
+<?php $tb_barang_list->ShowPageHeader(); ?>
 <?php
-$tb_customer_list->ShowMessage();
+$tb_barang_list->ShowMessage();
 ?>
-<?php if ($tb_customer_list->TotalRecs > 0 || $tb_customer->CurrentAction <> "") { ?>
-<div class="panel panel-default ewGrid tb_customer">
-<form name="ftb_customerlist" id="ftb_customerlist" class="form-inline ewForm ewListForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($tb_customer_list->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_customer_list->Token ?>">
+<?php if ($tb_barang_list->TotalRecs > 0 || $tb_barang->CurrentAction <> "") { ?>
+<div class="panel panel-default ewGrid tb_barang">
+<form name="ftb_baranglist" id="ftb_baranglist" class="form-inline ewForm ewListForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($tb_barang_list->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_barang_list->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="tb_customer">
-<div id="gmp_tb_customer" class="<?php if (ew_IsResponsiveLayout()) { echo "table-responsive "; } ?>ewGridMiddlePanel">
-<?php if ($tb_customer_list->TotalRecs > 0) { ?>
-<table id="tbl_tb_customerlist" class="table ewTable">
-<?php echo $tb_customer->TableCustomInnerHtml ?>
+<input type="hidden" name="t" value="tb_barang">
+<div id="gmp_tb_barang" class="<?php if (ew_IsResponsiveLayout()) { echo "table-responsive "; } ?>ewGridMiddlePanel">
+<?php if ($tb_barang_list->TotalRecs > 0) { ?>
+<table id="tbl_tb_baranglist" class="table ewTable">
+<?php echo $tb_barang->TableCustomInnerHtml ?>
 <thead><!-- Table header -->
 	<tr class="ewTableHeader">
 <?php
 
 // Header row
-$tb_customer_list->RowType = EW_ROWTYPE_HEADER;
+$tb_barang_list->RowType = EW_ROWTYPE_HEADER;
 
 // Render list options
-$tb_customer_list->RenderListOptions();
+$tb_barang_list->RenderListOptions();
 
 // Render list options (header, left)
-$tb_customer_list->ListOptions->Render("header", "left");
+$tb_barang_list->ListOptions->Render("header", "left");
 ?>
-<?php if ($tb_customer->id->Visible) { // id ?>
-	<?php if ($tb_customer->SortUrl($tb_customer->id) == "") { ?>
-		<th data-name="id"><div id="elh_tb_customer_id" class="tb_customer_id"><div class="ewTableHeaderCaption"><?php echo $tb_customer->id->FldCaption() ?></div></div></th>
+<?php if ($tb_barang->barang_id->Visible) { // barang_id ?>
+	<?php if ($tb_barang->SortUrl($tb_barang->barang_id) == "") { ?>
+		<th data-name="barang_id"><div id="elh_tb_barang_barang_id" class="tb_barang_barang_id"><div class="ewTableHeaderCaption"><?php echo $tb_barang->barang_id->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="id"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_customer->SortUrl($tb_customer->id) ?>',1);"><div id="elh_tb_customer_id" class="tb_customer_id">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_customer->id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($tb_customer->id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_customer->id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($tb_customer->nama->Visible) { // nama ?>
-	<?php if ($tb_customer->SortUrl($tb_customer->nama) == "") { ?>
-		<th data-name="nama"><div id="elh_tb_customer_nama" class="tb_customer_nama"><div class="ewTableHeaderCaption"><?php echo $tb_customer->nama->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="nama"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_customer->SortUrl($tb_customer->nama) ?>',1);"><div id="elh_tb_customer_nama" class="tb_customer_nama">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_customer->nama->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($tb_customer->nama->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_customer->nama->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($tb_customer->alamat->Visible) { // alamat ?>
-	<?php if ($tb_customer->SortUrl($tb_customer->alamat) == "") { ?>
-		<th data-name="alamat"><div id="elh_tb_customer_alamat" class="tb_customer_alamat"><div class="ewTableHeaderCaption"><?php echo $tb_customer->alamat->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="alamat"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_customer->SortUrl($tb_customer->alamat) ?>',1);"><div id="elh_tb_customer_alamat" class="tb_customer_alamat">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_customer->alamat->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($tb_customer->alamat->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_customer->alamat->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($tb_customer->kota->Visible) { // kota ?>
-	<?php if ($tb_customer->SortUrl($tb_customer->kota) == "") { ?>
-		<th data-name="kota"><div id="elh_tb_customer_kota" class="tb_customer_kota"><div class="ewTableHeaderCaption"><?php echo $tb_customer->kota->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="kota"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_customer->SortUrl($tb_customer->kota) ?>',1);"><div id="elh_tb_customer_kota" class="tb_customer_kota">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_customer->kota->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($tb_customer->kota->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_customer->kota->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($tb_customer->kodepos->Visible) { // kodepos ?>
-	<?php if ($tb_customer->SortUrl($tb_customer->kodepos) == "") { ?>
-		<th data-name="kodepos"><div id="elh_tb_customer_kodepos" class="tb_customer_kodepos"><div class="ewTableHeaderCaption"><?php echo $tb_customer->kodepos->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="kodepos"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_customer->SortUrl($tb_customer->kodepos) ?>',1);"><div id="elh_tb_customer_kodepos" class="tb_customer_kodepos">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_customer->kodepos->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($tb_customer->kodepos->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_customer->kodepos->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($tb_customer->no_npwp->Visible) { // no_npwp ?>
-	<?php if ($tb_customer->SortUrl($tb_customer->no_npwp) == "") { ?>
-		<th data-name="no_npwp"><div id="elh_tb_customer_no_npwp" class="tb_customer_no_npwp"><div class="ewTableHeaderCaption"><?php echo $tb_customer->no_npwp->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="no_npwp"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_customer->SortUrl($tb_customer->no_npwp) ?>',1);"><div id="elh_tb_customer_no_npwp" class="tb_customer_no_npwp">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_customer->no_npwp->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($tb_customer->no_npwp->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_customer->no_npwp->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="barang_id"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_barang->SortUrl($tb_barang->barang_id) ?>',1);"><div id="elh_tb_barang_barang_id" class="tb_barang_barang_id">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_barang->barang_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($tb_barang->barang_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_barang->barang_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
 <?php
 
 // Render list options (header, right)
-$tb_customer_list->ListOptions->Render("header", "right");
+$tb_barang_list->ListOptions->Render("header", "right");
 ?>
 	</tr>
 </thead>
 <tbody>
 <?php
-if ($tb_customer->ExportAll && $tb_customer->Export <> "") {
-	$tb_customer_list->StopRec = $tb_customer_list->TotalRecs;
+if ($tb_barang->ExportAll && $tb_barang->Export <> "") {
+	$tb_barang_list->StopRec = $tb_barang_list->TotalRecs;
 } else {
 
 	// Set the last record to display
-	if ($tb_customer_list->TotalRecs > $tb_customer_list->StartRec + $tb_customer_list->DisplayRecs - 1)
-		$tb_customer_list->StopRec = $tb_customer_list->StartRec + $tb_customer_list->DisplayRecs - 1;
+	if ($tb_barang_list->TotalRecs > $tb_barang_list->StartRec + $tb_barang_list->DisplayRecs - 1)
+		$tb_barang_list->StopRec = $tb_barang_list->StartRec + $tb_barang_list->DisplayRecs - 1;
 	else
-		$tb_customer_list->StopRec = $tb_customer_list->TotalRecs;
+		$tb_barang_list->StopRec = $tb_barang_list->TotalRecs;
 }
-$tb_customer_list->RecCnt = $tb_customer_list->StartRec - 1;
-if ($tb_customer_list->Recordset && !$tb_customer_list->Recordset->EOF) {
-	$tb_customer_list->Recordset->MoveFirst();
-	$bSelectLimit = $tb_customer_list->UseSelectLimit;
-	if (!$bSelectLimit && $tb_customer_list->StartRec > 1)
-		$tb_customer_list->Recordset->Move($tb_customer_list->StartRec - 1);
-} elseif (!$tb_customer->AllowAddDeleteRow && $tb_customer_list->StopRec == 0) {
-	$tb_customer_list->StopRec = $tb_customer->GridAddRowCount;
+$tb_barang_list->RecCnt = $tb_barang_list->StartRec - 1;
+if ($tb_barang_list->Recordset && !$tb_barang_list->Recordset->EOF) {
+	$tb_barang_list->Recordset->MoveFirst();
+	$bSelectLimit = $tb_barang_list->UseSelectLimit;
+	if (!$bSelectLimit && $tb_barang_list->StartRec > 1)
+		$tb_barang_list->Recordset->Move($tb_barang_list->StartRec - 1);
+} elseif (!$tb_barang->AllowAddDeleteRow && $tb_barang_list->StopRec == 0) {
+	$tb_barang_list->StopRec = $tb_barang->GridAddRowCount;
 }
 
 // Initialize aggregate
-$tb_customer->RowType = EW_ROWTYPE_AGGREGATEINIT;
-$tb_customer->ResetAttrs();
-$tb_customer_list->RenderRow();
-while ($tb_customer_list->RecCnt < $tb_customer_list->StopRec) {
-	$tb_customer_list->RecCnt++;
-	if (intval($tb_customer_list->RecCnt) >= intval($tb_customer_list->StartRec)) {
-		$tb_customer_list->RowCnt++;
+$tb_barang->RowType = EW_ROWTYPE_AGGREGATEINIT;
+$tb_barang->ResetAttrs();
+$tb_barang_list->RenderRow();
+while ($tb_barang_list->RecCnt < $tb_barang_list->StopRec) {
+	$tb_barang_list->RecCnt++;
+	if (intval($tb_barang_list->RecCnt) >= intval($tb_barang_list->StartRec)) {
+		$tb_barang_list->RowCnt++;
 
 		// Set up key count
-		$tb_customer_list->KeyCount = $tb_customer_list->RowIndex;
+		$tb_barang_list->KeyCount = $tb_barang_list->RowIndex;
 
 		// Init row class and style
-		$tb_customer->ResetAttrs();
-		$tb_customer->CssClass = "";
-		if ($tb_customer->CurrentAction == "gridadd") {
+		$tb_barang->ResetAttrs();
+		$tb_barang->CssClass = "";
+		if ($tb_barang->CurrentAction == "gridadd") {
 		} else {
-			$tb_customer_list->LoadRowValues($tb_customer_list->Recordset); // Load row values
+			$tb_barang_list->LoadRowValues($tb_barang_list->Recordset); // Load row values
 		}
-		$tb_customer->RowType = EW_ROWTYPE_VIEW; // Render view
+		$tb_barang->RowType = EW_ROWTYPE_VIEW; // Render view
 
 		// Set up row id / data-rowindex
-		$tb_customer->RowAttrs = array_merge($tb_customer->RowAttrs, array('data-rowindex'=>$tb_customer_list->RowCnt, 'id'=>'r' . $tb_customer_list->RowCnt . '_tb_customer', 'data-rowtype'=>$tb_customer->RowType));
+		$tb_barang->RowAttrs = array_merge($tb_barang->RowAttrs, array('data-rowindex'=>$tb_barang_list->RowCnt, 'id'=>'r' . $tb_barang_list->RowCnt . '_tb_barang', 'data-rowtype'=>$tb_barang->RowType));
 
 		// Render row
-		$tb_customer_list->RenderRow();
+		$tb_barang_list->RenderRow();
 
 		// Render list options
-		$tb_customer_list->RenderListOptions();
+		$tb_barang_list->RenderListOptions();
 ?>
-	<tr<?php echo $tb_customer->RowAttributes() ?>>
+	<tr<?php echo $tb_barang->RowAttributes() ?>>
 <?php
 
 // Render list options (body, left)
-$tb_customer_list->ListOptions->Render("body", "left", $tb_customer_list->RowCnt);
+$tb_barang_list->ListOptions->Render("body", "left", $tb_barang_list->RowCnt);
 ?>
-	<?php if ($tb_customer->id->Visible) { // id ?>
-		<td data-name="id"<?php echo $tb_customer->id->CellAttributes() ?>>
-<span id="el<?php echo $tb_customer_list->RowCnt ?>_tb_customer_id" class="tb_customer_id">
-<span<?php echo $tb_customer->id->ViewAttributes() ?>>
-<?php echo $tb_customer->id->ListViewValue() ?></span>
+	<?php if ($tb_barang->barang_id->Visible) { // barang_id ?>
+		<td data-name="barang_id"<?php echo $tb_barang->barang_id->CellAttributes() ?>>
+<span id="el<?php echo $tb_barang_list->RowCnt ?>_tb_barang_barang_id" class="tb_barang_barang_id">
+<span<?php echo $tb_barang->barang_id->ViewAttributes() ?>>
+<?php echo $tb_barang->barang_id->ListViewValue() ?></span>
 </span>
-<a id="<?php echo $tb_customer_list->PageObjName . "_row_" . $tb_customer_list->RowCnt ?>"></a></td>
-	<?php } ?>
-	<?php if ($tb_customer->nama->Visible) { // nama ?>
-		<td data-name="nama"<?php echo $tb_customer->nama->CellAttributes() ?>>
-<span id="el<?php echo $tb_customer_list->RowCnt ?>_tb_customer_nama" class="tb_customer_nama">
-<span<?php echo $tb_customer->nama->ViewAttributes() ?>>
-<?php echo $tb_customer->nama->ListViewValue() ?></span>
-</span>
-</td>
-	<?php } ?>
-	<?php if ($tb_customer->alamat->Visible) { // alamat ?>
-		<td data-name="alamat"<?php echo $tb_customer->alamat->CellAttributes() ?>>
-<span id="el<?php echo $tb_customer_list->RowCnt ?>_tb_customer_alamat" class="tb_customer_alamat">
-<span<?php echo $tb_customer->alamat->ViewAttributes() ?>>
-<?php echo $tb_customer->alamat->ListViewValue() ?></span>
-</span>
-</td>
-	<?php } ?>
-	<?php if ($tb_customer->kota->Visible) { // kota ?>
-		<td data-name="kota"<?php echo $tb_customer->kota->CellAttributes() ?>>
-<span id="el<?php echo $tb_customer_list->RowCnt ?>_tb_customer_kota" class="tb_customer_kota">
-<span<?php echo $tb_customer->kota->ViewAttributes() ?>>
-<?php echo $tb_customer->kota->ListViewValue() ?></span>
-</span>
-</td>
-	<?php } ?>
-	<?php if ($tb_customer->kodepos->Visible) { // kodepos ?>
-		<td data-name="kodepos"<?php echo $tb_customer->kodepos->CellAttributes() ?>>
-<span id="el<?php echo $tb_customer_list->RowCnt ?>_tb_customer_kodepos" class="tb_customer_kodepos">
-<span<?php echo $tb_customer->kodepos->ViewAttributes() ?>>
-<?php echo $tb_customer->kodepos->ListViewValue() ?></span>
-</span>
-</td>
-	<?php } ?>
-	<?php if ($tb_customer->no_npwp->Visible) { // no_npwp ?>
-		<td data-name="no_npwp"<?php echo $tb_customer->no_npwp->CellAttributes() ?>>
-<span id="el<?php echo $tb_customer_list->RowCnt ?>_tb_customer_no_npwp" class="tb_customer_no_npwp">
-<span<?php echo $tb_customer->no_npwp->ViewAttributes() ?>>
-<?php echo $tb_customer->no_npwp->ListViewValue() ?></span>
-</span>
-</td>
+<a id="<?php echo $tb_barang_list->PageObjName . "_row_" . $tb_barang_list->RowCnt ?>"></a></td>
 	<?php } ?>
 <?php
 
 // Render list options (body, right)
-$tb_customer_list->ListOptions->Render("body", "right", $tb_customer_list->RowCnt);
+$tb_barang_list->ListOptions->Render("body", "right", $tb_barang_list->RowCnt);
 ?>
 	</tr>
 <?php
 	}
-	if ($tb_customer->CurrentAction <> "gridadd")
-		$tb_customer_list->Recordset->MoveNext();
+	if ($tb_barang->CurrentAction <> "gridadd")
+		$tb_barang_list->Recordset->MoveNext();
 }
 ?>
 </tbody>
 </table>
 <?php } ?>
-<?php if ($tb_customer->CurrentAction == "") { ?>
+<?php if ($tb_barang->CurrentAction == "") { ?>
 <input type="hidden" name="a_list" id="a_list" value="">
 <?php } ?>
 </div>
@@ -2030,60 +1494,60 @@ $tb_customer_list->ListOptions->Render("body", "right", $tb_customer_list->RowCn
 <?php
 
 // Close recordset
-if ($tb_customer_list->Recordset)
-	$tb_customer_list->Recordset->Close();
+if ($tb_barang_list->Recordset)
+	$tb_barang_list->Recordset->Close();
 ?>
 <div class="panel-footer ewGridLowerPanel">
-<?php if ($tb_customer->CurrentAction <> "gridadd" && $tb_customer->CurrentAction <> "gridedit") { ?>
+<?php if ($tb_barang->CurrentAction <> "gridadd" && $tb_barang->CurrentAction <> "gridedit") { ?>
 <form name="ewPagerForm" class="ewForm form-inline ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
-<?php if (!isset($tb_customer_list->Pager)) $tb_customer_list->Pager = new cPrevNextPager($tb_customer_list->StartRec, $tb_customer_list->DisplayRecs, $tb_customer_list->TotalRecs) ?>
-<?php if ($tb_customer_list->Pager->RecordCount > 0 && $tb_customer_list->Pager->Visible) { ?>
+<?php if (!isset($tb_barang_list->Pager)) $tb_barang_list->Pager = new cPrevNextPager($tb_barang_list->StartRec, $tb_barang_list->DisplayRecs, $tb_barang_list->TotalRecs) ?>
+<?php if ($tb_barang_list->Pager->RecordCount > 0 && $tb_barang_list->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($tb_customer_list->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $tb_customer_list->PageUrl() ?>start=<?php echo $tb_customer_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($tb_barang_list->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $tb_barang_list->PageUrl() ?>start=<?php echo $tb_barang_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($tb_customer_list->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $tb_customer_list->PageUrl() ?>start=<?php echo $tb_customer_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($tb_barang_list->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $tb_barang_list->PageUrl() ?>start=<?php echo $tb_barang_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $tb_customer_list->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $tb_barang_list->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($tb_customer_list->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $tb_customer_list->PageUrl() ?>start=<?php echo $tb_customer_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($tb_barang_list->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $tb_barang_list->PageUrl() ?>start=<?php echo $tb_barang_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($tb_customer_list->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $tb_customer_list->PageUrl() ?>start=<?php echo $tb_customer_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($tb_barang_list->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $tb_barang_list->PageUrl() ?>start=<?php echo $tb_barang_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $tb_customer_list->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $tb_barang_list->Pager->PageCount ?></span>
 </div>
 <div class="ewPager ewRec">
-	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $tb_customer_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $tb_customer_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $tb_customer_list->Pager->RecordCount ?></span>
+	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $tb_barang_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $tb_barang_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $tb_barang_list->Pager->RecordCount ?></span>
 </div>
 <?php } ?>
 </form>
 <?php } ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($tb_customer_list->OtherOptions as &$option)
+	foreach ($tb_barang_list->OtherOptions as &$option)
 		$option->Render("body", "bottom");
 ?>
 </div>
@@ -2091,10 +1555,10 @@ if ($tb_customer_list->Recordset)
 </div>
 </div>
 <?php } ?>
-<?php if ($tb_customer_list->TotalRecs == 0 && $tb_customer->CurrentAction == "") { // Show other options ?>
+<?php if ($tb_barang_list->TotalRecs == 0 && $tb_barang->CurrentAction == "") { // Show other options ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($tb_customer_list->OtherOptions as &$option) {
+	foreach ($tb_barang_list->OtherOptions as &$option) {
 		$option->ButtonClass = "";
 		$option->Render("body", "");
 	}
@@ -2103,12 +1567,10 @@ if ($tb_customer_list->Recordset)
 <div class="clearfix"></div>
 <?php } ?>
 <script type="text/javascript">
-ftb_customerlistsrch.FilterList = <?php echo $tb_customer_list->GetFilterList() ?>;
-ftb_customerlistsrch.Init();
-ftb_customerlist.Init();
+ftb_baranglist.Init();
 </script>
 <?php
-$tb_customer_list->ShowPageFooter();
+$tb_barang_list->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -2120,5 +1582,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$tb_customer_list->Page_Terminate();
+$tb_barang_list->Page_Terminate();
 ?>

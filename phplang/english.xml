@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2016/12/22" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2016/12/23" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -597,6 +597,9 @@
     <menu id="4">
       <phrase id="menutext" value="Customer" />
     </menu>
+    <menu id="10012">
+      <phrase id="menutext" value="Fee" />
+    </menu>
     <menu id="5">
       <phrase id="menutext" value="Fee" />
     </menu>
@@ -737,6 +740,9 @@
       <field id="invoice_id">
         <phrase id="fldcaption" value="No. Invoice" />
       </field>
+      <field id="barang_id">
+        <phrase id="fldcaption" value="barang id" />
+      </field>
       <field id="harga">
         <phrase id="fldcaption" value="Harga" />
       </field>
@@ -875,6 +881,15 @@
     </table>
     <table id="cetak2_php">
       <phrase id="tblcaption" value="Cetak Invoice" />
+    </table>
+    <table id="tb_barang">
+      <phrase id="tblcaption" value="Fee" />
+      <field id="barang_id">
+        <phrase id="fldcaption" value="barang id" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="nama" />
+      </field>
     </table>
   </project>
 </ew-language>
