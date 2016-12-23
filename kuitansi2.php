@@ -74,7 +74,7 @@ if (!$_POST["msubmit"]) {
 	header("location: .");
 }
 
-if ($_POST["no_invoice"] == "0") {
+if ($_POST["no_kuitansi"] == "0") {
 	header("location: .");
 }
 
