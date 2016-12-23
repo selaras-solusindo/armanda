@@ -138,21 +138,19 @@ $mquery = mysql_query($msql);
 while($row = mysql_fetch_array($mquery)) {
 	$html .= '
 	<tr>
-		<td width="485">
+		<td width="535">
 			<table border="0">
 				<tr>
-					<td>'.$row["nama1"].'</td>
-					<td align="right">'.number_format($row["harga"]).'</td>
-					<td align="center">x</td>
-					<td align="right">'.$row["qty"].'</td>
-					<td> '.$row["satuan"].' </td>
-					<td> '.$row["keterangan1"].' </td>
-					
-					<td>&nbsp;</td>
+					<td width="200">'.$row["nama1"].'</td>
+					<td width="105" align="right">'.number_format($row["harga"]).'</td>
+					<td width="40" align="center">x</td>
+					<td width="40" align="right">'.$row["qty"].'</td>
+					<td width="75"> '.$row["satuan"].' </td>
+					<td width="75"> '.$row["keterangan1"].' </td>
 				</tr>
 			</table>
 		</td>
-		<td align="right" width="155">'.number_format($row["jumlah"]).'</td>
+		<td align="right" width="105">'.number_format($row["jumlah"]).'</td>
 	</tr>
 	';
 	/*$html .= '
