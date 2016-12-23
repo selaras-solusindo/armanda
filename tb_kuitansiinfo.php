@@ -390,6 +390,8 @@ class ctb_kuitansi extends cTable {
 		if (is_array($where))
 			$where = $this->ArrayToFilter($where);
 		if ($rs) {
+			if (array_key_exists('kuitansi_id', $rs))
+				ew_AddFilter($where, ew_QuotedName('kuitansi_id', $this->DBID) . '=' . ew_QuotedValue($rs['kuitansi_id'], $this->kuitansi_id->FldDataType, $this->DBID));
 		}
 		$filter = ($curfilter) ? $this->CurrentFilter : "";
 		ew_AddFilter($filter, $where);
@@ -408,12 +410,15 @@ class ctb_kuitansi extends cTable {
 
 	// Key filter WHERE clause
 	function SqlKeyFilter() {
-		return "";
+		return "`kuitansi_id` = @kuitansi_id@";
 	}
 
 	// Key filter
 	function KeyFilter() {
 		$sKeyFilter = $this->SqlKeyFilter();
+		if (!is_numeric($this->kuitansi_id->CurrentValue))
+			$sKeyFilter = "0=1"; // Invalid key
+		$sKeyFilter = str_replace("@kuitansi_id@", ew_AdjustSql($this->kuitansi_id->CurrentValue, $this->DBID), $sKeyFilter); // Replace key value
 		return $sKeyFilter;
 	}
 
@@ -494,6 +499,7 @@ class ctb_kuitansi extends cTable {
 
 	function KeyToJson() {
 		$json = "";
+		$json .= "kuitansi_id:" . ew_VarToJson($this->kuitansi_id->CurrentValue, "number", "'");
 		return "{" . $json . "}";
 	}
 
@@ -501,6 +507,11 @@ class ctb_kuitansi extends cTable {
 	function KeyUrl($url, $parm = "") {
 		$sUrl = $url . "?";
 		if ($parm <> "") $sUrl .= $parm . "&";
+		if (!is_null($this->kuitansi_id->CurrentValue)) {
+			$sUrl .= "kuitansi_id=" . urlencode($this->kuitansi_id->CurrentValue);
+		} else {
+			return "javascript:ew_Alert(ewLanguage.Phrase('InvalidRecord'));";
+		}
 		return $sUrl;
 	}
 
@@ -530,6 +541,12 @@ class ctb_kuitansi extends cTable {
 			$cnt = count($arKeys);
 		} elseif (!empty($_GET) || !empty($_POST)) {
 			$isPost = ew_IsHttpPost();
+			if ($isPost && isset($_POST["kuitansi_id"]))
+				$arKeys[] = ew_StripSlashes($_POST["kuitansi_id"]);
+			elseif (isset($_GET["kuitansi_id"]))
+				$arKeys[] = ew_StripSlashes($_GET["kuitansi_id"]);
+			else
+				$arKeys = NULL; // Do not setup
 
 			//return $arKeys; // Do not return yet, so the values will also be checked by the following code
 		}
@@ -538,6 +555,8 @@ class ctb_kuitansi extends cTable {
 		$ar = array();
 		if (is_array($arKeys)) {
 			foreach ($arKeys as $key) {
+				if (!is_numeric($key))
+					continue;
 				$ar[] = $key;
 			}
 		}
@@ -550,6 +569,7 @@ class ctb_kuitansi extends cTable {
 		$sKeyFilter = "";
 		foreach ($arKeys as $key) {
 			if ($sKeyFilter <> "") $sKeyFilter .= " OR ";
+			$this->kuitansi_id->CurrentValue = $key;
 			$sKeyFilter .= "(" . $this->KeyFilter() . ")";
 		}
 		return $sKeyFilter;
@@ -653,7 +673,7 @@ class ctb_kuitansi extends cTable {
 		$this->kuitansi_id->EditAttrs["class"] = "form-control";
 		$this->kuitansi_id->EditCustomAttributes = "";
 		$this->kuitansi_id->EditValue = $this->kuitansi_id->CurrentValue;
-		$this->kuitansi_id->PlaceHolder = ew_RemoveHtml($this->kuitansi_id->FldCaption());
+		$this->kuitansi_id->ViewCustomAttributes = "";
 
 		// invoice_id
 		$this->invoice_id->EditAttrs["class"] = "form-control";

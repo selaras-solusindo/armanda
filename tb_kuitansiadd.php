@@ -362,10 +362,19 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 		// Process form if post back
 		if (@$_POST["a_add"] <> "") {
 			$this->CurrentAction = $_POST["a_add"]; // Get form action
-			$this->CopyRecord = FALSE;
+			$this->CopyRecord = $this->LoadOldRecord(); // Load old recordset
 			$this->LoadFormValues(); // Load form values
 		} else { // Not post back
-			$this->CopyRecord = FALSE;
+
+			// Load key values from QueryString
+			$this->CopyRecord = TRUE;
+			if (@$_GET["kuitansi_id"] != "") {
+				$this->kuitansi_id->setQueryStringValue($_GET["kuitansi_id"]);
+				$this->setKey("kuitansi_id", $this->kuitansi_id->CurrentValue); // Set up key
+			} else {
+				$this->setKey("kuitansi_id", ""); // Clear key
+				$this->CopyRecord = FALSE;
+			}
 			if ($this->CopyRecord) {
 				$this->CurrentAction = "C"; // Copy record
 			} else {
@@ -513,6 +522,10 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 
 		// Load key values from Session
 		$bValidKey = TRUE;
+		if (strval($this->getKey("kuitansi_id")) <> "")
+			$this->kuitansi_id->CurrentValue = $this->getKey("kuitansi_id"); // kuitansi_id
+		else
+			$bValidKey = FALSE;
 
 		// Load old recordset
 		if ($bValidKey) {
@@ -697,6 +710,10 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 			$AddRow = $this->Insert($rsnew);
 			$conn->raiseErrorFn = '';
 			if ($AddRow) {
+
+				// Get insert id if necessary
+				$this->kuitansi_id->setDbValue($conn->Insert_ID());
+				$rsnew['kuitansi_id'] = $this->kuitansi_id->DbValue;
 			}
 		} else {
 			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {

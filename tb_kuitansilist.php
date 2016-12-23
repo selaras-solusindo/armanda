@@ -343,6 +343,7 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 		// Set up list options
 		$this->SetupListOptions();
 		$this->kuitansi_id->SetVisibility();
+		$this->kuitansi_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->invoice_id->SetVisibility();
 		$this->no_kuitansi->SetVisibility();
 
@@ -640,7 +641,10 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 	// Set up key values
 	function SetupKeyValues($key) {
 		$arrKeyFlds = explode($GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"], $key);
-		if (count($arrKeyFlds) >= 0) {
+		if (count($arrKeyFlds) >= 1) {
+			$this->kuitansi_id->setFormValue($arrKeyFlds[0]);
+			if (!is_numeric($this->kuitansi_id->FormValue))
+				return FALSE;
 		}
 		return TRUE;
 	}
@@ -1024,6 +1028,7 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 
 		// "checkbox"
 		$oListOpt = &$this->ListOptions->Items["checkbox"];
+		$oListOpt->Body = "<input type=\"checkbox\" name=\"key_m[]\" value=\"" . ew_HtmlEncode($this->kuitansi_id->CurrentValue) . "\" onclick='ew_ClickMultiCheckbox(event);'>";
 		$this->RenderListOptionsExt();
 
 		// Call ListOptions_Rendered event
@@ -1344,6 +1349,10 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 
 		// Load key values from Session
 		$bValidKey = TRUE;
+		if (strval($this->getKey("kuitansi_id")) <> "")
+			$this->kuitansi_id->CurrentValue = $this->getKey("kuitansi_id"); // kuitansi_id
+		else
+			$bValidKey = FALSE;
 
 		// Load old recordset
 		if ($bValidKey) {
