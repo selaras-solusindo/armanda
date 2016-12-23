@@ -126,7 +126,7 @@ $tgl_invoice = strtotime($row["tgl_invoice"]);
 $html .= '<tr><td width="485">&nbsp;</td><td>'.date("d", $tgl_invoice).' '.$anamabln_[date("m", $tgl_invoice)].' '.date("Y", $tgl_invoice).'</td></tr>';
 $html .= '</table>';
 $html .= '<table border="0">';
-$html .= '<tr><td width="155">&nbsp;</td><td>'.$row["total_ppn1"].'</td></tr>';
+$html .= '<tr><td width="155">&nbsp;</td><td>'.number_format($row["total_ppn1"]).'</td></tr>';
 
 //echo $html;
 $pdf->writeHTML($html, true, false, true, false, '');
