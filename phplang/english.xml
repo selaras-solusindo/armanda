@@ -888,10 +888,10 @@
     <table id="tb_barang">
       <phrase id="tblcaption" value="Fee" />
       <field id="barang_id">
-        <phrase id="fldcaption" value="barang id" />
+        <phrase id="fldcaption" value="ID" />
       </field>
       <field id="nama">
-        <phrase id="fldcaption" value="nama" />
+        <phrase id="fldcaption" value="Fee" />
       </field>
     </table>
   </project>
