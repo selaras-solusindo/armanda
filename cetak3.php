@@ -125,9 +125,9 @@ $html .= '<tr><td>Tgl. Pelaksanaan</td><td>: '.date("d", $tgl_pelaksanaan).' '.$
 $html .= '<tr><td>No. Sertifikat/Laporan</td><td>: '.$row["no_sertfikat"].'</td></tr>';
 $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 $html .= '<tr><td>Fee</td><td>:&nbsp;</td></tr>';
+$html .= '</table>';
 
-//$html .= '</table>';
-//$html .= '<table border="0">';
+$html .= '<table border="0">';
 
 $total = $row["total"];
 $ppn = $row["ppn"];
@@ -139,19 +139,21 @@ $mquery = mysql_query($msql);
 while($row = mysql_fetch_array($mquery)) {
 	$html .= '
 	<tr>
-		<td>&nbsp;</td>
-		<td>:<table border="0">
+		<td width="485">
+			<table border="0">
 				<tr>
+					<td>'.$row["nama1"].'</td>
 					<td align="right">'.number_format($row["harga"]).'</td>
 					<td align="center">x</td>
 					<td align="right">'.$row["qty"].'</td>
 					<td> '.$row["satuan"].' </td>
 					<td> '.$row["keterangan1"].' </td>
-					<td align="right">'.number_format($row["jumlah"]).'</td>
+					
 					<td>&nbsp;</td>
 				</tr>
 			</table>
 		</td>
+		<td align="right" width="155">'.number_format($row["jumlah"]).'</td>
 	</tr>
 	';
 	/*$html .= '
@@ -165,8 +167,22 @@ while($row = mysql_fetch_array($mquery)) {
 		<td align="right">'.number_format($row["jumlah"]).'</td>
 	</tr>';*/
 }
-
+$html .= '</table>';
+$html .= '<table border="0">';
 $html .= '
+	<tr>
+		<td width="155">&nbsp;</td>
+		<td width="485">
+			<table border="0">
+				<tr>
+					<td colspan="6"></td>
+					<td><hr></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	';
+/*$html .= '
 	<tr>
 		<td>&nbsp;</td>
 		<td>
@@ -179,12 +195,12 @@ $html .= '
 			</table>
 		</td>
 	</tr>
-	';
+	';*/
 $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 $html .= '
 	<tr>
-		<td>&nbsp;</td>
-		<td>
+		<td width="155">&nbsp;</td>
+		<td width="485">
 			<table border="0">
 				<tr>
 					<td colspan="3"></td>

@@ -741,7 +741,7 @@
         <phrase id="fldcaption" value="No. Invoice" />
       </field>
       <field id="barang_id">
-        <phrase id="fldcaption" value="barang id" />
+        <phrase id="fldcaption" value="Fee" />
       </field>
       <field id="harga">
         <phrase id="fldcaption" value="Harga" />
@@ -877,6 +877,9 @@
       </field>
       <field id="keterangan1">
         <phrase id="fldcaption" value="keterangan 1" />
+      </field>
+      <field id="nama1">
+        <phrase id="fldcaption" value="nama 1" />
       </field>
     </table>
     <table id="cetak2_php">
