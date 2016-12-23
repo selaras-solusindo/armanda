@@ -261,6 +261,16 @@ $html .= '<tr><td>Keterangan</td><td>: '.$keterangan.'</td></tr>';
 $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 $html .= '<tr><td>Terbilang</td><td>: '.$terbilang.' rupiah</td></tr>';
 $html .= '</table>';
+$html .= '<table border="0">';
+$html .= '<tr><td>&nbsp;</td></tr>';
+$html .= '<tr><td>&nbsp;</td></tr>';
+$html .= '<tr><td align="center">CV. ARMANDA NUSANTARA</td></tr>';
+$html .= '<tr><td>&nbsp;</td></tr>';
+$html .= '<tr><td>&nbsp;</td></tr>';
+$html .= '<tr><td>&nbsp;</td></tr>';
+$html .= '<tr><td align="center">SEINDRI SUSANTI</td></tr>';
+$html .= '</table>';
+
 
 //echo $html;
 $pdf->writeHTML($html, true, false, true, false, '');
