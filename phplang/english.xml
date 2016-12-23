@@ -582,6 +582,9 @@
   </global>
   <project>
     <phrase id="footertext" value="CV. Armanda Nusantara" />
+    <menu id="10014">
+      <phrase id="menutext" value="view 2" />
+    </menu>
     <menu id="10009">
       <phrase id="menutext" value="view 1" />
     </menu>
@@ -606,8 +609,14 @@
     <menu id="6">
       <phrase id="menutext" value="Invoice" />
     </menu>
+    <menu id="10013">
+      <phrase id="menutext" value="Kuitansi" />
+    </menu>
     <menu id="10011">
       <phrase id="menutext" value="Cetak Invoice" />
+    </menu>
+    <menu id="10015">
+      <phrase id="menutext" value="Cetak Kuitansi" />
     </menu>
     <table id="option_values">
       <phrase id="tblcaption" value="option values" />
@@ -893,6 +902,54 @@
       <field id="nama">
         <phrase id="fldcaption" value="Fee" />
       </field>
+    </table>
+    <table id="tb_kuitansi">
+      <phrase id="tblcaption" value="Kuitansi" />
+      <field id="kuitansi_id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="invoice_id">
+        <phrase id="fldcaption" value="No. Invoice" />
+      </field>
+      <field id="no_kuitansi">
+        <phrase id="fldcaption" value="No. Kuitansi" />
+      </field>
+    </table>
+    <table id="view2">
+      <phrase id="tblcaption" value="view 2" />
+      <field id="kuitansi_id">
+        <phrase id="fldcaption" value="kuitansi id" />
+      </field>
+      <field id="invoice_id">
+        <phrase id="fldcaption" value="invoice id" />
+      </field>
+      <field id="no_kuitansi">
+        <phrase id="fldcaption" value="no kuitansi" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+      <field id="total_ppn1">
+        <phrase id="fldcaption" value="Total PPN" />
+      </field>
+      <field id="terbilang1">
+        <phrase id="fldcaption" value="Terbilang" />
+      </field>
+      <field id="keterangan1">
+        <phrase id="fldcaption" value="Keterangan" />
+      </field>
+      <field id="no_invoice">
+        <phrase id="fldcaption" value="No. Invoice" />
+      </field>
+      <field id="tgl_invoice">
+        <phrase id="fldcaption" value="Tgl. Invoice" />
+      </field>
+      <field id="no_sertifikat">
+        <phrase id="fldcaption" value="No. Sertifikat" />
+      </field>
+    </table>
+    <table id="kuitansi_php">
+      <phrase id="tblcaption" value="Cetak Kuitansi" />
     </table>
   </project>
 </ew-language>

@@ -886,7 +886,7 @@ $tb_barang_edit->ShowMessage();
 		<label id="elh_tb_barang_nama" for="x_nama" class="col-sm-2 control-label ewLabel"><?php echo $tb_barang->nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
 		<div class="col-sm-10"><div<?php echo $tb_barang->nama->CellAttributes() ?>>
 <span id="el_tb_barang_nama">
-<textarea data-table="tb_barang" data-field="x_nama" name="x_nama" id="x_nama" cols="35" rows="4" placeholder="<?php echo ew_HtmlEncode($tb_barang->nama->getPlaceHolder()) ?>"<?php echo $tb_barang->nama->EditAttributes() ?>><?php echo $tb_barang->nama->EditValue ?></textarea>
+<input type="text" data-table="tb_barang" data-field="x_nama" name="x_nama" id="x_nama" placeholder="<?php echo ew_HtmlEncode($tb_barang->nama->getPlaceHolder()) ?>" value="<?php echo $tb_barang->nama->EditValue ?>"<?php echo $tb_barang->nama->EditAttributes() ?>>
 </span>
 <?php echo $tb_barang->nama->CustomMsg ?></div></div>
 	</div>
