@@ -109,7 +109,7 @@ $html .= '</table>';
 $html .= '<table border="0">';
 $html .= '<tr><td width="155">&nbsp;</td><td width="485">'.$row["nama"].'</td></tr>';
 $html .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
-$html .= '<tr><td width="155">&nbsp;</td><td>'.$row["terbilang1"].'</td></tr>';
+$html .= '<tr><td width="155">&nbsp;</td><td>'.$row["terbilang1"].' rupiah</td></tr>';
 $html .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 $html .= '<tr><td width="155">&nbsp;</td><td>'.$row["keterangan1"].'</td></tr>';
 $html .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
