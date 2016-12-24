@@ -36,12 +36,11 @@ class cewlookup {
 
 	// Main
 	function Page_Main() {
-		global $conn, $Language;
+		global $conn;
+		$GLOBALS["Page"] = &$this;
 		$post = ew_StripSlashes($_POST);
 		if (count($post) == 0)
 			die("Missing post data.");
-		$Language = new cLanguage("", @$post["lang"]);
-		$GLOBALS["Page"] = &$this;
 
 		//$sql = $qs->getValue("s");
 		$sql = @$post["s"];
@@ -156,7 +155,7 @@ class cewlookup {
 				for ($j = 0; $j < $fldcnt; $j++) {
 					$str = strval($rsarr[$i][$j]);
 					$str = ew_ConvertToUtf8($str);
-					if ($ardt[$j] != "" && intval($ardt[$j]) >= 0) // Format date
+					if ($ardt[$j] != "" && intval($ardt[$j]) > 0) // Format date
 						$str = ew_FormatDateTime($str, $ardt[$j]);
 					if (isset($post["keepCRLF"])) {
 						$str = str_replace(array("\r", "\n", "\t"), array("\\r", "\\n", "\\t"), $str);

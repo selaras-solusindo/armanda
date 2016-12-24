@@ -72,7 +72,7 @@ class ctb_invoice extends cTable {
 		$this->fields['no_invoice'] = &$this->no_invoice;
 
 		// tgl_invoice
-		$this->tgl_invoice = new cField('tb_invoice', 'tb_invoice', 'x_tgl_invoice', 'tgl_invoice', '`tgl_invoice`', ew_CastDateFieldForLike('`tgl_invoice`', 7, "DB"), 133, 7, FALSE, '`tgl_invoice`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->tgl_invoice = new cField('tb_invoice', 'tb_invoice', 'x_tgl_invoice', 'tgl_invoice', '`tgl_invoice`', 'DATE_FORMAT(`tgl_invoice`, \'%Y/%m/%d\')', 133, 7, FALSE, '`tgl_invoice`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->tgl_invoice->Sortable = TRUE; // Allow sort
 		$this->tgl_invoice->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
 		$this->fields['tgl_invoice'] = &$this->tgl_invoice;
@@ -93,7 +93,7 @@ class ctb_invoice extends cTable {
 		$this->fields['kegiatan'] = &$this->kegiatan;
 
 		// tgl_pelaksanaan
-		$this->tgl_pelaksanaan = new cField('tb_invoice', 'tb_invoice', 'x_tgl_pelaksanaan', 'tgl_pelaksanaan', '`tgl_pelaksanaan`', ew_CastDateFieldForLike('`tgl_pelaksanaan`', 7, "DB"), 133, 7, FALSE, '`tgl_pelaksanaan`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->tgl_pelaksanaan = new cField('tb_invoice', 'tb_invoice', 'x_tgl_pelaksanaan', 'tgl_pelaksanaan', '`tgl_pelaksanaan`', 'DATE_FORMAT(`tgl_pelaksanaan`, \'%Y/%m/%d\')', 133, 7, FALSE, '`tgl_pelaksanaan`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->tgl_pelaksanaan->Sortable = TRUE; // Allow sort
 		$this->tgl_pelaksanaan->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
 		$this->fields['tgl_pelaksanaan'] = &$this->tgl_pelaksanaan;

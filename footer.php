@@ -25,9 +25,7 @@
 <div id="ewTimer" class="modal" role="dialog" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"></div><div class="modal-footer"><button type="button" class="btn btn-primary ewButton" data-dismiss="modal"><?php echo $Language->Phrase("MessageOK") ?></button></div></div></div></div>
 <!-- tooltip -->
 <div id="ewTooltip"></div>
-<script type="text/javascript">
-jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt13.js");
-</script>
+<script type="text/javascript" src="<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt13.js"></script>
 <script type="text/javascript">
 
 // Write your global startup script here
