@@ -1053,7 +1053,7 @@
         <phrase id="fldcaption" value="ppn" />
       </field>
       <field id="total_ppn">
-        <phrase id="fldcaption" value="total ppn" />
+        <phrase id="fldcaption" value="Jumlah" />
       </field>
       <field id="terbilang">
         <phrase id="fldcaption" value="terbilang" />

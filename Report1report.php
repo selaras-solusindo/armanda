@@ -93,9 +93,9 @@ class cReport1 extends cTableBase {
 		$this->fields['customer_id'] = &$this->customer_id;
 
 		// tgl_invoice
-		$this->tgl_invoice = new cField('Report1', 'Report1', 'x_tgl_invoice', 'tgl_invoice', '`tgl_invoice`', 'DATE_FORMAT(`tgl_invoice`, \'%Y/%m/%d\')', 133, 7, FALSE, '`tgl_invoice`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->tgl_invoice = new cField('Report1', 'Report1', 'x_tgl_invoice', 'tgl_invoice', '`tgl_invoice`', 'DATE_FORMAT(`tgl_invoice`, \'%Y/%m/%d\')', 133, -1, FALSE, '`tgl_invoice`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->tgl_invoice->Sortable = TRUE; // Allow sort
-		$this->tgl_invoice->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
+		$this->tgl_invoice->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_FORMAT"], $Language->Phrase("IncorrectDate"));
 		$this->fields['tgl_invoice'] = &$this->tgl_invoice;
 
 		// no_order
@@ -510,7 +510,8 @@ class cReport1 extends cTableBase {
 	function Row_Rendered() {
 
 		// To view properties of field class, use:
-		//var_dump($this-><FieldName>); 
+		//var_dump($this->tgl_invoice);
+		//$this->tgl_invoice->ViewValue = tgl_indo($this->tgl_invoice->DbValue);
 
 	}
 
@@ -985,7 +986,7 @@ class cReport1_report extends cReport1 {
 
 		// tgl_invoice
 		$this->tgl_invoice->ViewValue = $this->tgl_invoice->CurrentValue;
-		$this->tgl_invoice->ViewValue = ew_FormatDateTime($this->tgl_invoice->ViewValue, 7);
+		$this->tgl_invoice->ViewValue = tgl_indo($this->tgl_invoice->ViewValue);
 		$this->tgl_invoice->ViewCustomAttributes = "";
 
 		// total_ppn
@@ -1210,10 +1211,10 @@ while (!$Report1_report->Recordset->EOF) {
 	// Get detail records
 	$Report1_report->ReportFilter = $Report1_report->DefaultFilter;
 	if ($Report1_report->ReportFilter <> "") $Report1_report->ReportFilter .= " AND ";
-	if (is_null(ew_UnFormatDateTime(ew_FormatDateTime($Report1->tgl_invoice->CurrentValue,7),7))) {
+	if (is_null($Report1->tgl_invoice->CurrentValue)) {
 		$Report1_report->ReportFilter .= "(`tgl_invoice` IS NULL)";
 	} else {
-		$Report1_report->ReportFilter .= "(`tgl_invoice` = " . ew_QuotedValue(ew_UnFormatDateTime(ew_FormatDateTime($Report1->tgl_invoice->CurrentValue,7),7), EW_DATATYPE_DATE, $Report1_report->DBID) . ")";
+		$Report1_report->ReportFilter .= "(`tgl_invoice` = " . ew_QuotedValue($Report1->tgl_invoice->CurrentValue, EW_DATATYPE_DATE, $Report1_report->DBID) . ")";
 	}
 	if ($Report1_report->DbDetailFilter <> "") {
 		if ($Report1_report->ReportFilter <> "")

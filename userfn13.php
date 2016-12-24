@@ -39,4 +39,28 @@ function Terbilang($x)
   elseif ($x < 1000000000)
 	return Terbilang($x / 1000000) . " juta" . Terbilang($x % 1000000);
 }
+
+function tgl_indo($tgl) {
+	$a_namabln = array(
+		1 => "Januari",
+		"Februari",
+		"Maret",
+		"April",
+		"Mei",
+		"Juni",
+		"Juli",
+		"Agustus",
+		"September",
+		"Oktober",
+		"November",
+		"Desember"
+	);
+	$tgl_data = strtotime($tgl);
+
+	//$tgl_data = $tgl;
+	$tanggal = date("d", $tgl_data);
+	$bulan = $a_namabln[date("m", $tgl_data)];
+	$tahun = date("Y", $tgl_data);
+	return $tanggal." ".$bulan." ".$tahun;
+}
 ?>
