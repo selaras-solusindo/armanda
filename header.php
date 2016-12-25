@@ -23,12 +23,17 @@ if (ew_IsResponsiveLayout()) {
 <head>
 	<title><?php echo $Language->ProjectPhrase("BodyTitle") ?></title>
 <meta charset="utf-8">
+<?php if (@$gsExport == "" || @$gsExport == "print") { ?>
 <link rel="stylesheet" type="text/css" href="<?php echo $EW_RELATIVE_PATH ?>bootstrap3/css/<?php echo ew_CssFile("bootstrap.css") ?>">
 <!-- Optional theme -->
 <link rel="stylesheet" type="text/css" href="<?php echo $EW_RELATIVE_PATH ?>bootstrap3/css/<?php echo ew_CssFile("bootstrap-theme.css") ?>">
+<?php } ?>
+<?php if (@$gsExport == "" || @$gsExport == "print") { ?>
 <link rel="stylesheet" type="text/css" href="<?php echo $EW_RELATIVE_PATH ?>phpcss/jquery.fileupload.css">
 <link rel="stylesheet" type="text/css" href="<?php echo $EW_RELATIVE_PATH ?>phpcss/jquery.fileupload-ui.css">
 <link rel="stylesheet" type="text/css" href="<?php echo $EW_RELATIVE_PATH ?>colorbox/colorbox.css">
+<?php } ?>
+<?php if (@$gsExport == "" || @$gsExport == "print") { ?>
 <?php if (ew_IsResponsiveLayout()) { ?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <?php } ?>
@@ -41,6 +46,8 @@ if (ew_IsResponsiveLayout()) {
 <script type="text/javascript" src="<?php echo $EW_RELATIVE_PATH ?>jquery/jquery.storageapi.min.js"></script>
 <script type="text/javascript" src="<?php echo $EW_RELATIVE_PATH ?>jquery/pStrength.jquery.js"></script>
 <script type="text/javascript" src="<?php echo $EW_RELATIVE_PATH ?>jquery/pGenerator.jquery.js"></script>
+<?php } ?>
+<?php if (@$gsExport == "" || @$gsExport == "print") { ?>
 <script type="text/javascript" src="<?php echo $EW_RELATIVE_PATH ?>bootstrap3/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="<?php echo $EW_RELATIVE_PATH ?>phpjs/typeahead.bundle.min.js"></script>
 <script type="text/javascript" src="<?php echo $EW_RELATIVE_PATH ?>jqueryfileupload/load-image.all.min.js"></script>
@@ -80,6 +87,7 @@ var EW_LOOKUP_FILE_NAME = "ewlookup13.php"; // Lookup file name
 var EW_LOOKUP_FILTER_VALUE_SEPARATOR = "<?php echo EW_LOOKUP_FILTER_VALUE_SEPARATOR ?>"; // Lookup filter value separator
 var EW_MODAL_LOOKUP_FILE_NAME = "ewmodallookup13.php"; // Modal lookup file name
 var EW_AUTO_SUGGEST_MAX_ENTRIES = <?php echo EW_AUTO_SUGGEST_MAX_ENTRIES ?>; // Auto-Suggest max entries
+var EW_MAX_EMAIL_RECIPIENT = <?php echo EW_MAX_EMAIL_RECIPIENT ?>;
 var EW_DISABLE_BUTTON_ON_SUBMIT = true;
 var EW_IMAGE_FOLDER = "phpimages/"; // Image folder
 var EW_UPLOAD_URL = "<?php echo EW_UPLOAD_URL ?>"; // Upload URL
@@ -97,9 +105,13 @@ var EW_CSS_FLIP = <?php echo ($EW_CSS_FLIP) ? "true" : "false" ?>;
 var EW_CONFIRM_CANCEL = true;
 var EW_SEARCH_FILTER_OPTION = "<?php echo EW_SEARCH_FILTER_OPTION ?>";
 </script>
+<?php } ?>
+<?php if (@$gsExport == "" || @$gsExport == "print") { ?>
 <script type="text/javascript" src="<?php echo $EW_RELATIVE_PATH ?>phpjs/jsrender.min.js"></script>
 <script type="text/javascript" src="<?php echo $EW_RELATIVE_PATH ?>phpjs/ewp13.js"></script>
 <script type="text/javascript" src="<?php echo $EW_RELATIVE_PATH ?>jquery/jquery.ewjtable.js"></script>
+<?php } ?>
+<?php if (@$gsExport == "" || @$gsExport == "print") { ?>
 <script type="text/javascript">
 var ewVar = <?php echo json_encode($EW_CLIENT_VAR); ?>;
 <?php echo $Language->ToJSON() ?>
@@ -109,13 +121,15 @@ var ewVar = <?php echo json_encode($EW_CLIENT_VAR); ?>;
 
 // Write your client script here, no need to add script tags.
 </script>
+<?php } ?>
 <meta name="generator" content="PHPMaker v2017">
 </head>
 <body>
 <?php if (@!$gbSkipHeaderFooter) { ?>
+<?php if (@$gsExport == "") { ?>
 <div class="ewLayout">
 	<!-- header (begin) --><!-- ** Note: Only licensed users are allowed to change the logo ** -->
-	<div id="ewHeaderRow" class="<?php echo $gsHeaderRowClass ?>"><img src="<?php echo $EW_RELATIVE_PATH ?>phpimages/phpmkrlogo2017.png" alt=""></div>
+	<div id="ewHeaderRow" class="<?php echo $gsHeaderRowClass ?>"><img src="<?php echo $EW_RELATIVE_PATH ?>phpimages/logo_armanda (Custom) (2).png" alt=""></div>
 <?php if (ew_IsResponsiveLayout()) { ?>
 <nav id="ewMobileMenu" role="navigation" class="navbar navbar-default visible-xs hidden-print">
 	<div class="container-fluid"><!-- Brand and toggle get grouped for better mobile display -->
@@ -164,4 +178,5 @@ var ewVar = <?php echo json_encode($EW_CLIENT_VAR); ?>;
 			<div id="ewContentColumn" class="ewContentColumn">
 				<!-- right column (begin) -->
 				<h4 class="<?php echo $gsSiteTitleClass ?>"><?php echo $Language->ProjectPhrase("BodyTitle") ?></h4>
+<?php } ?>
 <?php } ?>

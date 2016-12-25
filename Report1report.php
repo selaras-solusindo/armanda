@@ -75,7 +75,7 @@ class cReport1 extends cTableBase {
 		$this->fields['no_sertifikat'] = &$this->no_sertifikat;
 
 		// tgl_pelaksanaan
-		$this->tgl_pelaksanaan = new cField('Report1', 'Report1', 'x_tgl_pelaksanaan', 'tgl_pelaksanaan', '`tgl_pelaksanaan`', 'DATE_FORMAT(`tgl_pelaksanaan`, \'%Y/%m/%d\')', 133, 7, FALSE, '`tgl_pelaksanaan`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->tgl_pelaksanaan = new cField('Report1', 'Report1', 'x_tgl_pelaksanaan', 'tgl_pelaksanaan', '`tgl_pelaksanaan`', 'DATE_FORMAT(`tgl_pelaksanaan`, \'%Y/%m/%d\')', 133, -1, FALSE, '`tgl_pelaksanaan`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->tgl_pelaksanaan->Sortable = TRUE; // Allow sort
 		$this->tgl_pelaksanaan->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
 		$this->fields['tgl_pelaksanaan'] = &$this->tgl_pelaksanaan;
@@ -832,6 +832,9 @@ class cReport1_report extends cReport1 {
 			$this->ExportPdfUrl .= "&amp;custom=1";
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 
+		// Setup export options
+		$this->SetupExportOptions();
+
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
 
@@ -981,7 +984,7 @@ class cReport1_report extends cReport1 {
 
 		// tgl_pelaksanaan
 		$this->tgl_pelaksanaan->ViewValue = $this->tgl_pelaksanaan->CurrentValue;
-		$this->tgl_pelaksanaan->ViewValue = ew_FormatDateTime($this->tgl_pelaksanaan->ViewValue, 7);
+		$this->tgl_pelaksanaan->ViewValue = tgl_indo($this->tgl_pelaksanaan->ViewValue);
 		$this->tgl_pelaksanaan->ViewCustomAttributes = "";
 
 		// tgl_invoice
@@ -1036,6 +1039,43 @@ class cReport1_report extends cReport1 {
 			$this->Row_Rendered();
 	}
 
+	// Set up export options
+	function SetupExportOptions() {
+		global $Language;
+
+		// Printer friendly
+		$item = &$this->ExportOptions->Add("print");
+		$item->Body = "<a href=\"" . $this->ExportPrintUrl . "\" class=\"ewExportLink ewPrint\" title=\"" . ew_HtmlEncode($Language->Phrase("PrinterFriendlyText")) . "\" data-caption=\"" . ew_HtmlEncode($Language->Phrase("PrinterFriendlyText")) . "\">" . $Language->Phrase("PrinterFriendly") . "</a>";
+		$item->Visible = TRUE;
+
+		// Export to Excel
+		$item = &$this->ExportOptions->Add("excel");
+		$item->Body = "<a href=\"" . $this->ExportExcelUrl . "\" class=\"ewExportLink ewExcel\" title=\"" . ew_HtmlEncode($Language->Phrase("ExportToExcelText")) . "\" data-caption=\"" . ew_HtmlEncode($Language->Phrase("ExportToExcelText")) . "\">" . $Language->Phrase("ExportToExcel") . "</a>";
+		$item->Visible = TRUE;
+
+		// Export to Word
+		$item = &$this->ExportOptions->Add("word");
+		$item->Body = "<a href=\"" . $this->ExportWordUrl . "\" class=\"ewExportLink ewWord\" title=\"" . ew_HtmlEncode($Language->Phrase("ExportToWordText")) . "\" data-caption=\"" . ew_HtmlEncode($Language->Phrase("ExportToWordText")) . "\">" . $Language->Phrase("ExportToWord") . "</a>";
+		$item->Visible = TRUE;
+
+		// Drop down button for export
+		$this->ExportOptions->UseButtonGroup = TRUE;
+		$this->ExportOptions->UseImageAndText = TRUE;
+		$this->ExportOptions->UseDropDownButton = TRUE;
+		if ($this->ExportOptions->UseButtonGroup && ew_IsMobile())
+			$this->ExportOptions->UseDropDownButton = TRUE;
+		$this->ExportOptions->DropDownButtonPhrase = $Language->Phrase("ButtonExport");
+
+		// Add group option item
+		$item = &$this->ExportOptions->Add($this->ExportOptions->GroupOptionName);
+		$item->Body = "";
+		$item->Visible = FALSE;
+
+		// Hide options for export
+		if ($this->Export <> "")
+			$this->ExportOptions->HideAllOptions();
+	}
+
 	// Set up Breadcrumb
 	function SetupBreadcrumb() {
 		global $Breadcrumb, $Language;
@@ -1059,6 +1099,32 @@ class cReport1_report extends cReport1 {
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
 		}
+	}
+
+	// Export report to HTML
+	function ExportReportHtml($html) {
+
+		//global $gsExportFile;
+		//header('Content-Type: text/html' . (EW_CHARSET <> '' ? ';charset=' . EW_CHARSET : ''));
+		//header('Content-Disposition: attachment; filename=' . $gsExportFile . '.html');
+		//echo $html;
+
+	}
+
+	// Export report to WORD
+	function ExportReportWord($html) {
+		global $gsExportFile;
+		header('Content-Type: application/vnd.ms-word' . (EW_CHARSET <> '' ? ';charset=' . EW_CHARSET : ''));
+		header('Content-Disposition: attachment; filename=' . $gsExportFile . '.doc');
+		echo $html;
+	}
+
+	// Export report to EXCEL
+	function ExportReportExcel($html) {
+		global $gsExportFile;
+		header('Content-Type: application/vnd.ms-excel' . (EW_CHARSET <> '' ? ';charset=' . EW_CHARSET : ''));
+		header('Content-Disposition: attachment; filename=' . $gsExportFile . '.xls');
+		echo $html;
 	}
 
 	// Page Load event
