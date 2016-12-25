@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 23, 2016 at 02:22 PM
+-- Generation Time: Dec 25, 2016 at 05:37 PM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.1
 
@@ -274,6 +274,25 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 
 INSERT INTO `view2` (`kuitansi_id`, `invoice_id`, `no_kuitansi`, `nama`, `total_ppn1`, `terbilang1`, `keterangan1`, `no_invoice`, `tgl_invoice`, `no_sertifikat`) VALUES
 (1, 5, 'NK1313', 'MJS, PT', 31500.00, ' tiga puluh satu ribu lima ratus ', NULL, '1313', '2016-12-23', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `view3`
+--
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `db_armanda`.`view3` AS select `db_armanda`.`tb_invoice`.`id` AS `id`,`db_armanda`.`tb_invoice`.`customer_id` AS `customer_id`,`db_armanda`.`tb_invoice`.`no_invoice` AS `no_invoice`,`db_armanda`.`tb_invoice`.`tgl_invoice` AS `tgl_invoice`,`db_armanda`.`tb_invoice`.`no_order` AS `no_order`,`db_armanda`.`tb_invoice`.`no_referensi` AS `no_referensi`,`db_armanda`.`tb_invoice`.`kegiatan` AS `kegiatan`,`db_armanda`.`tb_invoice`.`tgl_pelaksanaan` AS `tgl_pelaksanaan`,`db_armanda`.`tb_invoice`.`no_sertifikat` AS `no_sertifikat`,`db_armanda`.`tb_invoice`.`keterangan` AS `keterangan`,`db_armanda`.`tb_invoice`.`total` AS `total`,`db_armanda`.`tb_invoice`.`ppn` AS `ppn`,`db_armanda`.`tb_invoice`.`total_ppn` AS `total_ppn`,`db_armanda`.`tb_invoice`.`terbilang` AS `terbilang`,`db_armanda`.`tb_customer`.`nama` AS `nama`,`db_armanda`.`tb_kuitansi`.`no_kuitansi` AS `no_kuitansi` from ((`db_armanda`.`tb_invoice` join `db_armanda`.`tb_customer` on((`db_armanda`.`tb_invoice`.`customer_id` = `db_armanda`.`tb_customer`.`id`))) left join `db_armanda`.`tb_kuitansi` on((`db_armanda`.`tb_kuitansi`.`invoice_id` = `db_armanda`.`tb_invoice`.`id`)));
+
+--
+-- Dumping data for table `view3`
+--
+
+INSERT INTO `view3` (`id`, `customer_id`, `no_invoice`, `tgl_invoice`, `no_order`, `no_referensi`, `kegiatan`, `tgl_pelaksanaan`, `no_sertifikat`, `keterangan`, `total`, `ppn`, `total_ppn`, `terbilang`, `nama`, `no_kuitansi`) VALUES
+(1, 1, '11', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PT. Angkasa Buana Cipta', NULL),
+(2, 1, 'q123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 555000.00, 10, 610500.00, ' enam ratus sepuluh ribu lima ratus ', 'PT. Angkasa Buana Cipta', NULL),
+(3, 1, '007', '2016-12-20', '7', '8', 'tes', '2016-12-21', '9', '-', 56000.00, 10, 61600.00, ' enam puluh satu ribu enam ratus ', 'PT. Angkasa Buana Cipta', NULL),
+(4, 2, 'mjs123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 60000.00, 10, 66000.00, ' enam puluh enam ribu ', 'MJS, PT', NULL),
+(5, 2, '1313', '2016-12-23', NULL, NULL, NULL, NULL, NULL, NULL, 31500.00, NULL, 31500.00, ' tiga puluh satu ribu lima ratus ', 'MJS, PT', 'NK1313');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
