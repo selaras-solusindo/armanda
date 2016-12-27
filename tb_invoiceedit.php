@@ -379,9 +379,6 @@ class ctb_invoice_edit extends ctb_invoice {
 			$this->id->setQueryStringValue($_GET["id"]);
 		}
 
-		// Set up Breadcrumb
-		$this->SetupBreadcrumb();
-
 		// Process form if post back
 		if (@$_POST["a_edit"] <> "") {
 			$this->CurrentAction = $_POST["a_edit"]; // Get action code
@@ -439,6 +436,9 @@ class ctb_invoice_edit extends ctb_invoice {
 					$this->SetUpDetailParms();
 				}
 		}
+
+		// Set up Breadcrumb
+		$this->SetupBreadcrumb();
 
 		// Render the record
 		$this->RowType = EW_ROWTYPE_EDIT; // Render as Edit
@@ -1119,7 +1119,7 @@ class ctb_invoice_edit extends ctb_invoice {
 			$sSqlWrk = "SELECT `id` AS `LinkFld`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_customer`";
 			$sWhereWrk = "";
 			$this->customer_id->LookupFilters = array();
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => "`id` = {filter_value}", "t0" => "3", "fn0" => "");
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` = {filter_value}', "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;

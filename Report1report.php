@@ -75,7 +75,7 @@ class cReport1 extends cTableBase {
 		$this->fields['no_sertifikat'] = &$this->no_sertifikat;
 
 		// tgl_pelaksanaan
-		$this->tgl_pelaksanaan = new cField('Report1', 'Report1', 'x_tgl_pelaksanaan', 'tgl_pelaksanaan', '`tgl_pelaksanaan`', 'DATE_FORMAT(`tgl_pelaksanaan`, \'%Y/%m/%d\')', 133, -1, FALSE, '`tgl_pelaksanaan`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->tgl_pelaksanaan = new cField('Report1', 'Report1', 'x_tgl_pelaksanaan', 'tgl_pelaksanaan', '`tgl_pelaksanaan`', ew_CastDateFieldForLike('`tgl_pelaksanaan`', 7, "DB"), 133, -1, FALSE, '`tgl_pelaksanaan`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->tgl_pelaksanaan->Sortable = TRUE; // Allow sort
 		$this->tgl_pelaksanaan->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
 		$this->fields['tgl_pelaksanaan'] = &$this->tgl_pelaksanaan;
@@ -93,7 +93,7 @@ class cReport1 extends cTableBase {
 		$this->fields['customer_id'] = &$this->customer_id;
 
 		// tgl_invoice
-		$this->tgl_invoice = new cField('Report1', 'Report1', 'x_tgl_invoice', 'tgl_invoice', '`tgl_invoice`', 'DATE_FORMAT(`tgl_invoice`, \'%Y/%m/%d\')', 133, -1, FALSE, '`tgl_invoice`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->tgl_invoice = new cField('Report1', 'Report1', 'x_tgl_invoice', 'tgl_invoice', '`tgl_invoice`', ew_CastDateFieldForLike('`tgl_invoice`', 0, "DB"), 133, -1, FALSE, '`tgl_invoice`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->tgl_invoice->Sortable = TRUE; // Allow sort
 		$this->tgl_invoice->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_FORMAT"], $Language->Phrase("IncorrectDate"));
 		$this->fields['tgl_invoice'] = &$this->tgl_invoice;
@@ -987,11 +987,6 @@ class cReport1_report extends cReport1 {
 		$this->tgl_pelaksanaan->ViewValue = tgl_indo($this->tgl_pelaksanaan->ViewValue);
 		$this->tgl_pelaksanaan->ViewCustomAttributes = "";
 
-		// tgl_invoice
-		$this->tgl_invoice->ViewValue = $this->tgl_invoice->CurrentValue;
-		$this->tgl_invoice->ViewValue = tgl_indo($this->tgl_invoice->ViewValue);
-		$this->tgl_invoice->ViewCustomAttributes = "";
-
 		// total_ppn
 		$this->total_ppn->ViewValue = $this->total_ppn->CurrentValue;
 		$this->total_ppn->ViewValue = ew_FormatNumber($this->total_ppn->ViewValue, 0, -2, -2, -2);
@@ -1022,11 +1017,6 @@ class cReport1_report extends cReport1 {
 			$this->tgl_pelaksanaan->LinkCustomAttributes = "";
 			$this->tgl_pelaksanaan->HrefValue = "";
 			$this->tgl_pelaksanaan->TooltipValue = "";
-
-			// tgl_invoice
-			$this->tgl_invoice->LinkCustomAttributes = "";
-			$this->tgl_invoice->HrefValue = "";
-			$this->tgl_invoice->TooltipValue = "";
 
 			// total_ppn
 			$this->total_ppn->LinkCustomAttributes = "";
@@ -1397,26 +1387,6 @@ while (!$Report1_report->Recordset->EOF) {
 		$Report1->tgl_invoice->CurrentValue = $Report1->tgl_invoice->DbValue;
 ?>
 	<tr><td colspan=7 class="ewGroupSummary"><?php echo $Language->Phrase("RptSumHead") ?>&nbsp;<?php echo $Report1->tgl_invoice->FldCaption() ?>:&nbsp;<?php echo $Report1->tgl_invoice->ViewValue ?> (<?php echo ew_FormatNumber($Report1_report->ReportCounts[1],0) ?> <?php echo $Language->Phrase("RptDtlRec") ?>)</td></tr>
-<?php
-	$Report1->total_ppn->CurrentValue = $Report1_report->ReportTotals[1][5];
-
-	// Render row for view
-	$Report1->RowType = EW_ROWTYPE_VIEW;
-	$Report1->ResetAttrs();
-	$Report1_report->RenderRow();
-?>
-	<tr>
-		<td class="ewGroupAggregate"><?php echo $Language->Phrase("RptSum") ?></td>
-		<td>&nbsp;</td>
-		<td>&nbsp;</td>
-		<td>&nbsp;</td>
-		<td>&nbsp;</td>
-		<td>&nbsp;</td>
-		<td<?php echo $Report1->total_ppn->CellAttributes() ?>>
-<span<?php echo $Report1->total_ppn->ViewAttributes() ?>>
-<?php echo $Report1->total_ppn->ViewValue ?></span>
-</td>
-	</tr>
 	<tr><td colspan=7>&nbsp;<br></td></tr>
 <?php
 }
@@ -1428,26 +1398,6 @@ $Report1_report->Recordset->Close();
 <?php if ($Report1_report->RecordExists) { ?>
 	<tr><td colspan=7>&nbsp;<br></td></tr>
 	<tr><td colspan=7 class="ewGrandSummary"><?php echo $Language->Phrase("RptGrandTotal") ?>&nbsp;(<?php echo ew_FormatNumber($Report1_report->ReportCounts[0], 0) ?>&nbsp;<?php echo $Language->Phrase("RptDtlRec") ?>)</td></tr>
-<?php
-	$Report1->total_ppn->CurrentValue = $Report1_report->ReportTotals[0][5];
-
-	// Render row for view
-	$Report1->RowType = EW_ROWTYPE_VIEW;
-	$Report1->ResetAttrs();
-	$Report1_report->RenderRow();
-?>
-	<tr>
-		<td class="ewGroupAggregate"><?php echo $Language->Phrase("RptSum") ?></td>
-		<td>&nbsp;</td>
-		<td>&nbsp;</td>
-		<td>&nbsp;</td>
-		<td>&nbsp;</td>
-		<td>&nbsp;</td>
-		<td<?php echo $Report1->total_ppn->CellAttributes() ?>>
-<span<?php echo $Report1->total_ppn->ViewAttributes() ?>>
-<?php echo $Report1->total_ppn->ViewValue ?></span>
-</td>
-	</tr>
 <?php } ?>
 <?php if ($Report1_report->RecordExists) { ?>
 	<tr><td colspan=7>&nbsp;<br></td></tr>

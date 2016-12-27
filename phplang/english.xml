@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2016/12/25" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2016/12/27" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -623,6 +623,42 @@
     </menu>
     <menu id="10017">
       <phrase id="menutext" value="Rekap. Invoice" />
+    </menu>
+    <menu id="10001">
+      <phrase id="menutext" value="option values" />
+    </menu>
+    <menu id="10002">
+      <phrase id="menutext" value="options" />
+    </menu>
+    <menu id="10003">
+      <phrase id="menutext" value="products" />
+    </menu>
+    <menu id="10004">
+      <phrase id="menutext" value="tb barang" />
+    </menu>
+    <menu id="10005">
+      <phrase id="menutext" value="tb customer" />
+    </menu>
+    <menu id="10006">
+      <phrase id="menutext" value="tb fee" />
+    </menu>
+    <menu id="10007">
+      <phrase id="menutext" value="tb invoice" />
+    </menu>
+    <menu id="10008">
+      <phrase id="menutext" value="tb kuitansi" />
+    </menu>
+    <menu id="10018">
+      <phrase id="menutext" value="view 1" />
+    </menu>
+    <menu id="10010">
+      <phrase id="menutext" value="view 2" />
+    </menu>
+    <menu id="10019">
+      <phrase id="menutext" value="view 3" />
+    </menu>
+    <menu id="10020">
+      <phrase id="menutext" value="Rekap Invoice" />
     </menu>
     <table id="option_values">
       <phrase id="tblcaption" value="option values" />
