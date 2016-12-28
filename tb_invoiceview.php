@@ -368,6 +368,7 @@ class ctb_invoice_view extends ctb_invoice {
 		$this->ppn->SetVisibility();
 		$this->total_ppn->SetVisibility();
 		$this->terbilang->SetVisibility();
+		$this->terbayar->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -745,6 +746,7 @@ class ctb_invoice_view extends ctb_invoice {
 		$this->ppn->setDbValue($rs->fields('ppn'));
 		$this->total_ppn->setDbValue($rs->fields('total_ppn'));
 		$this->terbilang->setDbValue($rs->fields('terbilang'));
+		$this->terbayar->setDbValue($rs->fields('terbayar'));
 	}
 
 	// Load DbValue from recordset
@@ -765,6 +767,7 @@ class ctb_invoice_view extends ctb_invoice {
 		$this->ppn->DbValue = $row['ppn'];
 		$this->total_ppn->DbValue = $row['total_ppn'];
 		$this->terbilang->DbValue = $row['terbilang'];
+		$this->terbayar->DbValue = $row['terbayar'];
 	}
 
 	// Render row values based on field settings
@@ -805,6 +808,7 @@ class ctb_invoice_view extends ctb_invoice {
 		// ppn
 		// total_ppn
 		// terbilang
+		// terbayar
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -889,6 +893,14 @@ class ctb_invoice_view extends ctb_invoice {
 		$this->terbilang->ViewValue = $this->terbilang->CurrentValue;
 		$this->terbilang->ViewCustomAttributes = "";
 
+		// terbayar
+		if (strval($this->terbayar->CurrentValue) <> "") {
+			$this->terbayar->ViewValue = $this->terbayar->OptionCaption($this->terbayar->CurrentValue);
+		} else {
+			$this->terbayar->ViewValue = NULL;
+		}
+		$this->terbayar->ViewCustomAttributes = "";
+
 			// id
 			$this->id->LinkCustomAttributes = "";
 			$this->id->HrefValue = "";
@@ -958,6 +970,11 @@ class ctb_invoice_view extends ctb_invoice {
 			$this->terbilang->LinkCustomAttributes = "";
 			$this->terbilang->HrefValue = "";
 			$this->terbilang->TooltipValue = "";
+
+			// terbayar
+			$this->terbayar->LinkCustomAttributes = "";
+			$this->terbayar->HrefValue = "";
+			$this->terbayar->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1415,6 +1432,8 @@ ftb_invoiceview.ValidateRequired = false;
 
 // Dynamic selection lists
 ftb_invoiceview.Lists["x_customer_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"tb_customer"};
+ftb_invoiceview.Lists["x_terbayar"] = {"LinkField":"","Ajax":null,"AutoFill":false,"DisplayFields":["","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":""};
+ftb_invoiceview.Lists["x_terbayar"].Options = <?php echo json_encode($tb_invoice->terbayar->Options()) ?>;
 
 // Form object for search
 </script>
@@ -1606,6 +1625,17 @@ $tb_invoice_view->ShowMessage();
 <span id="el_tb_invoice_terbilang">
 <span<?php echo $tb_invoice->terbilang->ViewAttributes() ?>>
 <?php echo $tb_invoice->terbilang->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($tb_invoice->terbayar->Visible) { // terbayar ?>
+	<tr id="r_terbayar">
+		<td><span id="elh_tb_invoice_terbayar"><?php echo $tb_invoice->terbayar->FldCaption() ?></span></td>
+		<td data-name="terbayar"<?php echo $tb_invoice->terbayar->CellAttributes() ?>>
+<span id="el_tb_invoice_terbayar">
+<span<?php echo $tb_invoice->terbayar->ViewAttributes() ?>>
+<?php echo $tb_invoice->terbayar->ViewValue ?></span>
 </span>
 </td>
 	</tr>

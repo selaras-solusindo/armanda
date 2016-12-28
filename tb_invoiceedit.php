@@ -267,6 +267,7 @@ class ctb_invoice_edit extends ctb_invoice {
 		$this->no_sertifikat->SetVisibility();
 		$this->keterangan->SetVisibility();
 		$this->ppn->SetVisibility();
+		$this->terbayar->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -528,6 +529,9 @@ class ctb_invoice_edit extends ctb_invoice {
 		if (!$this->ppn->FldIsDetailKey) {
 			$this->ppn->setFormValue($objForm->GetValue("x_ppn"));
 		}
+		if (!$this->terbayar->FldIsDetailKey) {
+			$this->terbayar->setFormValue($objForm->GetValue("x_terbayar"));
+		}
 	}
 
 	// Restore form values
@@ -547,6 +551,7 @@ class ctb_invoice_edit extends ctb_invoice {
 		$this->no_sertifikat->CurrentValue = $this->no_sertifikat->FormValue;
 		$this->keterangan->CurrentValue = $this->keterangan->FormValue;
 		$this->ppn->CurrentValue = $this->ppn->FormValue;
+		$this->terbayar->CurrentValue = $this->terbayar->FormValue;
 	}
 
 	// Load row based on key values
@@ -592,6 +597,7 @@ class ctb_invoice_edit extends ctb_invoice {
 		$this->ppn->setDbValue($rs->fields('ppn'));
 		$this->total_ppn->setDbValue($rs->fields('total_ppn'));
 		$this->terbilang->setDbValue($rs->fields('terbilang'));
+		$this->terbayar->setDbValue($rs->fields('terbayar'));
 	}
 
 	// Load DbValue from recordset
@@ -612,6 +618,7 @@ class ctb_invoice_edit extends ctb_invoice {
 		$this->ppn->DbValue = $row['ppn'];
 		$this->total_ppn->DbValue = $row['total_ppn'];
 		$this->terbilang->DbValue = $row['terbilang'];
+		$this->terbayar->DbValue = $row['terbayar'];
 	}
 
 	// Render row values based on field settings
@@ -638,6 +645,7 @@ class ctb_invoice_edit extends ctb_invoice {
 		// ppn
 		// total_ppn
 		// terbilang
+		// terbayar
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -722,6 +730,14 @@ class ctb_invoice_edit extends ctb_invoice {
 		$this->terbilang->ViewValue = $this->terbilang->CurrentValue;
 		$this->terbilang->ViewCustomAttributes = "";
 
+		// terbayar
+		if (strval($this->terbayar->CurrentValue) <> "") {
+			$this->terbayar->ViewValue = $this->terbayar->OptionCaption($this->terbayar->CurrentValue);
+		} else {
+			$this->terbayar->ViewValue = NULL;
+		}
+		$this->terbayar->ViewCustomAttributes = "";
+
 			// id
 			$this->id->LinkCustomAttributes = "";
 			$this->id->HrefValue = "";
@@ -776,6 +792,11 @@ class ctb_invoice_edit extends ctb_invoice {
 			$this->ppn->LinkCustomAttributes = "";
 			$this->ppn->HrefValue = "";
 			$this->ppn->TooltipValue = "";
+
+			// terbayar
+			$this->terbayar->LinkCustomAttributes = "";
+			$this->terbayar->HrefValue = "";
+			$this->terbayar->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
 			// id
@@ -857,6 +878,10 @@ class ctb_invoice_edit extends ctb_invoice {
 			$this->ppn->EditValue = ew_HtmlEncode($this->ppn->CurrentValue);
 			$this->ppn->PlaceHolder = ew_RemoveHtml($this->ppn->FldCaption());
 
+			// terbayar
+			$this->terbayar->EditCustomAttributes = "";
+			$this->terbayar->EditValue = $this->terbayar->Options(FALSE);
+
 			// Edit refer script
 			// id
 
@@ -902,6 +927,10 @@ class ctb_invoice_edit extends ctb_invoice {
 			// ppn
 			$this->ppn->LinkCustomAttributes = "";
 			$this->ppn->HrefValue = "";
+
+			// terbayar
+			$this->terbayar->LinkCustomAttributes = "";
+			$this->terbayar->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -1018,6 +1047,9 @@ class ctb_invoice_edit extends ctb_invoice {
 
 			// ppn
 			$this->ppn->SetDbValueDef($rsnew, $this->ppn->CurrentValue, NULL, $this->ppn->ReadOnly);
+
+			// terbayar
+			$this->terbayar->SetDbValueDef($rsnew, $this->terbayar->CurrentValue, NULL, $this->terbayar->ReadOnly);
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -1297,6 +1329,8 @@ ftb_invoiceedit.ValidateRequired = false;
 
 // Dynamic selection lists
 ftb_invoiceedit.Lists["x_customer_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"tb_customer"};
+ftb_invoiceedit.Lists["x_terbayar"] = {"LinkField":"","Ajax":null,"AutoFill":false,"DisplayFields":["","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":""};
+ftb_invoiceedit.Lists["x_terbayar"].Options = <?php echo json_encode($tb_invoice->terbayar->Options()) ?>;
 
 // Form object for search
 </script>
@@ -1448,6 +1482,19 @@ ew_CreateCalendar("ftb_invoiceedit", "x_tgl_pelaksanaan", 7);
 <input type="text" data-table="tb_invoice" data-field="x_ppn" name="x_ppn" id="x_ppn" size="30" placeholder="<?php echo ew_HtmlEncode($tb_invoice->ppn->getPlaceHolder()) ?>" value="<?php echo $tb_invoice->ppn->EditValue ?>"<?php echo $tb_invoice->ppn->EditAttributes() ?>>
 </span>
 <?php echo $tb_invoice->ppn->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($tb_invoice->terbayar->Visible) { // terbayar ?>
+	<div id="r_terbayar" class="form-group">
+		<label id="elh_tb_invoice_terbayar" class="col-sm-2 control-label ewLabel"><?php echo $tb_invoice->terbayar->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $tb_invoice->terbayar->CellAttributes() ?>>
+<span id="el_tb_invoice_terbayar">
+<div id="tp_x_terbayar" class="ewTemplate"><input type="radio" data-table="tb_invoice" data-field="x_terbayar" data-value-separator="<?php echo $tb_invoice->terbayar->DisplayValueSeparatorAttribute() ?>" name="x_terbayar" id="x_terbayar" value="{value}"<?php echo $tb_invoice->terbayar->EditAttributes() ?>></div>
+<div id="dsl_x_terbayar" data-repeatcolumn="5" class="ewItemList" style="display: none;"><div>
+<?php echo $tb_invoice->terbayar->RadioButtonListHtml(FALSE, "x_terbayar") ?>
+</div></div>
+</span>
+<?php echo $tb_invoice->terbayar->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div>

@@ -14,6 +14,7 @@
 // ppn
 // total_ppn
 // terbilang
+// terbayar
 
 ?>
 <?php if ($tb_invoice->Visible) { ?>
@@ -171,6 +172,17 @@
 <span id="el_tb_invoice_terbilang">
 <span<?php echo $tb_invoice->terbilang->ViewAttributes() ?>>
 <?php echo $tb_invoice->terbilang->ListViewValue() ?></span>
+</span>
+</td>
+		</tr>
+<?php } ?>
+<?php if ($tb_invoice->terbayar->Visible) { // terbayar ?>
+		<tr id="r_terbayar">
+			<td><?php echo $tb_invoice->terbayar->FldCaption() ?></td>
+			<td<?php echo $tb_invoice->terbayar->CellAttributes() ?>>
+<span id="el_tb_invoice_terbayar">
+<span<?php echo $tb_invoice->terbayar->ViewAttributes() ?>>
+<?php echo $tb_invoice->terbayar->ListViewValue() ?></span>
 </span>
 </td>
 		</tr>

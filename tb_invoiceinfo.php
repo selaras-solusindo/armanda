@@ -21,6 +21,7 @@ class ctb_invoice extends cTable {
 	var $ppn;
 	var $total_ppn;
 	var $terbilang;
+	var $terbayar;
 
 	//
 	// Table class constructor
@@ -130,6 +131,13 @@ class ctb_invoice extends cTable {
 		$this->terbilang = new cField('tb_invoice', 'tb_invoice', 'x_terbilang', 'terbilang', '`terbilang`', '`terbilang`', 201, -1, FALSE, '`terbilang`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXTAREA');
 		$this->terbilang->Sortable = TRUE; // Allow sort
 		$this->fields['terbilang'] = &$this->terbilang;
+
+		// terbayar
+		$this->terbayar = new cField('tb_invoice', 'tb_invoice', 'x_terbayar', 'terbayar', '`terbayar`', '`terbayar`', 16, -1, FALSE, '`terbayar`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'RADIO');
+		$this->terbayar->Sortable = TRUE; // Allow sort
+		$this->terbayar->OptionCount = 2;
+		$this->terbayar->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['terbayar'] = &$this->terbayar;
 	}
 
 	// Set Field Visibility
@@ -656,6 +664,7 @@ class ctb_invoice extends cTable {
 		$this->ppn->setDbValue($rs->fields('ppn'));
 		$this->total_ppn->setDbValue($rs->fields('total_ppn'));
 		$this->terbilang->setDbValue($rs->fields('terbilang'));
+		$this->terbayar->setDbValue($rs->fields('terbayar'));
 	}
 
 	// Render list row values
@@ -680,6 +689,7 @@ class ctb_invoice extends cTable {
 		// ppn
 		// total_ppn
 		// terbilang
+		// terbayar
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
@@ -762,6 +772,14 @@ class ctb_invoice extends cTable {
 		$this->terbilang->ViewValue = $this->terbilang->CurrentValue;
 		$this->terbilang->ViewCustomAttributes = "";
 
+		// terbayar
+		if (strval($this->terbayar->CurrentValue) <> "") {
+			$this->terbayar->ViewValue = $this->terbayar->OptionCaption($this->terbayar->CurrentValue);
+		} else {
+			$this->terbayar->ViewValue = NULL;
+		}
+		$this->terbayar->ViewCustomAttributes = "";
+
 		// id
 		$this->id->LinkCustomAttributes = "";
 		$this->id->HrefValue = "";
@@ -831,6 +849,11 @@ class ctb_invoice extends cTable {
 		$this->terbilang->LinkCustomAttributes = "";
 		$this->terbilang->HrefValue = "";
 		$this->terbilang->TooltipValue = "";
+
+		// terbayar
+		$this->terbayar->LinkCustomAttributes = "";
+		$this->terbayar->HrefValue = "";
+		$this->terbayar->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -927,6 +950,10 @@ class ctb_invoice extends cTable {
 		$this->terbilang->EditValue = $this->terbilang->CurrentValue;
 		$this->terbilang->PlaceHolder = ew_RemoveHtml($this->terbilang->FldCaption());
 
+		// terbayar
+		$this->terbayar->EditCustomAttributes = "";
+		$this->terbayar->EditValue = $this->terbayar->Options(FALSE);
+
 		// Call Row Rendered event
 		$this->Row_Rendered();
 	}
@@ -968,6 +995,7 @@ class ctb_invoice extends cTable {
 					if ($this->ppn->Exportable) $Doc->ExportCaption($this->ppn);
 					if ($this->total_ppn->Exportable) $Doc->ExportCaption($this->total_ppn);
 					if ($this->terbilang->Exportable) $Doc->ExportCaption($this->terbilang);
+					if ($this->terbayar->Exportable) $Doc->ExportCaption($this->terbayar);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->customer_id->Exportable) $Doc->ExportCaption($this->customer_id);
@@ -983,6 +1011,7 @@ class ctb_invoice extends cTable {
 					if ($this->ppn->Exportable) $Doc->ExportCaption($this->ppn);
 					if ($this->total_ppn->Exportable) $Doc->ExportCaption($this->total_ppn);
 					if ($this->terbilang->Exportable) $Doc->ExportCaption($this->terbilang);
+					if ($this->terbayar->Exportable) $Doc->ExportCaption($this->terbayar);
 				}
 				$Doc->EndExportRow();
 			}
@@ -1028,6 +1057,7 @@ class ctb_invoice extends cTable {
 						if ($this->ppn->Exportable) $Doc->ExportField($this->ppn);
 						if ($this->total_ppn->Exportable) $Doc->ExportField($this->total_ppn);
 						if ($this->terbilang->Exportable) $Doc->ExportField($this->terbilang);
+						if ($this->terbayar->Exportable) $Doc->ExportField($this->terbayar);
 					} else {
 						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->customer_id->Exportable) $Doc->ExportField($this->customer_id);
@@ -1043,6 +1073,7 @@ class ctb_invoice extends cTable {
 						if ($this->ppn->Exportable) $Doc->ExportField($this->ppn);
 						if ($this->total_ppn->Exportable) $Doc->ExportField($this->total_ppn);
 						if ($this->terbilang->Exportable) $Doc->ExportField($this->terbilang);
+						if ($this->terbayar->Exportable) $Doc->ExportField($this->terbayar);
 					}
 					$Doc->EndExportRow();
 				}
