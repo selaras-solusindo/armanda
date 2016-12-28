@@ -1,6 +1,5 @@
 <?php
 
-// id
 // customer_id
 // no_invoice
 // tgl_invoice
@@ -22,17 +21,6 @@
 <table id="tbl_tb_invoicemaster" class="table table-bordered table-striped ewViewTable">
 <?php echo $tb_invoice->TableCustomInnerHtml ?>
 	<tbody>
-<?php if ($tb_invoice->id->Visible) { // id ?>
-		<tr id="r_id">
-			<td><?php echo $tb_invoice->id->FldCaption() ?></td>
-			<td<?php echo $tb_invoice->id->CellAttributes() ?>>
-<span id="el_tb_invoice_id">
-<span<?php echo $tb_invoice->id->ViewAttributes() ?>>
-<?php echo $tb_invoice->id->ListViewValue() ?></span>
-</span>
-</td>
-		</tr>
-<?php } ?>
 <?php if ($tb_invoice->customer_id->Visible) { // customer_id ?>
 		<tr id="r_customer_id">
 			<td><?php echo $tb_invoice->customer_id->FldCaption() ?></td>

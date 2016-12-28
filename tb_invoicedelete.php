@@ -251,8 +251,6 @@ class ctb_invoice_delete extends ctb_invoice {
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->id->SetVisibility();
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->customer_id->SetVisibility();
 		$this->no_invoice->SetVisibility();
 		$this->tgl_invoice->SetVisibility();
@@ -515,10 +513,6 @@ class ctb_invoice_delete extends ctb_invoice {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// id
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
-
 		// customer_id
 		if (strval($this->customer_id->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->customer_id->CurrentValue, EW_DATATYPE_NUMBER, "");
@@ -603,11 +597,6 @@ class ctb_invoice_delete extends ctb_invoice {
 			$this->terbayar->ViewValue = NULL;
 		}
 		$this->terbayar->ViewCustomAttributes = "";
-
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
 
 			// customer_id
 			$this->customer_id->LinkCustomAttributes = "";
@@ -927,9 +916,6 @@ $tb_invoice_delete->ShowMessage();
 <?php echo $tb_invoice->TableCustomInnerHtml ?>
 	<thead>
 	<tr class="ewTableHeader">
-<?php if ($tb_invoice->id->Visible) { // id ?>
-		<th><span id="elh_tb_invoice_id" class="tb_invoice_id"><?php echo $tb_invoice->id->FldCaption() ?></span></th>
-<?php } ?>
 <?php if ($tb_invoice->customer_id->Visible) { // customer_id ?>
 		<th><span id="elh_tb_invoice_customer_id" class="tb_invoice_customer_id"><?php echo $tb_invoice->customer_id->FldCaption() ?></span></th>
 <?php } ?>
@@ -993,14 +979,6 @@ while (!$tb_invoice_delete->Recordset->EOF) {
 	$tb_invoice_delete->RenderRow();
 ?>
 	<tr<?php echo $tb_invoice->RowAttributes() ?>>
-<?php if ($tb_invoice->id->Visible) { // id ?>
-		<td<?php echo $tb_invoice->id->CellAttributes() ?>>
-<span id="el<?php echo $tb_invoice_delete->RowCnt ?>_tb_invoice_id" class="tb_invoice_id">
-<span<?php echo $tb_invoice->id->ViewAttributes() ?>>
-<?php echo $tb_invoice->id->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($tb_invoice->customer_id->Visible) { // customer_id ?>
 		<td<?php echo $tb_invoice->customer_id->CellAttributes() ?>>
 <span id="el<?php echo $tb_invoice_delete->RowCnt ?>_tb_invoice_customer_id" class="tb_invoice_customer_id">

@@ -255,8 +255,6 @@ class ctb_invoice_edit extends ctb_invoice {
 		// Create form object
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->id->SetVisibility();
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->customer_id->SetVisibility();
 		$this->no_invoice->SetVisibility();
 		$this->tgl_invoice->SetVisibility();
@@ -495,8 +493,6 @@ class ctb_invoice_edit extends ctb_invoice {
 
 		// Load from form
 		global $objForm;
-		if (!$this->id->FldIsDetailKey)
-			$this->id->setFormValue($objForm->GetValue("x_id"));
 		if (!$this->customer_id->FldIsDetailKey) {
 			$this->customer_id->setFormValue($objForm->GetValue("x_customer_id"));
 		}
@@ -532,6 +528,8 @@ class ctb_invoice_edit extends ctb_invoice {
 		if (!$this->terbayar->FldIsDetailKey) {
 			$this->terbayar->setFormValue($objForm->GetValue("x_terbayar"));
 		}
+		if (!$this->id->FldIsDetailKey)
+			$this->id->setFormValue($objForm->GetValue("x_id"));
 	}
 
 	// Restore form values
@@ -649,10 +647,6 @@ class ctb_invoice_edit extends ctb_invoice {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// id
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
-
 		// customer_id
 		if (strval($this->customer_id->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->customer_id->CurrentValue, EW_DATATYPE_NUMBER, "");
@@ -738,11 +732,6 @@ class ctb_invoice_edit extends ctb_invoice {
 		}
 		$this->terbayar->ViewCustomAttributes = "";
 
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
-
 			// customer_id
 			$this->customer_id->LinkCustomAttributes = "";
 			$this->customer_id->HrefValue = "";
@@ -798,12 +787,6 @@ class ctb_invoice_edit extends ctb_invoice {
 			$this->terbayar->HrefValue = "";
 			$this->terbayar->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
-
-			// id
-			$this->id->EditAttrs["class"] = "form-control";
-			$this->id->EditCustomAttributes = "";
-			$this->id->EditValue = $this->id->CurrentValue;
-			$this->id->ViewCustomAttributes = "";
 
 			// customer_id
 			$this->customer_id->EditAttrs["class"] = "form-control";
@@ -883,12 +866,8 @@ class ctb_invoice_edit extends ctb_invoice {
 			$this->terbayar->EditValue = $this->terbayar->Options(FALSE);
 
 			// Edit refer script
-			// id
-
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-
 			// customer_id
+
 			$this->customer_id->LinkCustomAttributes = "";
 			$this->customer_id->HrefValue = "";
 
@@ -1359,18 +1338,6 @@ $tb_invoice_edit->ShowMessage();
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <div>
-<?php if ($tb_invoice->id->Visible) { // id ?>
-	<div id="r_id" class="form-group">
-		<label id="elh_tb_invoice_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_invoice->id->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $tb_invoice->id->CellAttributes() ?>>
-<span id="el_tb_invoice_id">
-<span<?php echo $tb_invoice->id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $tb_invoice->id->EditValue ?></p></span>
-</span>
-<input type="hidden" data-table="tb_invoice" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($tb_invoice->id->CurrentValue) ?>">
-<?php echo $tb_invoice->id->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
 <?php if ($tb_invoice->customer_id->Visible) { // customer_id ?>
 	<div id="r_customer_id" class="form-group">
 		<label id="elh_tb_invoice_customer_id" for="x_customer_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_invoice->customer_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
@@ -1498,6 +1465,7 @@ ew_CreateCalendar("ftb_invoiceedit", "x_tgl_pelaksanaan", 7);
 	</div>
 <?php } ?>
 </div>
+<input type="hidden" data-table="tb_invoice" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($tb_invoice->id->CurrentValue) ?>">
 <?php
 	if (in_array("tb_fee", explode(",", $tb_invoice->getCurrentDetailTable())) && $tb_fee->DetailEdit) {
 ?>

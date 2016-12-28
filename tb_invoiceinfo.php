@@ -981,7 +981,6 @@ class ctb_invoice extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
-					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->customer_id->Exportable) $Doc->ExportCaption($this->customer_id);
 					if ($this->no_invoice->Exportable) $Doc->ExportCaption($this->no_invoice);
 					if ($this->tgl_invoice->Exportable) $Doc->ExportCaption($this->tgl_invoice);
@@ -997,7 +996,6 @@ class ctb_invoice extends cTable {
 					if ($this->terbilang->Exportable) $Doc->ExportCaption($this->terbilang);
 					if ($this->terbayar->Exportable) $Doc->ExportCaption($this->terbayar);
 				} else {
-					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->customer_id->Exportable) $Doc->ExportCaption($this->customer_id);
 					if ($this->no_invoice->Exportable) $Doc->ExportCaption($this->no_invoice);
 					if ($this->tgl_invoice->Exportable) $Doc->ExportCaption($this->tgl_invoice);
@@ -1043,7 +1041,6 @@ class ctb_invoice extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
-						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->customer_id->Exportable) $Doc->ExportField($this->customer_id);
 						if ($this->no_invoice->Exportable) $Doc->ExportField($this->no_invoice);
 						if ($this->tgl_invoice->Exportable) $Doc->ExportField($this->tgl_invoice);
@@ -1059,7 +1056,6 @@ class ctb_invoice extends cTable {
 						if ($this->terbilang->Exportable) $Doc->ExportField($this->terbilang);
 						if ($this->terbayar->Exportable) $Doc->ExportField($this->terbayar);
 					} else {
-						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->customer_id->Exportable) $Doc->ExportField($this->customer_id);
 						if ($this->no_invoice->Exportable) $Doc->ExportField($this->no_invoice);
 						if ($this->tgl_invoice->Exportable) $Doc->ExportField($this->tgl_invoice);

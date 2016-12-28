@@ -353,8 +353,6 @@ class ctb_invoice_view extends ctb_invoice {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->id->SetVisibility();
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->customer_id->SetVisibility();
 		$this->no_invoice->SetVisibility();
 		$this->tgl_invoice->SetVisibility();
@@ -812,10 +810,6 @@ class ctb_invoice_view extends ctb_invoice {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// id
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
-
 		// customer_id
 		if (strval($this->customer_id->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->customer_id->CurrentValue, EW_DATATYPE_NUMBER, "");
@@ -900,11 +894,6 @@ class ctb_invoice_view extends ctb_invoice {
 			$this->terbayar->ViewValue = NULL;
 		}
 		$this->terbayar->ViewCustomAttributes = "";
-
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
 
 			// customer_id
 			$this->customer_id->LinkCustomAttributes = "";
@@ -1475,17 +1464,6 @@ $tb_invoice_view->ShowMessage();
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <table class="table table-bordered table-striped ewViewTable">
-<?php if ($tb_invoice->id->Visible) { // id ?>
-	<tr id="r_id">
-		<td><span id="elh_tb_invoice_id"><?php echo $tb_invoice->id->FldCaption() ?></span></td>
-		<td data-name="id"<?php echo $tb_invoice->id->CellAttributes() ?>>
-<span id="el_tb_invoice_id">
-<span<?php echo $tb_invoice->id->ViewAttributes() ?>>
-<?php echo $tb_invoice->id->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
 <?php if ($tb_invoice->customer_id->Visible) { // customer_id ?>
 	<tr id="r_customer_id">
 		<td><span id="elh_tb_invoice_customer_id"><?php echo $tb_invoice->customer_id->FldCaption() ?></span></td>
