@@ -567,13 +567,13 @@
 <table id="report2"><phrase id="tblcaption" value="Report 2"/>
 <field id="nama"><phrase id="fldcaption" value="Customer"/>
 </field>
-<field id="no_kuitansi"><phrase id="fldcaption" value="no kuitansi"/>
+<field id="no_kuitansi"><phrase id="fldcaption" value="No. KW"/>
 </field>
-<field id="no_invoice"><phrase id="fldcaption" value="no invoice"/>
+<field id="no_invoice"><phrase id="fldcaption" value="No. INV"/>
 </field>
-<field id="total_ppn"><phrase id="fldcaption" value="total ppn"/>
+<field id="total_ppn"><phrase id="fldcaption" value="Rp."/>
 </field>
-<field id="tgl_pelaksanaan"><phrase id="fldcaption" value="tgl pelaksanaan"/>
+<field id="tgl_pelaksanaan"><phrase id="fldcaption" value="Tgl. Kegiatan"/>
 </field>
 </table>
 </project>

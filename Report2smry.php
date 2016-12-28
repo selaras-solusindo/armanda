@@ -261,9 +261,8 @@ class crReport2_summary extends crReport2 {
 		$gsEmailContentType = @$_POST["contenttype"]; // Get email content type
 
 		// Setup placeholder
-		$this->nama->PlaceHolder = $this->nama->FldCaption();
-
 		// Setup export options
+
 		$this->SetupExportOptions();
 
 		// Global Page Loading event (in userfn*.php)
@@ -495,7 +494,7 @@ class crReport2_summary extends crReport2 {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(FALSE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -738,10 +737,10 @@ class crReport2_summary extends crReport2 {
 			if ($this->GrpCount == 1) {
 				$this->FirstRowData = array();
 				$this->FirstRowData['nama'] = ewr_Conv($rs->fields('nama'),200);
+				$this->FirstRowData['tgl_pelaksanaan'] = ewr_Conv($rs->fields('tgl_pelaksanaan'),133);
 				$this->FirstRowData['no_kuitansi'] = ewr_Conv($rs->fields('no_kuitansi'),200);
 				$this->FirstRowData['no_invoice'] = ewr_Conv($rs->fields('no_invoice'),200);
 				$this->FirstRowData['total_ppn'] = ewr_Conv($rs->fields('total_ppn'),4);
-				$this->FirstRowData['tgl_pelaksanaan'] = ewr_Conv($rs->fields('tgl_pelaksanaan'),133);
 			}
 		} else { // Get next row
 			$rs->MoveNext();
@@ -753,20 +752,20 @@ class crReport2_summary extends crReport2 {
 				else
 					$this->nama->setDbValue(ewr_GroupValue($this->nama, $rs->fields('nama')));
 			}
+			$this->tgl_pelaksanaan->setDbValue($rs->fields('tgl_pelaksanaan'));
 			$this->no_kuitansi->setDbValue($rs->fields('no_kuitansi'));
 			$this->no_invoice->setDbValue($rs->fields('no_invoice'));
 			$this->total_ppn->setDbValue($rs->fields('total_ppn'));
-			$this->tgl_pelaksanaan->setDbValue($rs->fields('tgl_pelaksanaan'));
-			$this->Val[1] = $this->no_kuitansi->CurrentValue;
-			$this->Val[2] = $this->no_invoice->CurrentValue;
-			$this->Val[3] = $this->total_ppn->CurrentValue;
-			$this->Val[4] = $this->tgl_pelaksanaan->CurrentValue;
+			$this->Val[1] = $this->tgl_pelaksanaan->CurrentValue;
+			$this->Val[2] = $this->no_kuitansi->CurrentValue;
+			$this->Val[3] = $this->no_invoice->CurrentValue;
+			$this->Val[4] = $this->total_ppn->CurrentValue;
 		} else {
 			$this->nama->setDbValue("");
+			$this->tgl_pelaksanaan->setDbValue("");
 			$this->no_kuitansi->setDbValue("");
 			$this->no_invoice->setDbValue("");
 			$this->total_ppn->setDbValue("");
-			$this->tgl_pelaksanaan->setDbValue("");
 		}
 	}
 
@@ -939,8 +938,8 @@ class crReport2_summary extends crReport2 {
 				$this->GrandCnt[1] = $this->TotCount;
 				$this->GrandCnt[2] = $this->TotCount;
 				$this->GrandCnt[3] = $this->TotCount;
-				$this->GrandSmry[3] = $rsagg->fields("sum_total_ppn");
 				$this->GrandCnt[4] = $this->TotCount;
+				$this->GrandSmry[4] = $rsagg->fields("sum_total_ppn");
 				$rsagg->Close();
 				$bGotSummary = TRUE;
 			}
@@ -981,11 +980,15 @@ class crReport2_summary extends crReport2 {
 
 			// total_ppn
 			$this->total_ppn->SumViewValue = $this->total_ppn->SumValue;
-			$this->total_ppn->SumViewValue = ewr_FormatNumber($this->total_ppn->SumViewValue, $this->total_ppn->DefaultDecimalPrecision, -1, 0, 0);
+			$this->total_ppn->SumViewValue = ewr_FormatNumber($this->total_ppn->SumViewValue, 0, -2, -2, -1);
+			$this->total_ppn->CellAttrs["style"] = "text-align:right;";
 			$this->total_ppn->CellAttrs["class"] = ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : "ewRptGrpSummary" . $this->RowGroupLevel;
 
 			// nama
 			$this->nama->HrefValue = "";
+
+			// tgl_pelaksanaan
+			$this->tgl_pelaksanaan->HrefValue = "";
 
 			// no_kuitansi
 			$this->no_kuitansi->HrefValue = "";
@@ -995,9 +998,6 @@ class crReport2_summary extends crReport2 {
 
 			// total_ppn
 			$this->total_ppn->HrefValue = "";
-
-			// tgl_pelaksanaan
-			$this->tgl_pelaksanaan->HrefValue = "";
 		} else {
 
 			// nama
@@ -1006,6 +1006,11 @@ class crReport2_summary extends crReport2 {
 			$this->nama->GroupViewValue = ewr_DisplayGroupValue($this->nama, $this->nama->GroupViewValue);
 			if ($this->nama->GroupValue() == $this->nama->GroupOldValue() && !$this->ChkLvlBreak(1))
 				$this->nama->GroupViewValue = "&nbsp;";
+
+			// tgl_pelaksanaan
+			$this->tgl_pelaksanaan->ViewValue = $this->tgl_pelaksanaan->CurrentValue;
+			$this->tgl_pelaksanaan->ViewValue = tgl_indo($this->tgl_pelaksanaan->ViewValue);
+			$this->tgl_pelaksanaan->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 
 			// no_kuitansi
 			$this->no_kuitansi->ViewValue = $this->no_kuitansi->CurrentValue;
@@ -1017,16 +1022,15 @@ class crReport2_summary extends crReport2 {
 
 			// total_ppn
 			$this->total_ppn->ViewValue = $this->total_ppn->CurrentValue;
-			$this->total_ppn->ViewValue = ewr_FormatNumber($this->total_ppn->ViewValue, $this->total_ppn->DefaultDecimalPrecision, -1, 0, 0);
+			$this->total_ppn->ViewValue = ewr_FormatNumber($this->total_ppn->ViewValue, 0, -2, -2, -1);
 			$this->total_ppn->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
-
-			// tgl_pelaksanaan
-			$this->tgl_pelaksanaan->ViewValue = $this->tgl_pelaksanaan->CurrentValue;
-			$this->tgl_pelaksanaan->ViewValue = ewr_FormatDateTime($this->tgl_pelaksanaan->ViewValue, 5);
-			$this->tgl_pelaksanaan->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+			$this->total_ppn->CellAttrs["style"] = "text-align:right;";
 
 			// nama
 			$this->nama->HrefValue = "";
+
+			// tgl_pelaksanaan
+			$this->tgl_pelaksanaan->HrefValue = "";
 
 			// no_kuitansi
 			$this->no_kuitansi->HrefValue = "";
@@ -1036,9 +1040,6 @@ class crReport2_summary extends crReport2 {
 
 			// total_ppn
 			$this->total_ppn->HrefValue = "";
-
-			// tgl_pelaksanaan
-			$this->tgl_pelaksanaan->HrefValue = "";
 		}
 
 		// Call Cell_Rendered event
@@ -1072,6 +1073,15 @@ class crReport2_summary extends crReport2 {
 			$LinkAttrs = &$this->nama->LinkAttrs;
 			$this->Cell_Rendered($this->nama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
+			// tgl_pelaksanaan
+			$CurrentValue = $this->tgl_pelaksanaan->CurrentValue;
+			$ViewValue = &$this->tgl_pelaksanaan->ViewValue;
+			$ViewAttrs = &$this->tgl_pelaksanaan->ViewAttrs;
+			$CellAttrs = &$this->tgl_pelaksanaan->CellAttrs;
+			$HrefValue = &$this->tgl_pelaksanaan->HrefValue;
+			$LinkAttrs = &$this->tgl_pelaksanaan->LinkAttrs;
+			$this->Cell_Rendered($this->tgl_pelaksanaan, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
 			// no_kuitansi
 			$CurrentValue = $this->no_kuitansi->CurrentValue;
 			$ViewValue = &$this->no_kuitansi->ViewValue;
@@ -1098,15 +1108,6 @@ class crReport2_summary extends crReport2 {
 			$HrefValue = &$this->total_ppn->HrefValue;
 			$LinkAttrs = &$this->total_ppn->LinkAttrs;
 			$this->Cell_Rendered($this->total_ppn, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
-
-			// tgl_pelaksanaan
-			$CurrentValue = $this->tgl_pelaksanaan->CurrentValue;
-			$ViewValue = &$this->tgl_pelaksanaan->ViewValue;
-			$ViewAttrs = &$this->tgl_pelaksanaan->ViewAttrs;
-			$CellAttrs = &$this->tgl_pelaksanaan->CellAttrs;
-			$HrefValue = &$this->tgl_pelaksanaan->HrefValue;
-			$LinkAttrs = &$this->tgl_pelaksanaan->LinkAttrs;
-			$this->Cell_Rendered($this->tgl_pelaksanaan, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 		}
 
 		// Call Row_Rendered event
@@ -1120,10 +1121,10 @@ class crReport2_summary extends crReport2 {
 		$this->SubGrpFldCount = 0;
 		$this->DtlFldCount = 0;
 		if ($this->nama->Visible) $this->GrpFldCount += 1;
+		if ($this->tgl_pelaksanaan->Visible) $this->DtlFldCount += 1;
 		if ($this->no_kuitansi->Visible) $this->DtlFldCount += 1;
 		if ($this->no_invoice->Visible) $this->DtlFldCount += 1;
 		if ($this->total_ppn->Visible) $this->DtlFldCount += 1;
-		if ($this->tgl_pelaksanaan->Visible) $this->DtlFldCount += 1;
 	}
 
 	// Set up Breadcrumb
@@ -1161,14 +1162,16 @@ class crReport2_summary extends crReport2 {
 		} elseif (@$_GET["cmd"] == "reset") {
 
 			// Load default values
-			$this->SetSessionFilterValues($this->nama->SearchValue, $this->nama->SearchOperator, $this->nama->SearchCondition, $this->nama->SearchValue2, $this->nama->SearchOperator2, 'nama'); // Field nama
+			$this->SetSessionDropDownValue($this->nama->DropDownValue, $this->nama->SearchOperator, 'nama'); // Field nama
 
 			//$bSetupFilter = TRUE; // No need to set up, just use default
 		} else {
 			$bRestoreSession = !$this->SearchCommand;
 
 			// Field nama
-			if ($this->GetFilterValues($this->nama)) {
+			if ($this->GetDropDownValue($this->nama)) {
+				$bSetupFilter = TRUE;
+			} elseif ($this->nama->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_Report2_nama'])) {
 				$bSetupFilter = TRUE;
 			}
 			if (!$this->ValidateForm()) {
@@ -1179,21 +1182,24 @@ class crReport2_summary extends crReport2 {
 
 		// Restore session
 		if ($bRestoreSession) {
-			$this->GetSessionFilterValues($this->nama); // Field nama
+			$this->GetSessionDropDownValue($this->nama); // Field nama
 		}
 
 		// Call page filter validated event
 		$this->Page_FilterValidated();
 
 		// Build SQL
-		$this->BuildExtendedFilter($this->nama, $sFilter, FALSE, TRUE); // Field nama
+		$this->BuildDropDownFilter($this->nama, $sFilter, $this->nama->SearchOperator, FALSE, TRUE); // Field nama
 
 		// Save parms to session
-		$this->SetSessionFilterValues($this->nama->SearchValue, $this->nama->SearchOperator, $this->nama->SearchCondition, $this->nama->SearchValue2, $this->nama->SearchOperator2, 'nama'); // Field nama
+		$this->SetSessionDropDownValue($this->nama->DropDownValue, $this->nama->SearchOperator, 'nama'); // Field nama
 
 		// Setup filter
 		if ($bSetupFilter) {
 		}
+
+		// Field nama
+		ewr_LoadDropDownList($this->nama->DropDownList, $this->nama->DropDownValue);
 		return $sFilter;
 	}
 
@@ -1495,6 +1501,10 @@ class crReport2_summary extends crReport2 {
 		* Set up default values for non Text filters
 		*/
 
+		// Field nama
+		$this->nama->DefaultDropDownValue = EWR_INIT_VALUE;
+		if (!$this->SearchCommand) $this->nama->DropDownValue = $this->nama->DefaultDropDownValue;
+
 		/**
 		* Set up default values for extended filters
 		* function SetDefaultExtFilter(&$fld, $so1, $sv1, $sc, $so2, $sv2)
@@ -1507,10 +1517,6 @@ class crReport2_summary extends crReport2 {
 		* $sv2 - Default ext filter value 2 (if operator 2 is enabled)
 		*/
 
-		// Field nama
-		$this->SetDefaultExtFilter($this->nama, "LIKE", NULL, 'AND', "=", NULL);
-		if (!$this->SearchCommand) $this->ApplyDefaultExtFilter($this->nama);
-
 		/**
 		* Set up default values for popup filters
 		*/
@@ -1519,8 +1525,8 @@ class crReport2_summary extends crReport2 {
 	// Check if filter applied
 	function CheckFilter() {
 
-		// Check nama text filter
-		if ($this->TextFilterApplied($this->nama))
+		// Check nama extended filter
+		if ($this->NonTextFilterApplied($this->nama))
 			return TRUE;
 		return FALSE;
 	}
@@ -1535,7 +1541,7 @@ class crReport2_summary extends crReport2 {
 		// Field nama
 		$sExtWrk = "";
 		$sWrk = "";
-		$this->BuildExtendedFilter($this->nama, $sExtWrk);
+		$this->BuildDropDownFilter($this->nama, $sExtWrk, $this->nama->SearchOperator);
 		$sFilter = "";
 		if ($sExtWrk <> "")
 			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
@@ -1562,13 +1568,11 @@ class crReport2_summary extends crReport2 {
 
 		// Field nama
 		$sWrk = "";
-		if ($this->nama->SearchValue <> "" || $this->nama->SearchValue2 <> "") {
-			$sWrk = "\"sv_nama\":\"" . ewr_JsEncode2($this->nama->SearchValue) . "\"," .
-				"\"so_nama\":\"" . ewr_JsEncode2($this->nama->SearchOperator) . "\"," .
-				"\"sc_nama\":\"" . ewr_JsEncode2($this->nama->SearchCondition) . "\"," .
-				"\"sv2_nama\":\"" . ewr_JsEncode2($this->nama->SearchValue2) . "\"," .
-				"\"so2_nama\":\"" . ewr_JsEncode2($this->nama->SearchOperator2) . "\"";
-		}
+		$sWrk = ($this->nama->DropDownValue <> EWR_INIT_VALUE) ? $this->nama->DropDownValue : "";
+		if (is_array($sWrk))
+			$sWrk = implode("||", $sWrk);
+		if ($sWrk <> "")
+			$sWrk = "\"sv_nama\":\"" . ewr_JsEncode2($sWrk) . "\"";
 		if ($sWrk <> "") {
 			if ($sFilterList <> "") $sFilterList .= ",";
 			$sFilterList .= $sWrk;
@@ -1591,14 +1595,15 @@ class crReport2_summary extends crReport2 {
 
 		// Field nama
 		$bRestoreFilter = FALSE;
-		if (array_key_exists("sv_nama", $filter) || array_key_exists("so_nama", $filter) ||
-			array_key_exists("sc_nama", $filter) ||
-			array_key_exists("sv2_nama", $filter) || array_key_exists("so2_nama", $filter)) {
-			$this->SetSessionFilterValues(@$filter["sv_nama"], @$filter["so_nama"], @$filter["sc_nama"], @$filter["sv2_nama"], @$filter["so2_nama"], "nama");
+		if (array_key_exists("sv_nama", $filter)) {
+			$sWrk = $filter["sv_nama"];
+			if (strpos($sWrk, "||") !== FALSE)
+				$sWrk = explode("||", $sWrk);
+			$this->SetSessionDropDownValue($sWrk, @$filter["sv_nama"], "nama");
 			$bRestoreFilter = TRUE;
 		}
 		if (!$bRestoreFilter) { // Clear filter
-			$this->SetSessionFilterValues("", "=", "AND", "", "=", "nama");
+			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "nama");
 		}
 	}
 
@@ -1625,10 +1630,10 @@ class crReport2_summary extends crReport2 {
 				$this->setOrderBy("");
 				$this->setStartGroup(1);
 				$this->nama->setSort("");
+				$this->tgl_pelaksanaan->setSort("");
 				$this->no_kuitansi->setSort("");
 				$this->no_invoice->setSort("");
 				$this->total_ppn->setSort("");
-				$this->tgl_pelaksanaan->setSort("");
 			}
 
 		// Check for an Order parameter
@@ -1927,6 +1932,7 @@ fReport2summary.ValidateRequired = false; // No JavaScript validation
 <?php } ?>
 
 // Use Ajax
+fReport2summary.Lists["sv_nama"] = {"LinkField":"sv_nama","Ajax":true,"DisplayFields":["sv_nama","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
 </script>
 <?php } ?>
 <?php if ($Page->Export == "" && !$Page->DrillDown) { ?>
@@ -1987,15 +1993,48 @@ if (!$Page->DrillDownInPanel) {
 <div id="r_1" class="ewRow">
 <div id="c_nama" class="ewCell form-group">
 	<label for="sv_nama" class="ewSearchCaption ewLabel"><?php echo $Page->nama->FldCaption() ?></label>
-	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_nama" id="so_nama" value="LIKE"></span>
-	<span class="control-group ewSearchField">
-<?php ewr_PrependClass($Page->nama->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="Report2" data-field="x_nama" id="sv_nama" name="sv_nama" size="30" maxlength="50" placeholder="<?php echo $Page->nama->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->nama->SearchValue) ?>"<?php echo $Page->nama->EditAttributes() ?>>
-</span>
+	<span class="ewSearchField">
+<?php $Page->nama->EditAttrs["onchange"] = "ewrForms(this).Submit(); " . @$Page->nama->EditAttrs["onchange"]; ?>
+<?php ewr_PrependClass($Page->nama->EditAttrs["class"], "form-control"); ?>
+<select data-table="Report2" data-field="x_nama" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->nama->DisplayValueSeparator) ? json_encode($Page->nama->DisplayValueSeparator) : $Page->nama->DisplayValueSeparator) ?>" id="sv_nama" name="sv_nama"<?php echo $Page->nama->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->nama->AdvancedFilters) ? count($Page->nama->AdvancedFilters) : 0;
+	$cntd = is_array($Page->nama->DropDownList) ? count($Page->nama->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->nama->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->nama->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->nama->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->nama->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
+<?php
+$Page->nama->LookupSql = "SELECT DISTINCT `nama`, `nama` AS `DispFld` FROM `view4`";
+$sWhereWrk = "";
+
+// Call Lookup selecting
+$Page->Lookup_Selecting($Page->nama, $sWhereWrk);
+if ($sWhereWrk <> "") $Page->nama->LookupSql .= " WHERE " . $sWhereWrk;
+$Page->nama->LookupSql .= " ORDER BY `nama`";
+?>
+<input type="hidden" name="s_sv_nama" id="s_sv_nama" value="s=<?php echo ewr_Encrypt($Page->nama->LookupSql) ?>&amp;f0=<?php echo ewr_Encrypt("`nama` = {filter_value}"); ?>&amp;t0=200&amp;ds=&amp;df=0&amp;dlm=<?php echo ewr_Encrypt($Page->nama->FldDelimiter) ?>&amp;d="></span>
 </div>
 </div>
-<div class="ewRow"><input type="submit" name="btnsubmit" id="btnsubmit" class="btn btn-primary" value="<?php echo $ReportLanguage->Phrase("Search") ?>">
-<input type="reset" name="btnreset" id="btnreset" class="btn hide" value="<?php echo $ReportLanguage->Phrase("Reset") ?>"></div>
 </div>
 </form>
 <script type="text/javascript">
@@ -2082,6 +2121,24 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	</td>
 <?php } ?>
 <?php } ?>
+<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="tgl_pelaksanaan"><div class="Report2_tgl_pelaksanaan"><span class="ewTableHeaderCaption"><?php echo $Page->tgl_pelaksanaan->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="tgl_pelaksanaan">
+<?php if ($Page->SortUrl($Page->tgl_pelaksanaan) == "") { ?>
+		<div class="ewTableHeaderBtn Report2_tgl_pelaksanaan">
+			<span class="ewTableHeaderCaption"><?php echo $Page->tgl_pelaksanaan->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer Report2_tgl_pelaksanaan" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->tgl_pelaksanaan) ?>',0);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->tgl_pelaksanaan->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->tgl_pelaksanaan->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->tgl_pelaksanaan->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
 <?php if ($Page->no_kuitansi->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
 	<td data-field="no_kuitansi"><div class="Report2_no_kuitansi"><span class="ewTableHeaderCaption"><?php echo $Page->no_kuitansi->FldCaption() ?></span></div></td>
@@ -2120,35 +2177,17 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 <?php if ($Page->total_ppn->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="total_ppn"><div class="Report2_total_ppn"><span class="ewTableHeaderCaption"><?php echo $Page->total_ppn->FldCaption() ?></span></div></td>
+	<td data-field="total_ppn"><div class="Report2_total_ppn" style="text-align: right;"><span class="ewTableHeaderCaption"><?php echo $Page->total_ppn->FldCaption() ?></span></div></td>
 <?php } else { ?>
 	<td data-field="total_ppn">
 <?php if ($Page->SortUrl($Page->total_ppn) == "") { ?>
-		<div class="ewTableHeaderBtn Report2_total_ppn">
+		<div class="ewTableHeaderBtn Report2_total_ppn" style="text-align: right;">
 			<span class="ewTableHeaderCaption"><?php echo $Page->total_ppn->FldCaption() ?></span>
 		</div>
 <?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer Report2_total_ppn" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->total_ppn) ?>',0);">
+		<div class="ewTableHeaderBtn ewPointer Report2_total_ppn" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->total_ppn) ?>',0);" style="text-align: right;">
 			<span class="ewTableHeaderCaption"><?php echo $Page->total_ppn->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->total_ppn->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->total_ppn->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
-		</div>
-<?php } ?>
-	</td>
-<?php } ?>
-<?php } ?>
-<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
-<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="tgl_pelaksanaan"><div class="Report2_tgl_pelaksanaan"><span class="ewTableHeaderCaption"><?php echo $Page->tgl_pelaksanaan->FldCaption() ?></span></div></td>
-<?php } else { ?>
-	<td data-field="tgl_pelaksanaan">
-<?php if ($Page->SortUrl($Page->tgl_pelaksanaan) == "") { ?>
-		<div class="ewTableHeaderBtn Report2_tgl_pelaksanaan">
-			<span class="ewTableHeaderCaption"><?php echo $Page->tgl_pelaksanaan->FldCaption() ?></span>
-		</div>
-<?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer Report2_tgl_pelaksanaan" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->tgl_pelaksanaan) ?>',0);">
-			<span class="ewTableHeaderCaption"><?php echo $Page->tgl_pelaksanaan->FldCaption() ?></span>
-			<span class="ewTableHeaderSort"><?php if ($Page->tgl_pelaksanaan->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->tgl_pelaksanaan->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
 <?php } ?>
 	</td>
@@ -2188,6 +2227,10 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="nama"<?php echo $Page->nama->CellAttributes(); ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_Report2_nama"<?php echo $Page->nama->ViewAttributes() ?>><?php echo $Page->nama->GroupViewValue ?></span></td>
 <?php } ?>
+<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
+		<td data-field="tgl_pelaksanaan"<?php echo $Page->tgl_pelaksanaan->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_Report2_tgl_pelaksanaan"<?php echo $Page->tgl_pelaksanaan->ViewAttributes() ?>><?php echo $Page->tgl_pelaksanaan->ListViewValue() ?></span></td>
+<?php } ?>
 <?php if ($Page->no_kuitansi->Visible) { ?>
 		<td data-field="no_kuitansi"<?php echo $Page->no_kuitansi->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_Report2_no_kuitansi"<?php echo $Page->no_kuitansi->ViewAttributes() ?>><?php echo $Page->no_kuitansi->ListViewValue() ?></span></td>
@@ -2199,10 +2242,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->total_ppn->Visible) { ?>
 		<td data-field="total_ppn"<?php echo $Page->total_ppn->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_Report2_total_ppn"<?php echo $Page->total_ppn->ViewAttributes() ?>><?php echo $Page->total_ppn->ListViewValue() ?></span></td>
-<?php } ?>
-<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
-		<td data-field="tgl_pelaksanaan"<?php echo $Page->tgl_pelaksanaan->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_Report2_tgl_pelaksanaan"<?php echo $Page->tgl_pelaksanaan->ViewAttributes() ?>><?php echo $Page->tgl_pelaksanaan->ListViewValue() ?></span></td>
 <?php } ?>
 	</tr>
 <?php
@@ -2236,13 +2275,16 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 </tr>
 <?php
 			$Page->ResetAttrs();
-			$Page->total_ppn->Count = $Page->Cnt[1][3];
-			$Page->total_ppn->SumValue = $Page->Smry[1][3]; // Load SUM
+			$Page->total_ppn->Count = $Page->Cnt[1][4];
+			$Page->total_ppn->SumValue = $Page->Smry[1][4]; // Load SUM
 			$Page->RowTotalSubType = EWR_ROWTOTAL_SUM;
 			$Page->RenderRow();
 ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
 		<td colspan="<?php echo ($Page->GrpFldCount - 0) ?>"<?php echo $Page->nama->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
+		<td data-field="tgl_pelaksanaan"<?php echo $Page->nama->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
 <?php if ($Page->no_kuitansi->Visible) { ?>
 		<td data-field="no_kuitansi"<?php echo $Page->nama->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
@@ -2252,9 +2294,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->total_ppn->Visible) { ?>
 		<td data-field="total_ppn"<?php echo $Page->total_ppn->CellAttributes() ?>>
 <span data-class="tpgs<?php echo $Page->GrpCount ?>_Report2_total_ppn"<?php echo $Page->total_ppn->ViewAttributes() ?>><?php echo $Page->total_ppn->SumViewValue ?></span></td>
-<?php } ?>
-<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
-		<td data-field="tgl_pelaksanaan"<?php echo $Page->nama->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 	</tr>
 <?php
@@ -2297,8 +2336,8 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes(); ?>><td colspan="<?php echo ($Page->GrpFldCount + $Page->DtlFldCount) ?>"><?php echo $ReportLanguage->Phrase("RptPageTotal") ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[0][0],0,-2,-2,-2); ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td></tr>
 <?php
 	$Page->ResetAttrs();
-	$Page->total_ppn->Count = $Page->Cnt[0][3];
-	$Page->total_ppn->SumValue = $Page->Smry[0][3]; // Load SUM
+	$Page->total_ppn->Count = $Page->Cnt[0][4];
+	$Page->total_ppn->SumValue = $Page->Smry[0][4]; // Load SUM
 	$Page->RowTotalSubType = EWR_ROWTOTAL_SUM;
 	$Page->RowAttrs["class"] = "ewRptPageSummary";
 	$Page->RenderRow();
@@ -2306,6 +2345,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->GrpFldCount > 0) { ?>
 		<td colspan="<?php echo $Page->GrpFldCount ?>" class="ewRptGrpAggregate"><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+<?php } ?>
+<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
+		<td data-field="tgl_pelaksanaan"<?php echo $Page->tgl_pelaksanaan->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->no_kuitansi->Visible) { ?>
 		<td data-field="no_kuitansi"<?php echo $Page->no_kuitansi->CellAttributes() ?>>&nbsp;</td>
@@ -2316,9 +2358,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->total_ppn->Visible) { ?>
 		<td data-field="total_ppn"<?php echo $Page->total_ppn->CellAttributes() ?>>
 <span data-class="tpps_Report2_total_ppn"<?php echo $Page->total_ppn->ViewAttributes() ?>><?php echo $Page->total_ppn->SumViewValue ?></span></td>
-<?php } ?>
-<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
-		<td data-field="tgl_pelaksanaan"<?php echo $Page->tgl_pelaksanaan->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 	</tr>
 <?php } ?>
@@ -2333,8 +2372,8 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes(); ?>><td colspan="<?php echo ($Page->GrpFldCount + $Page->DtlFldCount) ?>"><?php echo $ReportLanguage->Phrase("RptGrandTotal") ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->TotCount,0,-2,-2,-2); ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td></tr>
 <?php
 	$Page->ResetAttrs();
-	$Page->total_ppn->Count = $Page->GrandCnt[3];
-	$Page->total_ppn->SumValue = $Page->GrandSmry[3]; // Load SUM
+	$Page->total_ppn->Count = $Page->GrandCnt[4];
+	$Page->total_ppn->SumValue = $Page->GrandSmry[4]; // Load SUM
 	$Page->RowTotalSubType = EWR_ROWTOTAL_SUM;
 	$Page->RowAttrs["class"] = "ewRptGrandSummary";
 	$Page->RenderRow();
@@ -2342,6 +2381,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->GrpFldCount > 0) { ?>
 		<td colspan="<?php echo $Page->GrpFldCount ?>" class="ewRptGrpAggregate"><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+<?php } ?>
+<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
+		<td data-field="tgl_pelaksanaan"<?php echo $Page->tgl_pelaksanaan->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->no_kuitansi->Visible) { ?>
 		<td data-field="no_kuitansi"<?php echo $Page->no_kuitansi->CellAttributes() ?>>&nbsp;</td>
@@ -2352,9 +2394,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->total_ppn->Visible) { ?>
 		<td data-field="total_ppn"<?php echo $Page->total_ppn->CellAttributes() ?>>
 <span data-class="tpts_Report2_total_ppn"<?php echo $Page->total_ppn->ViewAttributes() ?>><?php echo $Page->total_ppn->SumViewValue ?></span></td>
-<?php } ?>
-<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
-		<td data-field="tgl_pelaksanaan"<?php echo $Page->tgl_pelaksanaan->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 	</tr>
 	</tfoot>

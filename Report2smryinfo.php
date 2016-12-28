@@ -8,10 +8,10 @@ $Report2 = NULL;
 //
 class crReport2 extends crTableBase {
 	var $nama;
+	var $tgl_pelaksanaan;
 	var $no_kuitansi;
 	var $no_invoice;
 	var $total_ppn;
-	var $tgl_pelaksanaan;
 
 	//
 	// Table class constructor
@@ -36,6 +36,14 @@ class crReport2 extends crTableBase {
 		$this->nama->FldGroupInt = "0";
 		$this->nama->FldGroupSql = "";
 
+		// tgl_pelaksanaan
+		$this->tgl_pelaksanaan = new crField('Report2', 'Report2', 'x_tgl_pelaksanaan', 'tgl_pelaksanaan', '`tgl_pelaksanaan`', 133, EWR_DATATYPE_DATE, -1);
+		$this->tgl_pelaksanaan->FldDefaultErrMsg = str_replace("%s", "/", $ReportLanguage->Phrase("IncorrectDateYMD"));
+		$this->fields['tgl_pelaksanaan'] = &$this->tgl_pelaksanaan;
+		$this->tgl_pelaksanaan->DateFilter = "";
+		$this->tgl_pelaksanaan->SqlSelect = "";
+		$this->tgl_pelaksanaan->SqlOrderBy = "";
+
 		// no_kuitansi
 		$this->no_kuitansi = new crField('Report2', 'Report2', 'x_no_kuitansi', 'no_kuitansi', '`no_kuitansi`', 200, EWR_DATATYPE_STRING, -1);
 		$this->fields['no_kuitansi'] = &$this->no_kuitansi;
@@ -57,14 +65,6 @@ class crReport2 extends crTableBase {
 		$this->total_ppn->DateFilter = "";
 		$this->total_ppn->SqlSelect = "";
 		$this->total_ppn->SqlOrderBy = "";
-
-		// tgl_pelaksanaan
-		$this->tgl_pelaksanaan = new crField('Report2', 'Report2', 'x_tgl_pelaksanaan', 'tgl_pelaksanaan', '`tgl_pelaksanaan`', 133, EWR_DATATYPE_DATE, 5);
-		$this->tgl_pelaksanaan->FldDefaultErrMsg = str_replace("%s", "/", $ReportLanguage->Phrase("IncorrectDateYMD"));
-		$this->fields['tgl_pelaksanaan'] = &$this->tgl_pelaksanaan;
-		$this->tgl_pelaksanaan->DateFilter = "";
-		$this->tgl_pelaksanaan->SqlSelect = "";
-		$this->tgl_pelaksanaan->SqlOrderBy = "";
 	}
 
 	// Single column sort
