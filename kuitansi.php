@@ -10,7 +10,7 @@ mysql_select_db($database_conn) or die ("Database tidak ditemukan");
 	</head>
 	<body>
 		<form method="post" action="kuitansi2.php">
-			Pilih No. Kuitansi :
+			Pilih No. Kwitansi :
 			<select name="no_kuitansi">
 				<option value="0">No. Kwitansi</option>
 				<?php
