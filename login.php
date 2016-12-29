@@ -616,7 +616,6 @@ $login->ShowMessage();
 	</div>
 </form>
 <br>
-<a class="ewLink ewLinkSeparator" href="register.php"><?php echo $Language->Phrase("Register") ?></a>
 <script type="text/javascript">
 flogin.Init();
 </script>
