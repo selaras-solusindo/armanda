@@ -41,6 +41,12 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 		if ($this->UseTokenInUrl) $PageUrl .= "t=" . $this->TableVar . "&"; // Add page token
 		return $PageUrl;
 	}
+	var $AuditTrailOnAdd = TRUE;
+	var $AuditTrailOnEdit = FALSE;
+	var $AuditTrailOnDelete = FALSE;
+	var $AuditTrailOnView = FALSE;
+	var $AuditTrailOnViewData = FALSE;
+	var $AuditTrailOnSearch = FALSE;
 
 	// Message
 	function getMessage() {
@@ -596,6 +602,8 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 		$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
 		$sWhereWrk = "";
 		$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
+		$lookuptblfilter = "`id` not in (select invoice_id from tb_kuitansi)";
+		ew_AddFilter($sWhereWrk, $lookuptblfilter);
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -638,6 +646,8 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 			$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
 			$sWhereWrk = "";
 			$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
+			$lookuptblfilter = "`id` not in (select invoice_id from tb_kuitansi)";
+			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -758,6 +768,7 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 			// Call Row Inserted event
 			$rs = ($rsold == NULL) ? NULL : $rsold->fields;
 			$this->Row_Inserted($rs, $rsnew);
+			$this->WriteAuditTrailOnAdd($rsnew);
 		}
 		return $AddRow;
 	}
@@ -782,6 +793,8 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 			$sSqlWrk = "SELECT `id` AS `LinkFld`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
 			$sWhereWrk = "{filter}";
 			$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
+			$lookuptblfilter = "`id` not in (select invoice_id from tb_kuitansi)";
+			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` = {filter_value}', "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
@@ -802,6 +815,8 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 			$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld` FROM `tb_invoice`";
 			$sWhereWrk = "`no_invoice` LIKE '{query_value}%'";
 			$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
+			$lookuptblfilter = "`id` not in (select invoice_id from tb_kuitansi)";
+			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
@@ -810,6 +825,47 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 			if ($sSqlWrk <> "")
 				$fld->LookupFilters["s"] .= $sSqlWrk;
 			break;
+		}
+	}
+
+	// Write Audit Trail start/end for grid update
+	function WriteAuditTrailDummy($typ) {
+		$table = 'tb_kuitansi';
+		$usr = CurrentUserName();
+		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
+	}
+
+	// Write Audit Trail (add page)
+	function WriteAuditTrailOnAdd(&$rs) {
+		global $Language;
+		if (!$this->AuditTrailOnAdd) return;
+		$table = 'tb_kuitansi';
+
+		// Get key value
+		$key = "";
+		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
+		$key .= $rs['kuitansi_id'];
+
+		// Write Audit Trail
+		$dt = ew_StdCurrentDateTime();
+		$id = ew_ScriptName();
+		$usr = CurrentUserName();
+		foreach (array_keys($rs) as $fldname) {
+			if ($this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
+				if ($this->fields[$fldname]->FldHtmlTag == "PASSWORD") {
+					$newvalue = $Language->Phrase("PasswordMask"); // Password Field
+				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) {
+					if (EW_AUDIT_TRAIL_TO_DATABASE)
+						$newvalue = $rs[$fldname];
+					else
+						$newvalue = "[MEMO]"; // Memo Field
+				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_XML) {
+					$newvalue = "[XML]"; // XML Field
+				} else {
+					$newvalue = $rs[$fldname];
+				}
+				ew_WriteAuditTrail("log", $dt, $id, $usr, "A", $table, $fldname, $key, "", $newvalue);
+			}
 		}
 	}
 

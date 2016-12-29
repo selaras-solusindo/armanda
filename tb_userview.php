@@ -72,6 +72,12 @@ class ctb_user_view extends ctb_user {
 	var $GridEditUrl;
 	var $MultiDeleteUrl;
 	var $MultiUpdateUrl;
+	var $AuditTrailOnAdd = FALSE;
+	var $AuditTrailOnEdit = FALSE;
+	var $AuditTrailOnDelete = FALSE;
+	var $AuditTrailOnView = FALSE;
+	var $AuditTrailOnViewData = FALSE;
+	var $AuditTrailOnSearch = FALSE;
 
 	// Message
 	function getMessage() {
@@ -662,6 +668,7 @@ class ctb_user_view extends ctb_user {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
+		if ($this->AuditTrailOnView) $this->WriteAuditTrailOnView($row);
 		$this->user_id->setDbValue($rs->fields('user_id'));
 		$this->username->setDbValue($rs->fields('username'));
 		$this->password->setDbValue($rs->fields('password'));
@@ -1013,6 +1020,13 @@ class ctb_user_view extends ctb_user {
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
 		}
+	}
+
+	// Write Audit Trail start/end for grid update
+	function WriteAuditTrailDummy($typ) {
+		$table = 'tb_user';
+		$usr = CurrentUserName();
+		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
 	// Page Load event

@@ -82,6 +82,12 @@ class ctb_invoice_list extends ctb_invoice {
 	var $GridEditUrl;
 	var $MultiDeleteUrl;
 	var $MultiUpdateUrl;
+	var $AuditTrailOnAdd = FALSE;
+	var $AuditTrailOnEdit = FALSE;
+	var $AuditTrailOnDelete = FALSE;
+	var $AuditTrailOnView = FALSE;
+	var $AuditTrailOnViewData = FALSE;
+	var $AuditTrailOnSearch = FALSE;
 
 	// Message
 	function getMessage() {
@@ -2311,6 +2317,13 @@ class ctb_invoice_list extends ctb_invoice {
 		}
 	}
 
+	// Write Audit Trail start/end for grid update
+	function WriteAuditTrailDummy($typ) {
+		$table = 'tb_invoice';
+		$usr = CurrentUserName();
+		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
+	}
+
 	// Page Load event
 	function Page_Load() {
 
@@ -2533,6 +2546,13 @@ var CurrentSearchForm = ftb_invoicelistsrch = new ew_Form("ftb_invoicelistsrch")
 			$tb_invoice_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
 			$tb_invoice_list->setWarningMessage($Language->Phrase("NoRecord"));
+	}
+
+	// Audit trail on search
+	if ($tb_invoice_list->AuditTrailOnSearch && $tb_invoice_list->Command == "search" && !$tb_invoice_list->RestoreSearch) {
+		$searchparm = ew_ServerVar("QUERY_STRING");
+		$searchsql = $tb_invoice_list->getSessionWhere();
+		$tb_invoice_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
 	}
 $tb_invoice_list->RenderOtherOptions();
 ?>

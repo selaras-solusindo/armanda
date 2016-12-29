@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "tb_baranginfo.php" ?>
+<?php include_once "tb_kuitansiinfo.php" ?>
 <?php include_once "tb_userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$tb_barang_view = NULL; // Initialize page object first
+$tb_kuitansi_view = NULL; // Initialize page object first
 
-class ctb_barang_view extends ctb_barang {
+class ctb_kuitansi_view extends ctb_kuitansi {
 
 	// Page ID
 	var $PageID = 'view';
@@ -25,10 +25,10 @@ class ctb_barang_view extends ctb_barang {
 	var $ProjectID = "{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}";
 
 	// Table name
-	var $TableName = 'tb_barang';
+	var $TableName = 'tb_kuitansi';
 
 	// Page object name
-	var $PageObjName = 'tb_barang_view';
+	var $PageObjName = 'tb_kuitansi_view';
 
 	// Page name
 	function PageName() {
@@ -264,15 +264,15 @@ class ctb_barang_view extends ctb_barang {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (tb_barang)
-		if (!isset($GLOBALS["tb_barang"]) || get_class($GLOBALS["tb_barang"]) == "ctb_barang") {
-			$GLOBALS["tb_barang"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["tb_barang"];
+		// Table object (tb_kuitansi)
+		if (!isset($GLOBALS["tb_kuitansi"]) || get_class($GLOBALS["tb_kuitansi"]) == "ctb_kuitansi") {
+			$GLOBALS["tb_kuitansi"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["tb_kuitansi"];
 		}
 		$KeyUrl = "";
-		if (@$_GET["barang_id"] <> "") {
-			$this->RecKey["barang_id"] = $_GET["barang_id"];
-			$KeyUrl .= "&amp;barang_id=" . urlencode($this->RecKey["barang_id"]);
+		if (@$_GET["kuitansi_id"] <> "") {
+			$this->RecKey["kuitansi_id"] = $_GET["kuitansi_id"];
+			$KeyUrl .= "&amp;kuitansi_id=" . urlencode($this->RecKey["kuitansi_id"]);
 		}
 		$this->ExportPrintUrl = $this->PageUrl() . "export=print" . $KeyUrl;
 		$this->ExportHtmlUrl = $this->PageUrl() . "export=html" . $KeyUrl;
@@ -291,7 +291,7 @@ class ctb_barang_view extends ctb_barang {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'tb_barang', TRUE);
+			define("EW_TABLE_NAME", 'tb_kuitansi', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -335,7 +335,7 @@ class ctb_barang_view extends ctb_barang {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
 			if ($Security->CanList())
-				$this->Page_Terminate(ew_GetUrl("tb_baranglist.php"));
+				$this->Page_Terminate(ew_GetUrl("tb_kuitansilist.php"));
 			else
 				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
@@ -356,9 +356,9 @@ class ctb_barang_view extends ctb_barang {
 			$this->setExportReturnUrl(ew_CurrentUrl());
 		}
 		$gsExportFile = $this->TableVar; // Get export file, used in header
-		if (@$_GET["barang_id"] <> "") {
+		if (@$_GET["kuitansi_id"] <> "") {
 			if ($gsExportFile <> "") $gsExportFile .= "_";
-			$gsExportFile .= ew_StripSlashes($_GET["barang_id"]);
+			$gsExportFile .= ew_StripSlashes($_GET["kuitansi_id"]);
 		}
 
 		// Get custom export parameters
@@ -384,9 +384,10 @@ class ctb_barang_view extends ctb_barang {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->barang_id->SetVisibility();
-		$this->barang_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
-		$this->nama->SetVisibility();
+		$this->kuitansi_id->SetVisibility();
+		$this->kuitansi_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
+		$this->invoice_id->SetVisibility();
+		$this->no_kuitansi->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -418,13 +419,13 @@ class ctb_barang_view extends ctb_barang {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $tb_barang;
+		global $EW_EXPORT, $tb_kuitansi;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($tb_barang);
+				$doc = new $class($tb_kuitansi);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -486,14 +487,14 @@ class ctb_barang_view extends ctb_barang {
 		$sReturnUrl = "";
 		$bMatchRecord = FALSE;
 		if ($this->IsPageRequest()) { // Validate request
-			if (@$_GET["barang_id"] <> "") {
-				$this->barang_id->setQueryStringValue($_GET["barang_id"]);
-				$this->RecKey["barang_id"] = $this->barang_id->QueryStringValue;
-			} elseif (@$_POST["barang_id"] <> "") {
-				$this->barang_id->setFormValue($_POST["barang_id"]);
-				$this->RecKey["barang_id"] = $this->barang_id->FormValue;
+			if (@$_GET["kuitansi_id"] <> "") {
+				$this->kuitansi_id->setQueryStringValue($_GET["kuitansi_id"]);
+				$this->RecKey["kuitansi_id"] = $this->kuitansi_id->QueryStringValue;
+			} elseif (@$_POST["kuitansi_id"] <> "") {
+				$this->kuitansi_id->setFormValue($_POST["kuitansi_id"]);
+				$this->RecKey["kuitansi_id"] = $this->kuitansi_id->FormValue;
 			} else {
-				$sReturnUrl = "tb_baranglist.php"; // Return to list
+				$sReturnUrl = "tb_kuitansilist.php"; // Return to list
 			}
 
 			// Get action
@@ -503,7 +504,7 @@ class ctb_barang_view extends ctb_barang {
 					if (!$this->LoadRow()) { // Load record based on key
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$sReturnUrl = "tb_baranglist.php"; // No matching record, return to list
+						$sReturnUrl = "tb_kuitansilist.php"; // No matching record, return to list
 					}
 			}
 
@@ -514,7 +515,7 @@ class ctb_barang_view extends ctb_barang {
 				exit();
 			}
 		} else {
-			$sReturnUrl = "tb_baranglist.php"; // Not page request, return to list
+			$sReturnUrl = "tb_kuitansilist.php"; // Not page request, return to list
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
@@ -629,7 +630,7 @@ class ctb_barang_view extends ctb_barang {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -673,16 +674,23 @@ class ctb_barang_view extends ctb_barang {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		if ($this->AuditTrailOnView) $this->WriteAuditTrailOnView($row);
-		$this->barang_id->setDbValue($rs->fields('barang_id'));
-		$this->nama->setDbValue($rs->fields('nama'));
+		$this->kuitansi_id->setDbValue($rs->fields('kuitansi_id'));
+		$this->invoice_id->setDbValue($rs->fields('invoice_id'));
+		if (array_key_exists('EV__invoice_id', $rs->fields)) {
+			$this->invoice_id->VirtualValue = $rs->fields('EV__invoice_id'); // Set up virtual field value
+		} else {
+			$this->invoice_id->VirtualValue = ""; // Clear value
+		}
+		$this->no_kuitansi->setDbValue($rs->fields('no_kuitansi'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->barang_id->DbValue = $row['barang_id'];
-		$this->nama->DbValue = $row['nama'];
+		$this->kuitansi_id->DbValue = $row['kuitansi_id'];
+		$this->invoice_id->DbValue = $row['invoice_id'];
+		$this->no_kuitansi->DbValue = $row['no_kuitansi'];
 	}
 
 	// Render row values based on field settings
@@ -701,28 +709,64 @@ class ctb_barang_view extends ctb_barang {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// barang_id
-		// nama
+		// kuitansi_id
+		// invoice_id
+		// no_kuitansi
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// barang_id
-		$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
-		$this->barang_id->ViewCustomAttributes = "";
+		// kuitansi_id
+		$this->kuitansi_id->ViewValue = $this->kuitansi_id->CurrentValue;
+		$this->kuitansi_id->ViewCustomAttributes = "";
 
-		// nama
-		$this->nama->ViewValue = $this->nama->CurrentValue;
-		$this->nama->ViewCustomAttributes = "";
+		// invoice_id
+		if ($this->invoice_id->VirtualValue <> "") {
+			$this->invoice_id->ViewValue = $this->invoice_id->VirtualValue;
+		} else {
+			$this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
+		if (strval($this->invoice_id->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->invoice_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
+		$sWhereWrk = "";
+		$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
+		$lookuptblfilter = "`id` not in (select invoice_id from tb_kuitansi)";
+		ew_AddFilter($sWhereWrk, $lookuptblfilter);
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->invoice_id->ViewValue = $this->invoice_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
+			}
+		} else {
+			$this->invoice_id->ViewValue = NULL;
+		}
+		}
+		$this->invoice_id->ViewCustomAttributes = "";
 
-			// barang_id
-			$this->barang_id->LinkCustomAttributes = "";
-			$this->barang_id->HrefValue = "";
-			$this->barang_id->TooltipValue = "";
+		// no_kuitansi
+		$this->no_kuitansi->ViewValue = $this->no_kuitansi->CurrentValue;
+		$this->no_kuitansi->ViewCustomAttributes = "";
 
-			// nama
-			$this->nama->LinkCustomAttributes = "";
-			$this->nama->HrefValue = "";
-			$this->nama->TooltipValue = "";
+			// kuitansi_id
+			$this->kuitansi_id->LinkCustomAttributes = "";
+			$this->kuitansi_id->HrefValue = "";
+			$this->kuitansi_id->TooltipValue = "";
+
+			// invoice_id
+			$this->invoice_id->LinkCustomAttributes = "";
+			$this->invoice_id->HrefValue = "";
+			$this->invoice_id->TooltipValue = "";
+
+			// no_kuitansi
+			$this->no_kuitansi->LinkCustomAttributes = "";
+			$this->no_kuitansi->HrefValue = "";
+			$this->no_kuitansi->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -772,7 +816,7 @@ class ctb_barang_view extends ctb_barang {
 		// Export to Email
 		$item = &$this->ExportOptions->Add("email");
 		$url = "";
-		$item->Body = "<button id=\"emf_tb_barang\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_tb_barang',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ftb_barangview,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
+		$item->Body = "<button id=\"emf_tb_kuitansi\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_tb_kuitansi',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ftb_kuitansiview,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
 		$item->Visible = TRUE;
 
 		// Drop down button for export
@@ -982,7 +1026,7 @@ class ctb_barang_view extends ctb_barang {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("tb_baranglist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("tb_kuitansilist.php"), "", $this->TableVar, TRUE);
 		$PageId = "view";
 		$Breadcrumb->Add("view", $PageId, $url);
 	}
@@ -1005,7 +1049,7 @@ class ctb_barang_view extends ctb_barang {
 
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
-		$table = 'tb_barang';
+		$table = 'tb_kuitansi';
 		$usr = CurrentUserName();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
@@ -1101,30 +1145,30 @@ class ctb_barang_view extends ctb_barang {
 <?php
 
 // Create page object
-if (!isset($tb_barang_view)) $tb_barang_view = new ctb_barang_view();
+if (!isset($tb_kuitansi_view)) $tb_kuitansi_view = new ctb_kuitansi_view();
 
 // Page init
-$tb_barang_view->Page_Init();
+$tb_kuitansi_view->Page_Init();
 
 // Page main
-$tb_barang_view->Page_Main();
+$tb_kuitansi_view->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$tb_barang_view->Page_Render();
+$tb_kuitansi_view->Page_Render();
 ?>
 <?php include_once "header.php" ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($tb_kuitansi->Export == "") { ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "view";
-var CurrentForm = ftb_barangview = new ew_Form("ftb_barangview", "view");
+var CurrentForm = ftb_kuitansiview = new ew_Form("ftb_kuitansiview", "view");
 
 // Form_CustomValidate event
-ftb_barangview.Form_CustomValidate = 
+ftb_kuitansiview.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -1133,88 +1177,100 @@ ftb_barangview.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ftb_barangview.ValidateRequired = true;
+ftb_kuitansiview.ValidateRequired = true;
 <?php } else { ?>
-ftb_barangview.ValidateRequired = false; 
+ftb_kuitansiview.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+ftb_kuitansiview.Lists["x_invoice_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_no_invoice","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"tb_invoice"};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
 <?php } ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($tb_kuitansi->Export == "") { ?>
 <div class="ewToolbar">
-<?php if (!$tb_barang_view->IsModal) { ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if (!$tb_kuitansi_view->IsModal) { ?>
+<?php if ($tb_kuitansi->Export == "") { ?>
 <?php $Breadcrumb->Render(); ?>
 <?php } ?>
 <?php } ?>
-<?php $tb_barang_view->ExportOptions->Render("body") ?>
+<?php $tb_kuitansi_view->ExportOptions->Render("body") ?>
 <?php
-	foreach ($tb_barang_view->OtherOptions as &$option)
+	foreach ($tb_kuitansi_view->OtherOptions as &$option)
 		$option->Render("body");
 ?>
-<?php if (!$tb_barang_view->IsModal) { ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if (!$tb_kuitansi_view->IsModal) { ?>
+<?php if ($tb_kuitansi->Export == "") { ?>
 <?php echo $Language->SelectionForm(); ?>
 <?php } ?>
 <?php } ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<?php $tb_barang_view->ShowPageHeader(); ?>
+<?php $tb_kuitansi_view->ShowPageHeader(); ?>
 <?php
-$tb_barang_view->ShowMessage();
+$tb_kuitansi_view->ShowMessage();
 ?>
-<form name="ftb_barangview" id="ftb_barangview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($tb_barang_view->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_barang_view->Token ?>">
+<form name="ftb_kuitansiview" id="ftb_kuitansiview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($tb_kuitansi_view->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_kuitansi_view->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="tb_barang">
-<?php if ($tb_barang_view->IsModal) { ?>
+<input type="hidden" name="t" value="tb_kuitansi">
+<?php if ($tb_kuitansi_view->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <table class="table table-bordered table-striped ewViewTable">
-<?php if ($tb_barang->barang_id->Visible) { // barang_id ?>
-	<tr id="r_barang_id">
-		<td><span id="elh_tb_barang_barang_id"><?php echo $tb_barang->barang_id->FldCaption() ?></span></td>
-		<td data-name="barang_id"<?php echo $tb_barang->barang_id->CellAttributes() ?>>
-<span id="el_tb_barang_barang_id">
-<span<?php echo $tb_barang->barang_id->ViewAttributes() ?>>
-<?php echo $tb_barang->barang_id->ViewValue ?></span>
+<?php if ($tb_kuitansi->kuitansi_id->Visible) { // kuitansi_id ?>
+	<tr id="r_kuitansi_id">
+		<td><span id="elh_tb_kuitansi_kuitansi_id"><?php echo $tb_kuitansi->kuitansi_id->FldCaption() ?></span></td>
+		<td data-name="kuitansi_id"<?php echo $tb_kuitansi->kuitansi_id->CellAttributes() ?>>
+<span id="el_tb_kuitansi_kuitansi_id">
+<span<?php echo $tb_kuitansi->kuitansi_id->ViewAttributes() ?>>
+<?php echo $tb_kuitansi->kuitansi_id->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($tb_barang->nama->Visible) { // nama ?>
-	<tr id="r_nama">
-		<td><span id="elh_tb_barang_nama"><?php echo $tb_barang->nama->FldCaption() ?></span></td>
-		<td data-name="nama"<?php echo $tb_barang->nama->CellAttributes() ?>>
-<span id="el_tb_barang_nama">
-<span<?php echo $tb_barang->nama->ViewAttributes() ?>>
-<?php echo $tb_barang->nama->ViewValue ?></span>
+<?php if ($tb_kuitansi->invoice_id->Visible) { // invoice_id ?>
+	<tr id="r_invoice_id">
+		<td><span id="elh_tb_kuitansi_invoice_id"><?php echo $tb_kuitansi->invoice_id->FldCaption() ?></span></td>
+		<td data-name="invoice_id"<?php echo $tb_kuitansi->invoice_id->CellAttributes() ?>>
+<span id="el_tb_kuitansi_invoice_id">
+<span<?php echo $tb_kuitansi->invoice_id->ViewAttributes() ?>>
+<?php echo $tb_kuitansi->invoice_id->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($tb_kuitansi->no_kuitansi->Visible) { // no_kuitansi ?>
+	<tr id="r_no_kuitansi">
+		<td><span id="elh_tb_kuitansi_no_kuitansi"><?php echo $tb_kuitansi->no_kuitansi->FldCaption() ?></span></td>
+		<td data-name="no_kuitansi"<?php echo $tb_kuitansi->no_kuitansi->CellAttributes() ?>>
+<span id="el_tb_kuitansi_no_kuitansi">
+<span<?php echo $tb_kuitansi->no_kuitansi->ViewAttributes() ?>>
+<?php echo $tb_kuitansi->no_kuitansi->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
 </table>
 </form>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($tb_kuitansi->Export == "") { ?>
 <script type="text/javascript">
-ftb_barangview.Init();
+ftb_kuitansiview.Init();
 </script>
 <?php } ?>
 <?php
-$tb_barang_view->ShowPageFooter();
+$tb_kuitansi_view->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($tb_kuitansi->Export == "") { ?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
@@ -1224,5 +1280,5 @@ if (EW_DEBUG_ENABLED)
 <?php } ?>
 <?php include_once "footer.php" ?>
 <?php
-$tb_barang_view->Page_Terminate();
+$tb_kuitansi_view->Page_Terminate();
 ?>

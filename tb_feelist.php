@@ -82,6 +82,12 @@ class ctb_fee_list extends ctb_fee {
 	var $GridEditUrl;
 	var $MultiDeleteUrl;
 	var $MultiUpdateUrl;
+	var $AuditTrailOnAdd = FALSE;
+	var $AuditTrailOnEdit = FALSE;
+	var $AuditTrailOnDelete = FALSE;
+	var $AuditTrailOnView = FALSE;
+	var $AuditTrailOnViewData = FALSE;
+	var $AuditTrailOnSearch = FALSE;
 
 	// Message
 	function getMessage() {
@@ -2134,6 +2140,13 @@ class ctb_fee_list extends ctb_fee {
 		}
 	}
 
+	// Write Audit Trail start/end for grid update
+	function WriteAuditTrailDummy($typ) {
+		$table = 'tb_fee';
+		$usr = CurrentUserName();
+		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
+	}
+
 	// Page Load event
 	function Page_Load() {
 
@@ -2363,6 +2376,13 @@ if ($tb_fee_list->DbMasterFilter <> "" && $tb_fee->getCurrentMasterTable() == "t
 			$tb_fee_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
 			$tb_fee_list->setWarningMessage($Language->Phrase("NoRecord"));
+	}
+
+	// Audit trail on search
+	if ($tb_fee_list->AuditTrailOnSearch && $tb_fee_list->Command == "search" && !$tb_fee_list->RestoreSearch) {
+		$searchparm = ew_ServerVar("QUERY_STRING");
+		$searchsql = $tb_fee_list->getSessionWhere();
+		$tb_fee_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
 	}
 $tb_fee_list->RenderOtherOptions();
 ?>

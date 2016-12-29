@@ -582,6 +582,9 @@
   </global>
   <project>
     <phrase id="footertext" value="CV. Armanda Nusantara" />
+    <menu id="10035">
+      <phrase id="menutext" value="view 4" />
+    </menu>
     <menu id="10034">
       <phrase id="menutext" value="User" />
     </menu>
@@ -1027,6 +1030,12 @@
       <field id="no_sertifikat">
         <phrase id="fldcaption" value="No. Sertifikat" />
       </field>
+      <field id="pasal23">
+        <phrase id="fldcaption" value="pasal 23" />
+      </field>
+      <field id="total">
+        <phrase id="fldcaption" value="total" />
+      </field>
     </table>
     <table id="kuitansi_php">
       <phrase id="tblcaption" value="Cetak Kuitansi" />
@@ -1131,6 +1140,24 @@
       </field>
       <field id="terbilang">
         <phrase id="fldcaption" value="terbilang" />
+      </field>
+    </table>
+    <table id="view4">
+      <phrase id="tblcaption" value="view 4" />
+      <field id="nama">
+        <phrase id="fldcaption" value="nama" />
+      </field>
+      <field id="no_kuitansi">
+        <phrase id="fldcaption" value="no kuitansi" />
+      </field>
+      <field id="no_invoice">
+        <phrase id="fldcaption" value="no invoice" />
+      </field>
+      <field id="total_ppn">
+        <phrase id="fldcaption" value="total ppn" />
+      </field>
+      <field id="tgl_pelaksanaan">
+        <phrase id="fldcaption" value="tgl pelaksanaan" />
       </field>
     </table>
     <table id="view5">

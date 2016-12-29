@@ -74,6 +74,12 @@ class ctb_fee_view extends ctb_fee {
 	var $GridEditUrl;
 	var $MultiDeleteUrl;
 	var $MultiUpdateUrl;
+	var $AuditTrailOnAdd = FALSE;
+	var $AuditTrailOnEdit = FALSE;
+	var $AuditTrailOnDelete = FALSE;
+	var $AuditTrailOnView = FALSE;
+	var $AuditTrailOnViewData = FALSE;
+	var $AuditTrailOnSearch = FALSE;
 
 	// Message
 	function getMessage() {
@@ -678,6 +684,7 @@ class ctb_fee_view extends ctb_fee {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
+		if ($this->AuditTrailOnView) $this->WriteAuditTrailOnView($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->invoice_id->setDbValue($rs->fields('invoice_id'));
 		$this->barang_id->setDbValue($rs->fields('barang_id'));
@@ -1171,6 +1178,13 @@ class ctb_fee_view extends ctb_fee {
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
 		}
+	}
+
+	// Write Audit Trail start/end for grid update
+	function WriteAuditTrailDummy($typ) {
+		$table = 'tb_fee';
+		$usr = CurrentUserName();
+		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
 	// Page Load event

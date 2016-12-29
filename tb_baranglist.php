@@ -81,6 +81,12 @@ class ctb_barang_list extends ctb_barang {
 	var $GridEditUrl;
 	var $MultiDeleteUrl;
 	var $MultiUpdateUrl;
+	var $AuditTrailOnAdd = FALSE;
+	var $AuditTrailOnEdit = FALSE;
+	var $AuditTrailOnDelete = FALSE;
+	var $AuditTrailOnView = FALSE;
+	var $AuditTrailOnViewData = FALSE;
+	var $AuditTrailOnSearch = FALSE;
 
 	// Message
 	function getMessage() {
@@ -1827,6 +1833,13 @@ class ctb_barang_list extends ctb_barang {
 		}
 	}
 
+	// Write Audit Trail start/end for grid update
+	function WriteAuditTrailDummy($typ) {
+		$table = 'tb_barang';
+		$usr = CurrentUserName();
+		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
+	}
+
 	// Page Load event
 	function Page_Load() {
 
@@ -2044,6 +2057,13 @@ var CurrentSearchForm = ftb_baranglistsrch = new ew_Form("ftb_baranglistsrch");
 			$tb_barang_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
 			$tb_barang_list->setWarningMessage($Language->Phrase("NoRecord"));
+	}
+
+	// Audit trail on search
+	if ($tb_barang_list->AuditTrailOnSearch && $tb_barang_list->Command == "search" && !$tb_barang_list->RestoreSearch) {
+		$searchparm = ew_ServerVar("QUERY_STRING");
+		$searchsql = $tb_barang_list->getSessionWhere();
+		$tb_barang_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
 	}
 $tb_barang_list->RenderOtherOptions();
 ?>

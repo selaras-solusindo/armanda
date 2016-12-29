@@ -80,6 +80,12 @@ class ctb_user_list extends ctb_user {
 	var $GridEditUrl;
 	var $MultiDeleteUrl;
 	var $MultiUpdateUrl;
+	var $AuditTrailOnAdd = FALSE;
+	var $AuditTrailOnEdit = FALSE;
+	var $AuditTrailOnDelete = FALSE;
+	var $AuditTrailOnView = FALSE;
+	var $AuditTrailOnViewData = FALSE;
+	var $AuditTrailOnSearch = FALSE;
 
 	// Message
 	function getMessage() {
@@ -1879,6 +1885,13 @@ class ctb_user_list extends ctb_user {
 		}
 	}
 
+	// Write Audit Trail start/end for grid update
+	function WriteAuditTrailDummy($typ) {
+		$table = 'tb_user';
+		$usr = CurrentUserName();
+		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
+	}
+
 	// Page Load event
 	function Page_Load() {
 
@@ -2098,6 +2111,13 @@ var CurrentSearchForm = ftb_userlistsrch = new ew_Form("ftb_userlistsrch");
 			$tb_user_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
 			$tb_user_list->setWarningMessage($Language->Phrase("NoRecord"));
+	}
+
+	// Audit trail on search
+	if ($tb_user_list->AuditTrailOnSearch && $tb_user_list->Command == "search" && !$tb_user_list->RestoreSearch) {
+		$searchparm = ew_ServerVar("QUERY_STRING");
+		$searchsql = $tb_user_list->getSessionWhere();
+		$tb_user_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
 	}
 $tb_user_list->RenderOtherOptions();
 ?>

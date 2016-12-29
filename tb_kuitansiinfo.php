@@ -621,6 +621,8 @@ class ctb_kuitansi extends cTable {
 		$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
 		$sWhereWrk = "";
 		$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
+		$lookuptblfilter = "`id` not in (select invoice_id from tb_kuitansi)";
+		ew_AddFilter($sWhereWrk, $lookuptblfilter);
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
