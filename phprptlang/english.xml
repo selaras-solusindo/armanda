@@ -236,6 +236,8 @@
 		<phrase id="thisyear" value="This year"/>
 	</global>
 	<project><phrase id="footertext" value="&amp;copy;2016 e.World Technology Ltd. All rights reserved."/>
+<menu id="18"><phrase id="menutext" value="tb user"/>
+</menu>
 <menu id="15"><phrase id="menutext" value="view 5"/>
 </menu>
 <menu id="13"><phrase id="menutext" value="view 4"/>
@@ -690,6 +692,16 @@
 <field id="ppn"><phrase id="fldcaption" value="ppn"/>
 </field>
 <field id="terbilang"><phrase id="fldcaption" value="terbilang"/>
+</field>
+</table>
+<table id="tb_user"><phrase id="tblcaption" value="tb user"/>
+<field id="user_id"><phrase id="fldcaption" value="user id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="password"><phrase id="fldcaption" value="password"/>
+</field>
+<field id="userlevel"><phrase id="fldcaption" value="userlevel"/>
 </field>
 </table>
 </project>

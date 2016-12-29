@@ -195,6 +195,7 @@ class crReport2_summary extends crReport2 {
 	//
 	function __construct() {
 		global $conn, $ReportLanguage;
+		global $UserTable, $UserTableConn;
 
 		// Language object
 		$ReportLanguage = new crLanguage();
@@ -228,6 +229,12 @@ class crReport2_summary extends crReport2 {
 		// Open connection
 		if (!isset($conn)) $conn = ewr_Connect($this->DBID);
 
+		// User table object (tb_user)
+		if (!isset($UserTable)) {
+			$UserTable = new crtb_user();
+			$UserTableConn = ReportConn($UserTable->DBID);
+		}
+
 		// Export options
 		$this->ExportOptions = new crListOptions();
 		$this->ExportOptions->Tag = "div";
@@ -250,6 +257,18 @@ class crReport2_summary extends crReport2 {
 	function Page_Init() {
 		global $gsExport, $gsExportFile, $gsEmailContentType, $ReportLanguage, $Security;
 		global $gsCustomExport;
+
+		// Security
+		$Security = new crAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin(); // Auto login
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . 'Report2');
+		$Security->TablePermission_Loaded();
+		if (!$Security->CanList()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($ReportLanguage->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate(ewr_GetUrl("index.php"));
+		}
 
 		// Get export parameters
 		if (@$_GET["export"] <> "")
@@ -566,11 +585,15 @@ class crReport2_summary extends crReport2 {
 
 		// Set no record found message
 		if ($this->TotalGrps == 0) {
+			if ($Security->CanList()) {
 				if ($this->Filter == "0=101") {
 					$this->setWarningMessage($ReportLanguage->Phrase("EnterSearchCriteria"));
 				} else {
 					$this->setWarningMessage($ReportLanguage->Phrase("NoRecord"));
 				}
+			} else {
+				$this->setWarningMessage($ReportLanguage->Phrase("NoPermission"));
+			}
 		}
 
 		// Hide export options if export
