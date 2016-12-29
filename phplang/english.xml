@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2016/12/28" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2016/12/29" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -658,13 +658,19 @@
       <phrase id="menutext" value="view 3" />
     </menu>
     <menu id="10020">
-      <phrase id="menutext" value="Rekap Invoice" />
+      <phrase id="menutext" value="Rekap Invoice (All)" />
+    </menu>
+    <menu id="10024">
+      <phrase id="menutext" value="Rekap Invoice (PPN)" />
+    </menu>
+    <menu id="10022">
+      <phrase id="menutext" value="Rekap Hutang" />
     </menu>
     <menu id="10021">
       <phrase id="menutext" value="view 4" />
     </menu>
-    <menu id="10022">
-      <phrase id="menutext" value="Rekap Hutang" />
+    <menu id="10023">
+      <phrase id="menutext" value="view 5" />
     </menu>
     <table id="option_values">
       <phrase id="tblcaption" value="option values" />

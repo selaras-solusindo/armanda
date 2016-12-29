@@ -65,7 +65,7 @@ class crReport3 extends crTableBase {
 		$this->no_sertifikat->SqlOrderBy = "";
 
 		// tgl_pelaksanaan
-		$this->tgl_pelaksanaan = new crField('Report3', 'Report3', 'x_tgl_pelaksanaan', 'tgl_pelaksanaan', '`tgl_pelaksanaan`', 133, EWR_DATATYPE_DATE, 5);
+		$this->tgl_pelaksanaan = new crField('Report3', 'Report3', 'x_tgl_pelaksanaan', 'tgl_pelaksanaan', '`tgl_pelaksanaan`', 133, EWR_DATATYPE_DATE, -1);
 		$this->tgl_pelaksanaan->FldDefaultErrMsg = str_replace("%s", "/", $ReportLanguage->Phrase("IncorrectDateYMD"));
 		$this->fields['tgl_pelaksanaan'] = &$this->tgl_pelaksanaan;
 		$this->tgl_pelaksanaan->DateFilter = "";

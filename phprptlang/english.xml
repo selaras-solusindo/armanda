@@ -242,7 +242,7 @@
 </menu>
 <menu id="12"><phrase id="menutext" value="Rekap Invoice (All)"/>
 </menu>
-<menu id="16"><phrase id="menutext" value="Rekap Invoice (w/ PPN)"/>
+<menu id="16"><phrase id="menutext" value="Rekap Invoice (PPN)"/>
 </menu>
 <menu id="14"><phrase id="menutext" value="Rekap Hutang"/>
 </menu>
@@ -621,7 +621,7 @@
 </field>
 <field id="no_invoice"><phrase id="fldcaption" value="No. INV"/>
 </field>
-<field id="tgl_invoice"><phrase id="fldcaption" value="tgl invoice"/>
+<field id="tgl_invoice"><phrase id="fldcaption" value="Tgl. INV"/>
 </field>
 <field id="no_order"><phrase id="fldcaption" value="no order"/>
 </field>

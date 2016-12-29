@@ -1015,7 +1015,8 @@ class crReport3_summary extends crReport3 {
 
 			// total_ppn
 			$this->total_ppn->SumViewValue = $this->total_ppn->SumValue;
-			$this->total_ppn->SumViewValue = ewr_FormatNumber($this->total_ppn->SumViewValue, $this->total_ppn->DefaultDecimalPrecision, -1, 0, 0);
+			$this->total_ppn->SumViewValue = ewr_FormatNumber($this->total_ppn->SumViewValue, 0, -2, -2, -1);
+			$this->total_ppn->CellAttrs["style"] = "text-align:right;";
 			$this->total_ppn->CellAttrs["class"] = ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : "ewRptGrpSummary" . $this->RowGroupLevel;
 
 			// tgl_invoice
@@ -1066,13 +1067,14 @@ class crReport3_summary extends crReport3 {
 
 			// tgl_pelaksanaan
 			$this->tgl_pelaksanaan->ViewValue = $this->tgl_pelaksanaan->CurrentValue;
-			$this->tgl_pelaksanaan->ViewValue = ewr_FormatDateTime($this->tgl_pelaksanaan->ViewValue, 5);
+			$this->tgl_pelaksanaan->ViewValue = tgl_indo($this->tgl_pelaksanaan->ViewValue);
 			$this->tgl_pelaksanaan->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 
 			// total_ppn
 			$this->total_ppn->ViewValue = $this->total_ppn->CurrentValue;
-			$this->total_ppn->ViewValue = ewr_FormatNumber($this->total_ppn->ViewValue, $this->total_ppn->DefaultDecimalPrecision, -1, 0, 0);
+			$this->total_ppn->ViewValue = ewr_FormatNumber($this->total_ppn->ViewValue, 0, -2, -2, -1);
 			$this->total_ppn->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+			$this->total_ppn->CellAttrs["style"] = "text-align:right;";
 
 			// tgl_invoice
 			$this->tgl_invoice->HrefValue = "";
@@ -2289,15 +2291,15 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 <?php if ($Page->total_ppn->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="total_ppn"><div class="Report3_total_ppn"><span class="ewTableHeaderCaption"><?php echo $Page->total_ppn->FldCaption() ?></span></div></td>
+	<td data-field="total_ppn"><div class="Report3_total_ppn" style="text-align: right;"><span class="ewTableHeaderCaption"><?php echo $Page->total_ppn->FldCaption() ?></span></div></td>
 <?php } else { ?>
 	<td data-field="total_ppn">
 <?php if ($Page->SortUrl($Page->total_ppn) == "") { ?>
-		<div class="ewTableHeaderBtn Report3_total_ppn">
+		<div class="ewTableHeaderBtn Report3_total_ppn" style="text-align: right;">
 			<span class="ewTableHeaderCaption"><?php echo $Page->total_ppn->FldCaption() ?></span>
 		</div>
 <?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer Report3_total_ppn" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->total_ppn) ?>',0);">
+		<div class="ewTableHeaderBtn ewPointer Report3_total_ppn" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->total_ppn) ?>',0);" style="text-align: right;">
 			<span class="ewTableHeaderCaption"><?php echo $Page->total_ppn->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->total_ppn->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->total_ppn->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
