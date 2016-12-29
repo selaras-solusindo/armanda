@@ -582,6 +582,9 @@
   </global>
   <project>
     <phrase id="footertext" value="CV. Armanda Nusantara" />
+    <menu id="10025">
+      <phrase id="menutext" value="view 5" />
+    </menu>
     <menu id="10016">
       <phrase id="menutext" value="view 3" />
     </menu>
@@ -624,6 +627,24 @@
     <menu id="10017">
       <phrase id="menutext" value="Rekap. Invoice" />
     </menu>
+    <menu id="10026">
+      <phrase id="menutext" value="view 5" />
+    </menu>
+    <menu id="10027">
+      <phrase id="menutext" value="view 4" />
+    </menu>
+    <menu id="10028">
+      <phrase id="menutext" value="Rekap Invoice (All)" />
+    </menu>
+    <menu id="10029">
+      <phrase id="menutext" value="Rekap Invoice (PPN)" />
+    </menu>
+    <menu id="10030">
+      <phrase id="menutext" value="Rekap Invoice (PPN)" />
+    </menu>
+    <menu id="10031">
+      <phrase id="menutext" value="Rekap Hutang" />
+    </menu>
     <menu id="10001">
       <phrase id="menutext" value="option values" />
     </menu>
@@ -648,29 +669,14 @@
     <menu id="10008">
       <phrase id="menutext" value="tb kuitansi" />
     </menu>
-    <menu id="10018">
+    <menu id="10032">
       <phrase id="menutext" value="view 1" />
     </menu>
     <menu id="10010">
       <phrase id="menutext" value="view 2" />
     </menu>
-    <menu id="10019">
+    <menu id="10033">
       <phrase id="menutext" value="view 3" />
-    </menu>
-    <menu id="10020">
-      <phrase id="menutext" value="Rekap Invoice (All)" />
-    </menu>
-    <menu id="10024">
-      <phrase id="menutext" value="Rekap Invoice (PPN)" />
-    </menu>
-    <menu id="10022">
-      <phrase id="menutext" value="Rekap Hutang" />
-    </menu>
-    <menu id="10021">
-      <phrase id="menutext" value="view 4" />
-    </menu>
-    <menu id="10023">
-      <phrase id="menutext" value="view 5" />
     </menu>
     <table id="option_values">
       <phrase id="tblcaption" value="option values" />
@@ -958,6 +964,9 @@
       <field id="nama1">
         <phrase id="fldcaption" value="nama 1" />
       </field>
+      <field id="pasal23">
+        <phrase id="fldcaption" value="pasal 23" />
+      </field>
     </table>
     <table id="cetak2_php">
       <phrase id="tblcaption" value="Cetak Invoice" />
@@ -1119,6 +1128,57 @@
       </field>
       <field id="terbilang">
         <phrase id="fldcaption" value="terbilang" />
+      </field>
+    </table>
+    <table id="view5">
+      <phrase id="tblcaption" value="view 5" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="customer_id">
+        <phrase id="fldcaption" value="customer id" />
+      </field>
+      <field id="no_invoice">
+        <phrase id="fldcaption" value="no invoice" />
+      </field>
+      <field id="tgl_invoice">
+        <phrase id="fldcaption" value="tgl invoice" />
+      </field>
+      <field id="no_order">
+        <phrase id="fldcaption" value="no order" />
+      </field>
+      <field id="no_referensi">
+        <phrase id="fldcaption" value="no referensi" />
+      </field>
+      <field id="kegiatan">
+        <phrase id="fldcaption" value="kegiatan" />
+      </field>
+      <field id="tgl_pelaksanaan">
+        <phrase id="fldcaption" value="tgl pelaksanaan" />
+      </field>
+      <field id="no_sertifikat">
+        <phrase id="fldcaption" value="no sertifikat" />
+      </field>
+      <field id="keterangan">
+        <phrase id="fldcaption" value="keterangan" />
+      </field>
+      <field id="total">
+        <phrase id="fldcaption" value="total" />
+      </field>
+      <field id="ppn">
+        <phrase id="fldcaption" value="ppn" />
+      </field>
+      <field id="total_ppn">
+        <phrase id="fldcaption" value="total ppn" />
+      </field>
+      <field id="terbilang">
+        <phrase id="fldcaption" value="terbilang" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="nama" />
+      </field>
+      <field id="no_kuitansi">
+        <phrase id="fldcaption" value="no kuitansi" />
       </field>
     </table>
   </project>
