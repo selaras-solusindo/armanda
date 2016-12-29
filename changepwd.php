@@ -245,12 +245,10 @@ class cchangepwd extends ctb_user {
 
 		// Security
 		$Security = new cAdvancedSecurity();
-		if (!IsPasswordReset()) {
 		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
 		if (!$Security->IsLoggedIn() || $Security->IsSysAdmin())
 			$this->Page_Terminate(ew_GetUrl("login.php"));
 		$Security->LoadCurrentUserLevel($this->ProjectID . 'tb_user');
-		}
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 
 		// Global Page Loading event (in userfn*.php)
