@@ -102,6 +102,32 @@ $anamabln_ = array(
 $msql = "select * from view2 where kuitansi_id = '".$_POST["no_kuitansi"]."'"; //echo $msql;
 $mquery = mysql_query($msql);
 $row = mysql_fetch_array($mquery);
+
+function Terbilang($x)
+{
+  $abil = array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
+  if ($x < 12)
+	return " " . $abil[$x];
+  elseif ($x < 20)
+	return Terbilang($x - 10) . "belas";
+  elseif ($x < 100)
+	return Terbilang($x / 10) . " puluh" . Terbilang($x % 10);
+  elseif ($x < 200)
+	return " seratus" . Terbilang($x - 100);
+  elseif ($x < 1000)
+	return Terbilang($x / 100) . " ratus" . Terbilang($x % 100);
+  elseif ($x < 2000)
+	return " seribu" . Terbilang($x - 1000);
+  elseif ($x < 1000000)
+	return Terbilang($x / 1000) . " ribu" . Terbilang($x % 1000);
+  elseif ($x < 1000000000)
+	return Terbilang($x / 1000000) . " juta" . Terbilang($x % 1000000);
+}
+
+$nilai_pasal23 = 0;
+if ($row["pasal23"] == 1) $nilai_pasal23 = $row["total"] * 0.02;
+$total_ppn = $row["total_ppn1"] - $nilai_pasal23; //$row["total_ppn"];
+
 $html = '';
 $html .= '<table border="0">';
 $html .= '<tr><td width="485">&nbsp;</td><td>Kwitansi No. '.$row["no_kuitansi"].'</td></tr>';
@@ -109,7 +135,7 @@ $html .= '</table>';
 $html .= '<table border="0">';
 $html .= '<tr><td width="155">Sudah terima dari</td><td width="485">: '.$row["nama"].'</td></tr>';
 $html .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
-$html .= '<tr><td width="155">Uang sejumlah</td><td>: '.$row["terbilang1"].' rupiah</td></tr>';
+$html .= '<tr><td width="155">Uang sejumlah</td><td>: '.Terbilang($total_ppn).' rupiah</td></tr>';
 $html .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 $html .= '<tr><td width="155">Untuk Pembayaran</td><td>: '.$row["keterangan1"].'</td></tr>';
 $html .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
@@ -126,7 +152,7 @@ $tgl_invoice = strtotime($row["tgl_invoice"]);
 $html .= '<tr><td width="435">&nbsp;</td><td>Surabaya, '.date("d", $tgl_invoice).' '.$anamabln_[date("m", $tgl_invoice)].' '.date("Y", $tgl_invoice).'</td></tr>';
 $html .= '</table>';
 $html .= '<table border="0">';
-$html .= '<tr><td width="155" align="right">Rp.</td><td> '.number_format($row["total_ppn1"]).'</td></tr>';
+$html .= '<tr><td width="155" align="right">Rp.</td><td> '.number_format($total_ppn).'</td></tr>';
 $html .= '</table>';
 $html .= '<table border="0">';
 $html .= '<tr><td width="385">&nbsp;</td><td align="center">CV. ARMANDA NUSANTARA</td></tr>';

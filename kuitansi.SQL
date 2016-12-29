@@ -1,11 +1,1 @@
-SELECT tb_kuitansi.*,
-  tb_customer.nama,
-  tb_invoice.total_ppn AS total_ppn1,
-  tb_invoice.terbilang AS terbilang1,
-  tb_invoice.keterangan AS keterangan1,
-  tb_invoice.no_invoice,
-  tb_invoice.tgl_invoice,
-  tb_invoice.no_sertifikat
-FROM tb_kuitansi
-  INNER JOIN tb_invoice ON tb_kuitansi.invoice_id = tb_invoice.id
-  INNER JOIN tb_customer ON tb_invoice.customer_id = tb_customer.id
+Select tb_kuitansi.kuitansi_id As kuitansi_id, tb_kuitansi.invoice_id As invoice_id, tb_kuitansi.no_kuitansi As no_kuitansi, tb_customer.nama As nama, tb_invoice.total_ppn As total_ppn1, tb_invoice.terbilang As terbilang1, tb_invoice.keterangan As keterangan1, tb_invoice.no_invoice As no_invoice, tb_invoice.tgl_invoice As tgl_invoice, tb_invoice.no_sertifikat As no_sertifikat, tb_invoice.pasal23 As pasal23, tb_invoice.total From (tb_kuitansi Join tb_invoice On tb_kuitansi.invoice_id = tb_invoice.id) Join tb_customer On tb_invoice.customer_id = tb_customer.id
