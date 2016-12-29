@@ -613,13 +613,13 @@
       <phrase id="menutext" value="Invoice" />
     </menu>
     <menu id="10013">
-      <phrase id="menutext" value="Kuitansi" />
+      <phrase id="menutext" value="Kwitansi" />
     </menu>
     <menu id="10011">
       <phrase id="menutext" value="Cetak Invoice" />
     </menu>
     <menu id="10015">
-      <phrase id="menutext" value="Cetak Kuitansi" />
+      <phrase id="menutext" value="Cetak Kwitansi" />
     </menu>
     <menu id="10017">
       <phrase id="menutext" value="Rekap. Invoice" />
@@ -973,7 +973,7 @@
         <phrase id="fldcaption" value="No. Invoice" />
       </field>
       <field id="no_kuitansi">
-        <phrase id="fldcaption" value="No. Kuitansi" />
+        <phrase id="fldcaption" value="No. Kwitansi" />
       </field>
     </table>
     <table id="view2">

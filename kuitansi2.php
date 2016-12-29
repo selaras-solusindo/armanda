@@ -104,7 +104,7 @@ $mquery = mysql_query($msql);
 $row = mysql_fetch_array($mquery);
 $html = '';
 $html .= '<table border="0">';
-$html .= '<tr><td width="485">&nbsp;</td><td>Kuitansi No. '.$row["no_kuitansi"].'</td></tr>';
+$html .= '<tr><td width="485">&nbsp;</td><td>Kwitansi No. '.$row["no_kuitansi"].'</td></tr>';
 $html .= '</table>';
 $html .= '<table border="0">';
 $html .= '<tr><td width="155">Sudah terima dari</td><td width="485">: '.$row["nama"].'</td></tr>';

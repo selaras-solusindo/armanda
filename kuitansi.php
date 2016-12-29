@@ -12,7 +12,7 @@ mysql_select_db($database_conn) or die ("Database tidak ditemukan");
 		<form method="post" action="kuitansi2.php">
 			Pilih No. Kuitansi :
 			<select name="no_kuitansi">
-				<option value="0">No. Kuitansi</option>
+				<option value="0">No. Kwitansi</option>
 				<?php
 				$msql = "select * from tb_kuitansi";
 				$mquery = mysql_query($msql);
