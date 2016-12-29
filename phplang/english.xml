@@ -840,7 +840,7 @@
         <phrase id="fldcaption" value="No. Order" />
       </field>
       <field id="no_referensi">
-        <phrase id="fldcaption" value="No. Referensi" />
+        <phrase id="fldcaption" value="No. Seri Faktur Pajak" />
       </field>
       <field id="kegiatan">
         <phrase id="fldcaption" value="Kegiatan" />

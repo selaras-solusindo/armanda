@@ -7,21 +7,21 @@ $Report3 = NULL;
 // Table class for Report3
 //
 class crReport3 extends crTableBase {
+	var $tgl_invoice;
 	var $nama;
 	var $no_kuitansi;
+	var $no_referensi;
+	var $ppn;
+	var $total_ppn;
+	var $no_order;
 	var $no_invoice;
 	var $no_sertifikat;
 	var $tgl_pelaksanaan;
-	var $total_ppn;
 	var $id;
 	var $customer_id;
-	var $tgl_invoice;
-	var $no_order;
-	var $no_referensi;
 	var $kegiatan;
 	var $keterangan;
 	var $total;
-	var $ppn;
 	var $terbilang;
 
 	//
@@ -36,6 +36,18 @@ class crReport3 extends crTableBase {
 		$this->ExportAll = FALSE;
 		$this->ExportPageBreakCount = 0;
 
+		// tgl_invoice
+		$this->tgl_invoice = new crField('Report3', 'Report3', 'x_tgl_invoice', 'tgl_invoice', '`tgl_invoice`', 133, EWR_DATATYPE_DATE, -1);
+		$this->tgl_invoice->GroupingFieldId = 1;
+		$this->tgl_invoice->FldDefaultErrMsg = str_replace("%s", "/", $ReportLanguage->Phrase("IncorrectDateYMD"));
+		$this->fields['tgl_invoice'] = &$this->tgl_invoice;
+		$this->tgl_invoice->DateFilter = "";
+		$this->tgl_invoice->SqlSelect = "";
+		$this->tgl_invoice->SqlOrderBy = "";
+		$this->tgl_invoice->FldGroupByType = "";
+		$this->tgl_invoice->FldGroupInt = "0";
+		$this->tgl_invoice->FldGroupSql = "";
+
 		// nama
 		$this->nama = new crField('Report3', 'Report3', 'x_nama', 'nama', '`nama`', 200, EWR_DATATYPE_STRING, -1);
 		$this->fields['nama'] = &$this->nama;
@@ -49,6 +61,36 @@ class crReport3 extends crTableBase {
 		$this->no_kuitansi->DateFilter = "";
 		$this->no_kuitansi->SqlSelect = "";
 		$this->no_kuitansi->SqlOrderBy = "";
+
+		// no_referensi
+		$this->no_referensi = new crField('Report3', 'Report3', 'x_no_referensi', 'no_referensi', '`no_referensi`', 200, EWR_DATATYPE_STRING, -1);
+		$this->fields['no_referensi'] = &$this->no_referensi;
+		$this->no_referensi->DateFilter = "";
+		$this->no_referensi->SqlSelect = "";
+		$this->no_referensi->SqlOrderBy = "";
+
+		// ppn
+		$this->ppn = new crField('Report3', 'Report3', 'x_ppn', 'ppn', '`ppn`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->ppn->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
+		$this->fields['ppn'] = &$this->ppn;
+		$this->ppn->DateFilter = "";
+		$this->ppn->SqlSelect = "";
+		$this->ppn->SqlOrderBy = "";
+
+		// total_ppn
+		$this->total_ppn = new crField('Report3', 'Report3', 'x_total_ppn', 'total_ppn', '`total_ppn`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->total_ppn->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
+		$this->fields['total_ppn'] = &$this->total_ppn;
+		$this->total_ppn->DateFilter = "";
+		$this->total_ppn->SqlSelect = "";
+		$this->total_ppn->SqlOrderBy = "";
+
+		// no_order
+		$this->no_order = new crField('Report3', 'Report3', 'x_no_order', 'no_order', '`no_order`', 200, EWR_DATATYPE_STRING, -1);
+		$this->fields['no_order'] = &$this->no_order;
+		$this->no_order->DateFilter = "";
+		$this->no_order->SqlSelect = "";
+		$this->no_order->SqlOrderBy = "";
 
 		// no_invoice
 		$this->no_invoice = new crField('Report3', 'Report3', 'x_no_invoice', 'no_invoice', '`no_invoice`', 200, EWR_DATATYPE_STRING, -1);
@@ -72,14 +114,6 @@ class crReport3 extends crTableBase {
 		$this->tgl_pelaksanaan->SqlSelect = "";
 		$this->tgl_pelaksanaan->SqlOrderBy = "";
 
-		// total_ppn
-		$this->total_ppn = new crField('Report3', 'Report3', 'x_total_ppn', 'total_ppn', '`total_ppn`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->total_ppn->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
-		$this->fields['total_ppn'] = &$this->total_ppn;
-		$this->total_ppn->DateFilter = "";
-		$this->total_ppn->SqlSelect = "";
-		$this->total_ppn->SqlOrderBy = "";
-
 		// id
 		$this->id = new crField('Report3', 'Report3', 'x_id', 'id', '`id`', 3, EWR_DATATYPE_NUMBER, -1);
 		$this->id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
@@ -95,32 +129,6 @@ class crReport3 extends crTableBase {
 		$this->customer_id->DateFilter = "";
 		$this->customer_id->SqlSelect = "";
 		$this->customer_id->SqlOrderBy = "";
-
-		// tgl_invoice
-		$this->tgl_invoice = new crField('Report3', 'Report3', 'x_tgl_invoice', 'tgl_invoice', '`tgl_invoice`', 133, EWR_DATATYPE_DATE, -1);
-		$this->tgl_invoice->GroupingFieldId = 1;
-		$this->tgl_invoice->FldDefaultErrMsg = str_replace("%s", "/", $ReportLanguage->Phrase("IncorrectDateYMD"));
-		$this->fields['tgl_invoice'] = &$this->tgl_invoice;
-		$this->tgl_invoice->DateFilter = "";
-		$this->tgl_invoice->SqlSelect = "";
-		$this->tgl_invoice->SqlOrderBy = "";
-		$this->tgl_invoice->FldGroupByType = "";
-		$this->tgl_invoice->FldGroupInt = "0";
-		$this->tgl_invoice->FldGroupSql = "";
-
-		// no_order
-		$this->no_order = new crField('Report3', 'Report3', 'x_no_order', 'no_order', '`no_order`', 200, EWR_DATATYPE_STRING, -1);
-		$this->fields['no_order'] = &$this->no_order;
-		$this->no_order->DateFilter = "";
-		$this->no_order->SqlSelect = "";
-		$this->no_order->SqlOrderBy = "";
-
-		// no_referensi
-		$this->no_referensi = new crField('Report3', 'Report3', 'x_no_referensi', 'no_referensi', '`no_referensi`', 200, EWR_DATATYPE_STRING, -1);
-		$this->fields['no_referensi'] = &$this->no_referensi;
-		$this->no_referensi->DateFilter = "";
-		$this->no_referensi->SqlSelect = "";
-		$this->no_referensi->SqlOrderBy = "";
 
 		// kegiatan
 		$this->kegiatan = new crField('Report3', 'Report3', 'x_kegiatan', 'kegiatan', '`kegiatan`', 201, EWR_DATATYPE_MEMO, -1);
@@ -143,14 +151,6 @@ class crReport3 extends crTableBase {
 		$this->total->DateFilter = "";
 		$this->total->SqlSelect = "";
 		$this->total->SqlOrderBy = "";
-
-		// ppn
-		$this->ppn = new crField('Report3', 'Report3', 'x_ppn', 'ppn', '`ppn`', 3, EWR_DATATYPE_NUMBER, -1);
-		$this->ppn->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
-		$this->fields['ppn'] = &$this->ppn;
-		$this->ppn->DateFilter = "";
-		$this->ppn->SqlSelect = "";
-		$this->ppn->SqlOrderBy = "";
 
 		// terbilang
 		$this->terbilang = new crField('Report3', 'Report3', 'x_terbilang', 'terbilang', '`terbilang`', 201, EWR_DATATYPE_MEMO, -1);

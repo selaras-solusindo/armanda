@@ -481,7 +481,7 @@ class crReport3_summary extends crReport3 {
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 7;
+		$nDtls = 6;
 		$nGrps = 2;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -494,7 +494,7 @@ class crReport3_summary extends crReport3 {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -736,67 +736,66 @@ class crReport3_summary extends crReport3 {
 	//		$rs->MoveFirst(); // NOTE: no need to move position
 			if ($this->GrpCount == 1) {
 				$this->FirstRowData = array();
+				$this->FirstRowData['tgl_invoice'] = ewr_Conv($rs->fields('tgl_invoice'),133);
 				$this->FirstRowData['nama'] = ewr_Conv($rs->fields('nama'),200);
 				$this->FirstRowData['no_kuitansi'] = ewr_Conv($rs->fields('no_kuitansi'),200);
+				$this->FirstRowData['no_referensi'] = ewr_Conv($rs->fields('no_referensi'),200);
+				$this->FirstRowData['ppn'] = ewr_Conv($rs->fields('ppn'),3);
+				$this->FirstRowData['total_ppn'] = ewr_Conv($rs->fields('total_ppn'),4);
+				$this->FirstRowData['no_order'] = ewr_Conv($rs->fields('no_order'),200);
 				$this->FirstRowData['no_invoice'] = ewr_Conv($rs->fields('no_invoice'),200);
 				$this->FirstRowData['no_sertifikat'] = ewr_Conv($rs->fields('no_sertifikat'),200);
 				$this->FirstRowData['tgl_pelaksanaan'] = ewr_Conv($rs->fields('tgl_pelaksanaan'),133);
-				$this->FirstRowData['total_ppn'] = ewr_Conv($rs->fields('total_ppn'),4);
 				$this->FirstRowData['id'] = ewr_Conv($rs->fields('id'),3);
 				$this->FirstRowData['customer_id'] = ewr_Conv($rs->fields('customer_id'),3);
-				$this->FirstRowData['tgl_invoice'] = ewr_Conv($rs->fields('tgl_invoice'),133);
-				$this->FirstRowData['no_order'] = ewr_Conv($rs->fields('no_order'),200);
-				$this->FirstRowData['no_referensi'] = ewr_Conv($rs->fields('no_referensi'),200);
 				$this->FirstRowData['total'] = ewr_Conv($rs->fields('total'),4);
-				$this->FirstRowData['ppn'] = ewr_Conv($rs->fields('ppn'),3);
 			}
 		} else { // Get next row
 			$rs->MoveNext();
 		}
 		if (!$rs->EOF) {
-			$this->nama->setDbValue($rs->fields('nama'));
-			$this->no_kuitansi->setDbValue($rs->fields('no_kuitansi'));
-			$this->no_invoice->setDbValue($rs->fields('no_invoice'));
-			$this->no_sertifikat->setDbValue($rs->fields('no_sertifikat'));
-			$this->tgl_pelaksanaan->setDbValue($rs->fields('tgl_pelaksanaan'));
-			$this->total_ppn->setDbValue($rs->fields('total_ppn'));
-			$this->id->setDbValue($rs->fields('id'));
-			$this->customer_id->setDbValue($rs->fields('customer_id'));
 			if ($opt <> 1) {
 				if (is_array($this->tgl_invoice->GroupDbValues))
 					$this->tgl_invoice->setDbValue(@$this->tgl_invoice->GroupDbValues[$rs->fields('tgl_invoice')]);
 				else
 					$this->tgl_invoice->setDbValue(ewr_GroupValue($this->tgl_invoice, $rs->fields('tgl_invoice')));
 			}
-			$this->no_order->setDbValue($rs->fields('no_order'));
+			$this->nama->setDbValue($rs->fields('nama'));
+			$this->no_kuitansi->setDbValue($rs->fields('no_kuitansi'));
 			$this->no_referensi->setDbValue($rs->fields('no_referensi'));
+			$this->ppn->setDbValue($rs->fields('ppn'));
+			$this->total_ppn->setDbValue($rs->fields('total_ppn'));
+			$this->no_order->setDbValue($rs->fields('no_order'));
+			$this->no_invoice->setDbValue($rs->fields('no_invoice'));
+			$this->no_sertifikat->setDbValue($rs->fields('no_sertifikat'));
+			$this->tgl_pelaksanaan->setDbValue($rs->fields('tgl_pelaksanaan'));
+			$this->id->setDbValue($rs->fields('id'));
+			$this->customer_id->setDbValue($rs->fields('customer_id'));
 			$this->kegiatan->setDbValue($rs->fields('kegiatan'));
 			$this->keterangan->setDbValue($rs->fields('keterangan'));
 			$this->total->setDbValue($rs->fields('total'));
-			$this->ppn->setDbValue($rs->fields('ppn'));
 			$this->terbilang->setDbValue($rs->fields('terbilang'));
 			$this->Val[1] = $this->nama->CurrentValue;
 			$this->Val[2] = $this->no_kuitansi->CurrentValue;
-			$this->Val[3] = $this->no_invoice->CurrentValue;
-			$this->Val[4] = $this->no_sertifikat->CurrentValue;
-			$this->Val[5] = $this->tgl_pelaksanaan->CurrentValue;
-			$this->Val[6] = $this->total_ppn->CurrentValue;
+			$this->Val[3] = $this->no_referensi->CurrentValue;
+			$this->Val[4] = $this->ppn->CurrentValue;
+			$this->Val[5] = $this->total_ppn->CurrentValue;
 		} else {
+			$this->tgl_invoice->setDbValue("");
 			$this->nama->setDbValue("");
 			$this->no_kuitansi->setDbValue("");
+			$this->no_referensi->setDbValue("");
+			$this->ppn->setDbValue("");
+			$this->total_ppn->setDbValue("");
+			$this->no_order->setDbValue("");
 			$this->no_invoice->setDbValue("");
 			$this->no_sertifikat->setDbValue("");
 			$this->tgl_pelaksanaan->setDbValue("");
-			$this->total_ppn->setDbValue("");
 			$this->id->setDbValue("");
 			$this->customer_id->setDbValue("");
-			$this->tgl_invoice->setDbValue("");
-			$this->no_order->setDbValue("");
-			$this->no_referensi->setDbValue("");
 			$this->kegiatan->setDbValue("");
 			$this->keterangan->setDbValue("");
 			$this->total->setDbValue("");
-			$this->ppn->setDbValue("");
 			$this->terbilang->setDbValue("");
 		}
 	}
@@ -972,8 +971,7 @@ class crReport3_summary extends crReport3 {
 				$this->GrandCnt[3] = $this->TotCount;
 				$this->GrandCnt[4] = $this->TotCount;
 				$this->GrandCnt[5] = $this->TotCount;
-				$this->GrandCnt[6] = $this->TotCount;
-				$this->GrandSmry[6] = $rsagg->fields("sum_total_ppn");
+				$this->GrandSmry[5] = $rsagg->fields("sum_total_ppn");
 				$rsagg->Close();
 				$bGotSummary = TRUE;
 			}
@@ -1028,14 +1026,11 @@ class crReport3_summary extends crReport3 {
 			// no_kuitansi
 			$this->no_kuitansi->HrefValue = "";
 
-			// no_invoice
-			$this->no_invoice->HrefValue = "";
+			// no_referensi
+			$this->no_referensi->HrefValue = "";
 
-			// no_sertifikat
-			$this->no_sertifikat->HrefValue = "";
-
-			// tgl_pelaksanaan
-			$this->tgl_pelaksanaan->HrefValue = "";
+			// ppn
+			$this->ppn->HrefValue = "";
 
 			// total_ppn
 			$this->total_ppn->HrefValue = "";
@@ -1057,18 +1052,15 @@ class crReport3_summary extends crReport3 {
 			$this->no_kuitansi->ViewValue = $this->no_kuitansi->CurrentValue;
 			$this->no_kuitansi->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 
-			// no_invoice
-			$this->no_invoice->ViewValue = $this->no_invoice->CurrentValue;
-			$this->no_invoice->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+			// no_referensi
+			$this->no_referensi->ViewValue = $this->no_referensi->CurrentValue;
+			$this->no_referensi->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 
-			// no_sertifikat
-			$this->no_sertifikat->ViewValue = $this->no_sertifikat->CurrentValue;
-			$this->no_sertifikat->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
-
-			// tgl_pelaksanaan
-			$this->tgl_pelaksanaan->ViewValue = $this->tgl_pelaksanaan->CurrentValue;
-			$this->tgl_pelaksanaan->ViewValue = tgl_indo($this->tgl_pelaksanaan->ViewValue);
-			$this->tgl_pelaksanaan->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+			// ppn
+			$this->ppn->ViewValue = $this->ppn->CurrentValue;
+			$this->ppn->ViewValue = ewr_FormatNumber($this->ppn->ViewValue, 0, -2, -2, -1);
+			$this->ppn->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+			$this->ppn->CellAttrs["style"] = "text-align:right;";
 
 			// total_ppn
 			$this->total_ppn->ViewValue = $this->total_ppn->CurrentValue;
@@ -1085,14 +1077,11 @@ class crReport3_summary extends crReport3 {
 			// no_kuitansi
 			$this->no_kuitansi->HrefValue = "";
 
-			// no_invoice
-			$this->no_invoice->HrefValue = "";
+			// no_referensi
+			$this->no_referensi->HrefValue = "";
 
-			// no_sertifikat
-			$this->no_sertifikat->HrefValue = "";
-
-			// tgl_pelaksanaan
-			$this->tgl_pelaksanaan->HrefValue = "";
+			// ppn
+			$this->ppn->HrefValue = "";
 
 			// total_ppn
 			$this->total_ppn->HrefValue = "";
@@ -1147,32 +1136,23 @@ class crReport3_summary extends crReport3 {
 			$LinkAttrs = &$this->no_kuitansi->LinkAttrs;
 			$this->Cell_Rendered($this->no_kuitansi, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
-			// no_invoice
-			$CurrentValue = $this->no_invoice->CurrentValue;
-			$ViewValue = &$this->no_invoice->ViewValue;
-			$ViewAttrs = &$this->no_invoice->ViewAttrs;
-			$CellAttrs = &$this->no_invoice->CellAttrs;
-			$HrefValue = &$this->no_invoice->HrefValue;
-			$LinkAttrs = &$this->no_invoice->LinkAttrs;
-			$this->Cell_Rendered($this->no_invoice, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+			// no_referensi
+			$CurrentValue = $this->no_referensi->CurrentValue;
+			$ViewValue = &$this->no_referensi->ViewValue;
+			$ViewAttrs = &$this->no_referensi->ViewAttrs;
+			$CellAttrs = &$this->no_referensi->CellAttrs;
+			$HrefValue = &$this->no_referensi->HrefValue;
+			$LinkAttrs = &$this->no_referensi->LinkAttrs;
+			$this->Cell_Rendered($this->no_referensi, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
-			// no_sertifikat
-			$CurrentValue = $this->no_sertifikat->CurrentValue;
-			$ViewValue = &$this->no_sertifikat->ViewValue;
-			$ViewAttrs = &$this->no_sertifikat->ViewAttrs;
-			$CellAttrs = &$this->no_sertifikat->CellAttrs;
-			$HrefValue = &$this->no_sertifikat->HrefValue;
-			$LinkAttrs = &$this->no_sertifikat->LinkAttrs;
-			$this->Cell_Rendered($this->no_sertifikat, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
-
-			// tgl_pelaksanaan
-			$CurrentValue = $this->tgl_pelaksanaan->CurrentValue;
-			$ViewValue = &$this->tgl_pelaksanaan->ViewValue;
-			$ViewAttrs = &$this->tgl_pelaksanaan->ViewAttrs;
-			$CellAttrs = &$this->tgl_pelaksanaan->CellAttrs;
-			$HrefValue = &$this->tgl_pelaksanaan->HrefValue;
-			$LinkAttrs = &$this->tgl_pelaksanaan->LinkAttrs;
-			$this->Cell_Rendered($this->tgl_pelaksanaan, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+			// ppn
+			$CurrentValue = $this->ppn->CurrentValue;
+			$ViewValue = &$this->ppn->ViewValue;
+			$ViewAttrs = &$this->ppn->ViewAttrs;
+			$CellAttrs = &$this->ppn->CellAttrs;
+			$HrefValue = &$this->ppn->HrefValue;
+			$LinkAttrs = &$this->ppn->LinkAttrs;
+			$this->Cell_Rendered($this->ppn, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// total_ppn
 			$CurrentValue = $this->total_ppn->CurrentValue;
@@ -1197,9 +1177,8 @@ class crReport3_summary extends crReport3 {
 		if ($this->tgl_invoice->Visible) $this->GrpFldCount += 1;
 		if ($this->nama->Visible) $this->DtlFldCount += 1;
 		if ($this->no_kuitansi->Visible) $this->DtlFldCount += 1;
-		if ($this->no_invoice->Visible) $this->DtlFldCount += 1;
-		if ($this->no_sertifikat->Visible) $this->DtlFldCount += 1;
-		if ($this->tgl_pelaksanaan->Visible) $this->DtlFldCount += 1;
+		if ($this->no_referensi->Visible) $this->DtlFldCount += 1;
+		if ($this->ppn->Visible) $this->DtlFldCount += 1;
 		if ($this->total_ppn->Visible) $this->DtlFldCount += 1;
 	}
 
@@ -1708,9 +1687,8 @@ class crReport3_summary extends crReport3 {
 				$this->tgl_invoice->setSort("");
 				$this->nama->setSort("");
 				$this->no_kuitansi->setSort("");
-				$this->no_invoice->setSort("");
-				$this->no_sertifikat->setSort("");
-				$this->tgl_pelaksanaan->setSort("");
+				$this->no_referensi->setSort("");
+				$this->ppn->setSort("");
 				$this->total_ppn->setSort("");
 			}
 
@@ -2235,55 +2213,37 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	</td>
 <?php } ?>
 <?php } ?>
-<?php if ($Page->no_invoice->Visible) { ?>
+<?php if ($Page->no_referensi->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="no_invoice"><div class="Report3_no_invoice"><span class="ewTableHeaderCaption"><?php echo $Page->no_invoice->FldCaption() ?></span></div></td>
+	<td data-field="no_referensi"><div class="Report3_no_referensi"><span class="ewTableHeaderCaption"><?php echo $Page->no_referensi->FldCaption() ?></span></div></td>
 <?php } else { ?>
-	<td data-field="no_invoice">
-<?php if ($Page->SortUrl($Page->no_invoice) == "") { ?>
-		<div class="ewTableHeaderBtn Report3_no_invoice">
-			<span class="ewTableHeaderCaption"><?php echo $Page->no_invoice->FldCaption() ?></span>
+	<td data-field="no_referensi">
+<?php if ($Page->SortUrl($Page->no_referensi) == "") { ?>
+		<div class="ewTableHeaderBtn Report3_no_referensi">
+			<span class="ewTableHeaderCaption"><?php echo $Page->no_referensi->FldCaption() ?></span>
 		</div>
 <?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer Report3_no_invoice" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->no_invoice) ?>',0);">
-			<span class="ewTableHeaderCaption"><?php echo $Page->no_invoice->FldCaption() ?></span>
-			<span class="ewTableHeaderSort"><?php if ($Page->no_invoice->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->no_invoice->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		<div class="ewTableHeaderBtn ewPointer Report3_no_referensi" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->no_referensi) ?>',0);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->no_referensi->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->no_referensi->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->no_referensi->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
 <?php } ?>
 	</td>
 <?php } ?>
 <?php } ?>
-<?php if ($Page->no_sertifikat->Visible) { ?>
+<?php if ($Page->ppn->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="no_sertifikat"><div class="Report3_no_sertifikat"><span class="ewTableHeaderCaption"><?php echo $Page->no_sertifikat->FldCaption() ?></span></div></td>
+	<td data-field="ppn"><div class="Report3_ppn" style="text-align: right;"><span class="ewTableHeaderCaption"><?php echo $Page->ppn->FldCaption() ?></span></div></td>
 <?php } else { ?>
-	<td data-field="no_sertifikat">
-<?php if ($Page->SortUrl($Page->no_sertifikat) == "") { ?>
-		<div class="ewTableHeaderBtn Report3_no_sertifikat">
-			<span class="ewTableHeaderCaption"><?php echo $Page->no_sertifikat->FldCaption() ?></span>
+	<td data-field="ppn">
+<?php if ($Page->SortUrl($Page->ppn) == "") { ?>
+		<div class="ewTableHeaderBtn Report3_ppn" style="text-align: right;">
+			<span class="ewTableHeaderCaption"><?php echo $Page->ppn->FldCaption() ?></span>
 		</div>
 <?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer Report3_no_sertifikat" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->no_sertifikat) ?>',0);">
-			<span class="ewTableHeaderCaption"><?php echo $Page->no_sertifikat->FldCaption() ?></span>
-			<span class="ewTableHeaderSort"><?php if ($Page->no_sertifikat->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->no_sertifikat->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
-		</div>
-<?php } ?>
-	</td>
-<?php } ?>
-<?php } ?>
-<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
-<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="tgl_pelaksanaan"><div class="Report3_tgl_pelaksanaan"><span class="ewTableHeaderCaption"><?php echo $Page->tgl_pelaksanaan->FldCaption() ?></span></div></td>
-<?php } else { ?>
-	<td data-field="tgl_pelaksanaan">
-<?php if ($Page->SortUrl($Page->tgl_pelaksanaan) == "") { ?>
-		<div class="ewTableHeaderBtn Report3_tgl_pelaksanaan">
-			<span class="ewTableHeaderCaption"><?php echo $Page->tgl_pelaksanaan->FldCaption() ?></span>
-		</div>
-<?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer Report3_tgl_pelaksanaan" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->tgl_pelaksanaan) ?>',0);">
-			<span class="ewTableHeaderCaption"><?php echo $Page->tgl_pelaksanaan->FldCaption() ?></span>
-			<span class="ewTableHeaderSort"><?php if ($Page->tgl_pelaksanaan->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->tgl_pelaksanaan->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		<div class="ewTableHeaderBtn ewPointer Report3_ppn" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->ppn) ?>',0);" style="text-align: right;">
+			<span class="ewTableHeaderCaption"><?php echo $Page->ppn->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->ppn->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->ppn->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
 <?php } ?>
 	</td>
@@ -2349,17 +2309,13 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="no_kuitansi"<?php echo $Page->no_kuitansi->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_Report3_no_kuitansi"<?php echo $Page->no_kuitansi->ViewAttributes() ?>><?php echo $Page->no_kuitansi->ListViewValue() ?></span></td>
 <?php } ?>
-<?php if ($Page->no_invoice->Visible) { ?>
-		<td data-field="no_invoice"<?php echo $Page->no_invoice->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_Report3_no_invoice"<?php echo $Page->no_invoice->ViewAttributes() ?>><?php echo $Page->no_invoice->ListViewValue() ?></span></td>
+<?php if ($Page->no_referensi->Visible) { ?>
+		<td data-field="no_referensi"<?php echo $Page->no_referensi->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_Report3_no_referensi"<?php echo $Page->no_referensi->ViewAttributes() ?>><?php echo $Page->no_referensi->ListViewValue() ?></span></td>
 <?php } ?>
-<?php if ($Page->no_sertifikat->Visible) { ?>
-		<td data-field="no_sertifikat"<?php echo $Page->no_sertifikat->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_Report3_no_sertifikat"<?php echo $Page->no_sertifikat->ViewAttributes() ?>><?php echo $Page->no_sertifikat->ListViewValue() ?></span></td>
-<?php } ?>
-<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
-		<td data-field="tgl_pelaksanaan"<?php echo $Page->tgl_pelaksanaan->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_Report3_tgl_pelaksanaan"<?php echo $Page->tgl_pelaksanaan->ViewAttributes() ?>><?php echo $Page->tgl_pelaksanaan->ListViewValue() ?></span></td>
+<?php if ($Page->ppn->Visible) { ?>
+		<td data-field="ppn"<?php echo $Page->ppn->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_Report3_ppn"<?php echo $Page->ppn->ViewAttributes() ?>><?php echo $Page->ppn->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->total_ppn->Visible) { ?>
 		<td data-field="total_ppn"<?php echo $Page->total_ppn->CellAttributes() ?>>
@@ -2397,8 +2353,8 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 </tr>
 <?php
 			$Page->ResetAttrs();
-			$Page->total_ppn->Count = $Page->Cnt[1][6];
-			$Page->total_ppn->SumValue = $Page->Smry[1][6]; // Load SUM
+			$Page->total_ppn->Count = $Page->Cnt[1][5];
+			$Page->total_ppn->SumValue = $Page->Smry[1][5]; // Load SUM
 			$Page->RowTotalSubType = EWR_ROWTOTAL_SUM;
 			$Page->RenderRow();
 ?>
@@ -2410,14 +2366,11 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->no_kuitansi->Visible) { ?>
 		<td data-field="no_kuitansi"<?php echo $Page->tgl_invoice->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
-<?php if ($Page->no_invoice->Visible) { ?>
-		<td data-field="no_invoice"<?php echo $Page->tgl_invoice->CellAttributes() ?>>&nbsp;</td>
+<?php if ($Page->no_referensi->Visible) { ?>
+		<td data-field="no_referensi"<?php echo $Page->tgl_invoice->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
-<?php if ($Page->no_sertifikat->Visible) { ?>
-		<td data-field="no_sertifikat"<?php echo $Page->tgl_invoice->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
-		<td data-field="tgl_pelaksanaan"<?php echo $Page->tgl_invoice->CellAttributes() ?>>&nbsp;</td>
+<?php if ($Page->ppn->Visible) { ?>
+		<td data-field="ppn"<?php echo $Page->tgl_invoice->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->total_ppn->Visible) { ?>
 		<td data-field="total_ppn"<?php echo $Page->total_ppn->CellAttributes() ?>>
@@ -2464,8 +2417,8 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes(); ?>><td colspan="<?php echo ($Page->GrpFldCount + $Page->DtlFldCount) ?>"><?php echo $ReportLanguage->Phrase("RptPageTotal") ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[0][0],0,-2,-2,-2); ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td></tr>
 <?php
 	$Page->ResetAttrs();
-	$Page->total_ppn->Count = $Page->Cnt[0][6];
-	$Page->total_ppn->SumValue = $Page->Smry[0][6]; // Load SUM
+	$Page->total_ppn->Count = $Page->Cnt[0][5];
+	$Page->total_ppn->SumValue = $Page->Smry[0][5]; // Load SUM
 	$Page->RowTotalSubType = EWR_ROWTOTAL_SUM;
 	$Page->RowAttrs["class"] = "ewRptPageSummary";
 	$Page->RenderRow();
@@ -2480,14 +2433,11 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->no_kuitansi->Visible) { ?>
 		<td data-field="no_kuitansi"<?php echo $Page->no_kuitansi->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
-<?php if ($Page->no_invoice->Visible) { ?>
-		<td data-field="no_invoice"<?php echo $Page->no_invoice->CellAttributes() ?>>&nbsp;</td>
+<?php if ($Page->no_referensi->Visible) { ?>
+		<td data-field="no_referensi"<?php echo $Page->no_referensi->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
-<?php if ($Page->no_sertifikat->Visible) { ?>
-		<td data-field="no_sertifikat"<?php echo $Page->no_sertifikat->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
-		<td data-field="tgl_pelaksanaan"<?php echo $Page->tgl_pelaksanaan->CellAttributes() ?>>&nbsp;</td>
+<?php if ($Page->ppn->Visible) { ?>
+		<td data-field="ppn"<?php echo $Page->ppn->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->total_ppn->Visible) { ?>
 		<td data-field="total_ppn"<?php echo $Page->total_ppn->CellAttributes() ?>>
@@ -2506,8 +2456,8 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes(); ?>><td colspan="<?php echo ($Page->GrpFldCount + $Page->DtlFldCount) ?>"><?php echo $ReportLanguage->Phrase("RptGrandTotal") ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->TotCount,0,-2,-2,-2); ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td></tr>
 <?php
 	$Page->ResetAttrs();
-	$Page->total_ppn->Count = $Page->GrandCnt[6];
-	$Page->total_ppn->SumValue = $Page->GrandSmry[6]; // Load SUM
+	$Page->total_ppn->Count = $Page->GrandCnt[5];
+	$Page->total_ppn->SumValue = $Page->GrandSmry[5]; // Load SUM
 	$Page->RowTotalSubType = EWR_ROWTOTAL_SUM;
 	$Page->RowAttrs["class"] = "ewRptGrandSummary";
 	$Page->RenderRow();
@@ -2522,14 +2472,11 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->no_kuitansi->Visible) { ?>
 		<td data-field="no_kuitansi"<?php echo $Page->no_kuitansi->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
-<?php if ($Page->no_invoice->Visible) { ?>
-		<td data-field="no_invoice"<?php echo $Page->no_invoice->CellAttributes() ?>>&nbsp;</td>
+<?php if ($Page->no_referensi->Visible) { ?>
+		<td data-field="no_referensi"<?php echo $Page->no_referensi->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
-<?php if ($Page->no_sertifikat->Visible) { ?>
-		<td data-field="no_sertifikat"<?php echo $Page->no_sertifikat->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->tgl_pelaksanaan->Visible) { ?>
-		<td data-field="tgl_pelaksanaan"<?php echo $Page->tgl_pelaksanaan->CellAttributes() ?>>&nbsp;</td>
+<?php if ($Page->ppn->Visible) { ?>
+		<td data-field="ppn"<?php echo $Page->ppn->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->total_ppn->Visible) { ?>
 		<td data-field="total_ppn"<?php echo $Page->total_ppn->CellAttributes() ?>>

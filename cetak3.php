@@ -119,7 +119,7 @@ $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 //$html .= '&nbsp;'.'<br>';
 //$html .= '<table border="0">';
 $html .= '<tr><td width="155">No. Order</td><td width="485">: '.$row["no_order"].'</td></tr>';
-$html .= '<tr><td>No. Referensi</td><td>: '.$row["no_referensi"].'</td></tr>';
+$html .= '<tr><td>No. Seri Faktur Pajak</td><td>: '.$row["no_referensi"].'</td></tr>';
 $html .= '<tr><td>Kegiatan</td><td>: '.$row["kegiatan"].'</td></tr>';
 $tgl_pelaksanaan = strtotime($row["tgl_invoice"]);
 $html .= '<tr><td>Tgl. Pelaksanaan</td><td>: '.date("d", $tgl_pelaksanaan).' '.$anamabln_[date("m", $tgl_pelaksanaan)].' '.date("Y", $tgl_pelaksanaan).'</td></tr>';

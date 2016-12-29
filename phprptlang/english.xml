@@ -625,7 +625,7 @@
 </field>
 <field id="no_order"><phrase id="fldcaption" value="no order"/>
 </field>
-<field id="no_referensi"><phrase id="fldcaption" value="no referensi"/>
+<field id="no_referensi"><phrase id="fldcaption" value="No. Seri Faktur Pajak"/>
 </field>
 <field id="kegiatan"><phrase id="fldcaption" value="kegiatan"/>
 </field>
@@ -637,7 +637,7 @@
 </field>
 <field id="total"><phrase id="fldcaption" value="total"/>
 </field>
-<field id="ppn"><phrase id="fldcaption" value="ppn"/>
+<field id="ppn"><phrase id="fldcaption" value="PPN 10%"/>
 </field>
 <field id="total_ppn"><phrase id="fldcaption" value="Jumlah"/>
 </field>
