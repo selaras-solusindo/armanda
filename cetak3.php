@@ -82,6 +82,27 @@ include("conn.php");
 mysql_connect($hostname_conn, $username_conn, $password_conn) or die ("Tidak bisa terkoneksi ke Database server");
 mysql_select_db($database_conn) or die ("Database tidak ditemukan");
 
+function Terbilang($x)
+{
+  $abil = array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
+  if ($x < 12)
+	return " " . $abil[$x];
+  elseif ($x < 20)
+	return Terbilang($x - 10) . "belas";
+  elseif ($x < 100)
+	return Terbilang($x / 10) . " puluh" . Terbilang($x % 10);
+  elseif ($x < 200)
+	return " seratus" . Terbilang($x - 100);
+  elseif ($x < 1000)
+	return Terbilang($x / 100) . " ratus" . Terbilang($x % 100);
+  elseif ($x < 2000)
+	return " seribu" . Terbilang($x - 1000);
+  elseif ($x < 1000000)
+	return Terbilang($x / 1000) . " ribu" . Terbilang($x % 1000);
+  elseif ($x < 1000000000)
+	return Terbilang($x / 1000000) . " juta" . Terbilang($x % 1000000);
+}
+
 // array nama bulan
 $anamabln_ = array(
   1 => "Januari",
@@ -114,7 +135,7 @@ $html .= '</table>';
 $html .= '<table border="0">';
 $html .= '<tr><td width="155">No.</td><td width="485">: '.$row["no_invoice"].'</td></tr>';
 $tgl_invoice = strtotime($row["tgl_invoice"]);
-$html .= '<tr><td>Tgl.</td><td>: '.date("d", $tgl_invoice).' '.$anamabln_[date("m", $tgl_invoice)].' '.date("Y", $tgl_invoice).'</td></tr>';
+$html .= '<tr><td>Tgl.</td><td>: '.date("d", $tgl_invoice).' '.$anamabln_[intval(date("m", $tgl_invoice))].' '.date("Y", $tgl_invoice).'</td></tr>';
 $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 //$html .= '&nbsp;'.'<br>';
 //$html .= '<table border="0">';
@@ -122,7 +143,7 @@ $html .= '<tr><td width="155">No. Order</td><td width="485">: '.$row["no_order"]
 $html .= '<tr><td>No. Seri Faktur Pajak</td><td>: '.$row["no_referensi"].'</td></tr>';
 $html .= '<tr><td>Kegiatan</td><td>: '.$row["kegiatan"].'</td></tr>';
 $tgl_pelaksanaan = strtotime($row["tgl_invoice"]);
-$html .= '<tr><td>Tgl. Pelaksanaan</td><td>: '.date("d", $tgl_pelaksanaan).' '.$anamabln_[date("m", $tgl_pelaksanaan)].' '.date("Y", $tgl_pelaksanaan).'</td></tr>';
+$html .= '<tr><td>Tgl. Pelaksanaan</td><td>: '.date("d", $tgl_pelaksanaan).' '.$anamabln_[intval(date("m", $tgl_pelaksanaan))].' '.date("Y", $tgl_pelaksanaan).'</td></tr>';
 $html .= '<tr><td>No. Sertifikat/Laporan</td><td>: '.$row["no_sertfikat"].'</td></tr>';
 $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 $html .= '<tr><td>Fee</td><td>:&nbsp;</td></tr>';
@@ -131,10 +152,14 @@ $html .= '</table>';
 $html .= '<table border="0">';
 
 $total = $row["total"];
+$pasal23 = $row["pasal23"];
+$nilai_pasal23 = 0;
+if ($pasal23 == 1) $nilai_pasal23 = $row["total"] * 0.02;
 $ppn = $row["ppn"];
-$total_ppn = $row["total_ppn"];
+$total_ppn = $row["total_ppn"] - $nilai_pasal23; //$row["total_ppn"];
 $keterangan = $row["keterangan"];
 $terbilang = $row["terbilang"];
+if ($pasal23 == 1) $terbilang = Terbilang($total_ppn);
 
 $mquery = mysql_query($msql);
 while($row = mysql_fetch_array($mquery)) {
@@ -241,6 +266,37 @@ $html .= '
 		</td>
 	</tr>
 	';
+if ($pasal23 == 1) {
+$html .= '
+	<tr>
+		<td>&nbsp;</td>
+		<td>
+			<table border="0">
+				<tr>
+					<td colspan="3"></td>
+					<td colspan="2">Pot. Pasal 23</td>
+					<td align="center">&nbsp;</td>
+					<td align="right">'.number_format($nilai_pasal23).'</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	';
+$html .= '
+	<tr>
+		<td>&nbsp;</td>
+		<td>
+			<table border="0">
+				<tr>
+					<td colspan="6"></td>
+					<td><hr></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	';	
+}
+
 $html .= '
 	<tr>
 		<td>&nbsp;</td>
@@ -256,6 +312,7 @@ $html .= '
 		</td>
 	</tr>
 	';
+
 $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 $html .= '<tr><td>Keterangan</td><td>: '.$keterangan.'</td></tr>';
 $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
