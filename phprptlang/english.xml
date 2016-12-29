@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ew-language date="2016/12/28" version="9.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2016/12/29" version="9.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
 	<locale>
 		<phrase id="locale" value=""/><!-- *** system locale for this language -->
 		<phrase id="use_system_locale" value="1"/><!-- *** change to "0" to disable system locale and use the following settings *** -->
@@ -236,9 +236,13 @@
 		<phrase id="thisyear" value="This year"/>
 	</global>
 	<project><phrase id="footertext" value="&amp;copy;2016 e.World Technology Ltd. All rights reserved."/>
+<menu id="15"><phrase id="menutext" value="view 5"/>
+</menu>
 <menu id="13"><phrase id="menutext" value="view 4"/>
 </menu>
-<menu id="12"><phrase id="menutext" value="Rekap Invoice"/>
+<menu id="12"><phrase id="menutext" value="Rekap Invoice (All)"/>
+</menu>
+<menu id="16"><phrase id="menutext" value="Rekap Invoice (w/ PPN)"/>
 </menu>
 <menu id="14"><phrase id="menutext" value="Rekap Hutang"/>
 </menu>
@@ -567,13 +571,81 @@
 <table id="report2"><phrase id="tblcaption" value="Report 2"/>
 <field id="nama"><phrase id="fldcaption" value="Customer"/>
 </field>
+<field id="tgl_pelaksanaan"><phrase id="fldcaption" value="Tgl. Kegiatan"/>
+</field>
 <field id="no_kuitansi"><phrase id="fldcaption" value="No. KW"/>
 </field>
 <field id="no_invoice"><phrase id="fldcaption" value="No. INV"/>
 </field>
 <field id="total_ppn"><phrase id="fldcaption" value="Rp."/>
 </field>
-<field id="tgl_pelaksanaan"><phrase id="fldcaption" value="Tgl. Kegiatan"/>
+</table>
+<table id="view5"><phrase id="tblcaption" value="view 5"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="customer_id"><phrase id="fldcaption" value="customer id"/>
+</field>
+<field id="no_invoice"><phrase id="fldcaption" value="no invoice"/>
+</field>
+<field id="tgl_invoice"><phrase id="fldcaption" value="tgl invoice"/>
+</field>
+<field id="no_order"><phrase id="fldcaption" value="no order"/>
+</field>
+<field id="no_referensi"><phrase id="fldcaption" value="no referensi"/>
+</field>
+<field id="kegiatan"><phrase id="fldcaption" value="kegiatan"/>
+</field>
+<field id="tgl_pelaksanaan"><phrase id="fldcaption" value="tgl pelaksanaan"/>
+</field>
+<field id="no_sertifikat"><phrase id="fldcaption" value="no sertifikat"/>
+</field>
+<field id="keterangan"><phrase id="fldcaption" value="keterangan"/>
+</field>
+<field id="total"><phrase id="fldcaption" value="total"/>
+</field>
+<field id="ppn"><phrase id="fldcaption" value="ppn"/>
+</field>
+<field id="total_ppn"><phrase id="fldcaption" value="total ppn"/>
+</field>
+<field id="terbilang"><phrase id="fldcaption" value="terbilang"/>
+</field>
+<field id="nama"><phrase id="fldcaption" value="nama"/>
+</field>
+<field id="no_kuitansi"><phrase id="fldcaption" value="no kuitansi"/>
+</field>
+</table>
+<table id="report3"><phrase id="tblcaption" value="Report 3"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="customer_id"><phrase id="fldcaption" value="customer id"/>
+</field>
+<field id="no_invoice"><phrase id="fldcaption" value="No. INV"/>
+</field>
+<field id="tgl_invoice"><phrase id="fldcaption" value="tgl invoice"/>
+</field>
+<field id="no_order"><phrase id="fldcaption" value="no order"/>
+</field>
+<field id="no_referensi"><phrase id="fldcaption" value="no referensi"/>
+</field>
+<field id="kegiatan"><phrase id="fldcaption" value="kegiatan"/>
+</field>
+<field id="tgl_pelaksanaan"><phrase id="fldcaption" value="Tgl. Pelaksanaan"/>
+</field>
+<field id="no_sertifikat"><phrase id="fldcaption" value="No. Sertifikat"/>
+</field>
+<field id="keterangan"><phrase id="fldcaption" value="keterangan"/>
+</field>
+<field id="total"><phrase id="fldcaption" value="total"/>
+</field>
+<field id="ppn"><phrase id="fldcaption" value="ppn"/>
+</field>
+<field id="total_ppn"><phrase id="fldcaption" value="Jumlah"/>
+</field>
+<field id="terbilang"><phrase id="fldcaption" value="terbilang"/>
+</field>
+<field id="nama"><phrase id="fldcaption" value="Nama"/>
+</field>
+<field id="no_kuitansi"><phrase id="fldcaption" value="No. KW"/>
 </field>
 </table>
 </project>
