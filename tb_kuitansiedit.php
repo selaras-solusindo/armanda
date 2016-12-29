@@ -594,8 +594,6 @@ class ctb_kuitansi_edit extends ctb_kuitansi {
 		$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
 		$sWhereWrk = "";
 		$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
-		$lookuptblfilter = "`id` not in (select invoice_id from tb_kuitansi)";
-		ew_AddFilter($sWhereWrk, $lookuptblfilter);
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -649,8 +647,6 @@ class ctb_kuitansi_edit extends ctb_kuitansi {
 			$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
 			$sWhereWrk = "";
 			$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
-			$lookuptblfilter = "`id` not in (select invoice_id from tb_kuitansi)";
-			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -737,6 +733,25 @@ class ctb_kuitansi_edit extends ctb_kuitansi {
 		$sFilter = $this->KeyFilter();
 		$sFilter = $this->ApplyUserIDFilters($sFilter);
 		$conn = &$this->Connection();
+		if ($this->invoice_id->CurrentValue <> "") { // Check field with unique index
+			$sFilterChk = "(`invoice_id` = " . ew_AdjustSql($this->invoice_id->CurrentValue, $this->DBID) . ")";
+			$sFilterChk .= " AND NOT (" . $sFilter . ")";
+			$this->CurrentFilter = $sFilterChk;
+			$sSqlChk = $this->SQL();
+			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+			$rsChk = $conn->Execute($sSqlChk);
+			$conn->raiseErrorFn = '';
+			if ($rsChk === FALSE) {
+				return FALSE;
+			} elseif (!$rsChk->EOF) {
+				$sIdxErrMsg = str_replace("%f", $this->invoice_id->FldCaption(), $Language->Phrase("DupIndex"));
+				$sIdxErrMsg = str_replace("%v", $this->invoice_id->CurrentValue, $sIdxErrMsg);
+				$this->setFailureMessage($sIdxErrMsg);
+				$rsChk->Close();
+				return FALSE;
+			}
+			$rsChk->Close();
+		}
 		$this->CurrentFilter = $sFilter;
 		$sSql = $this->SQL();
 		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
@@ -815,8 +830,6 @@ class ctb_kuitansi_edit extends ctb_kuitansi {
 			$sSqlWrk = "SELECT `id` AS `LinkFld`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
 			$sWhereWrk = "{filter}";
 			$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
-			$lookuptblfilter = "`id` not in (select invoice_id from tb_kuitansi)";
-			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` = {filter_value}', "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
@@ -837,8 +850,6 @@ class ctb_kuitansi_edit extends ctb_kuitansi {
 			$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld` FROM `tb_invoice`";
 			$sWhereWrk = "`no_invoice` LIKE '{query_value}%'";
 			$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
-			$lookuptblfilter = "`id` not in (select invoice_id from tb_kuitansi)";
-			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting

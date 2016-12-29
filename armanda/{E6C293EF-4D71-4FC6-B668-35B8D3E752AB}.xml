@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <configuration date="2016/12/29" author="e.World Technology Ltd.">
-  <project id="{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}" file="D:\xampp\htdocs\armanda\armanda.pmp" name="armanda" product="PHPMaker" version="13.0" datetime="2016/12/29 16:35:09" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
+  <project id="{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}" file="D:\xampp\htdocs\armanda\armanda.pmp" name="armanda" product="PHPMaker" version="13.0" datetime="2016/12/29 18:27:54" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
     <table id="option_values" name="option_values" caption="option values" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,40" priv="1" />
     <table id="options" name="options" caption="options" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,40" priv="1" />
     <table id="products" name="products" caption="products" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,40" priv="1" />
@@ -10,7 +10,7 @@
     <table id="view1" name="view1" caption="view 1" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,40" priv="1" />
     <table id="cetak2_php" name="cetak2.php" caption="Cetak Invoice" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,8" priv="1" />
     <table id="tb_barang" name="tb_barang" caption="Fee" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,40" priv="1" />
-    <table id="tb_kuitansi" name="tb_kuitansi" caption="Kuitansi" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,40" priv="1" />
+    <table id="tb_kuitansi" name="tb_kuitansi" caption="Kwitansi" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,40" priv="1" />
     <table id="view2" name="view2" caption="view 2" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,40" priv="1" />
     <table id="kuitansi_php" name="kuitansi.php" caption="Cetak Kuitansi" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,8" priv="1" />
     <table id="view3" name="view3" caption="view 3" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,40" priv="1" />
