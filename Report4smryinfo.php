@@ -358,7 +358,7 @@ class crReport4 extends crTableBase {
 	var $_SqlSelectAgg = "";
 
 	function getSqlSelectAgg() {
-		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT SUM(`total_ppn`) AS `sum_total_ppn` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT SUM((`ppn`/100) * `total`) AS `sum_ppn_nilai`, SUM(`total_ppn`) AS `sum_total_ppn` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelectAgg() { // For backward compatibility

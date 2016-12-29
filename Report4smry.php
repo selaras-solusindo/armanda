@@ -494,7 +494,7 @@ class crReport4_summary extends crReport4 {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -973,6 +973,7 @@ class crReport4_summary extends crReport4 {
 				$this->GrandCnt[2] = $this->TotCount;
 				$this->GrandCnt[3] = $this->TotCount;
 				$this->GrandCnt[4] = $this->TotCount;
+				$this->GrandSmry[4] = $rsagg->fields("sum_ppn_nilai");
 				$this->GrandCnt[5] = $this->TotCount;
 				$this->GrandSmry[5] = $rsagg->fields("sum_total_ppn");
 				$rsagg->Close();
@@ -1013,6 +1014,12 @@ class crReport4_summary extends crReport4 {
 			$this->tgl_invoice->GroupSummaryOldValue = $this->tgl_invoice->GroupSummaryValue;
 			$this->tgl_invoice->GroupSummaryValue = $this->tgl_invoice->GroupViewValue;
 			$this->tgl_invoice->GroupSummaryViewValue = ($this->tgl_invoice->GroupSummaryOldValue <> $this->tgl_invoice->GroupSummaryValue) ? $this->tgl_invoice->GroupSummaryValue : "&nbsp;";
+
+			// ppn_nilai
+			$this->ppn_nilai->SumViewValue = $this->ppn_nilai->SumValue;
+			$this->ppn_nilai->SumViewValue = ewr_FormatNumber($this->ppn_nilai->SumViewValue, 0, -2, -2, -1);
+			$this->ppn_nilai->CellAttrs["style"] = "text-align:right;";
+			$this->ppn_nilai->CellAttrs["class"] = ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : "ewRptGrpSummary" . $this->RowGroupLevel;
 
 			// total_ppn
 			$this->total_ppn->SumViewValue = $this->total_ppn->SumValue;
@@ -1101,6 +1108,15 @@ class crReport4_summary extends crReport4 {
 			$HrefValue = &$this->tgl_invoice->HrefValue;
 			$LinkAttrs = &$this->tgl_invoice->LinkAttrs;
 			$this->Cell_Rendered($this->tgl_invoice, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// ppn_nilai
+			$CurrentValue = $this->ppn_nilai->SumValue;
+			$ViewValue = &$this->ppn_nilai->SumViewValue;
+			$ViewAttrs = &$this->ppn_nilai->ViewAttrs;
+			$CellAttrs = &$this->ppn_nilai->CellAttrs;
+			$HrefValue = &$this->ppn_nilai->HrefValue;
+			$LinkAttrs = &$this->ppn_nilai->LinkAttrs;
+			$this->Cell_Rendered($this->ppn_nilai, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// total_ppn
 			$CurrentValue = $this->total_ppn->SumValue;
@@ -2356,6 +2372,8 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 </tr>
 <?php
 			$Page->ResetAttrs();
+			$Page->ppn_nilai->Count = $Page->Cnt[1][4];
+			$Page->ppn_nilai->SumValue = $Page->Smry[1][4]; // Load SUM
 			$Page->total_ppn->Count = $Page->Cnt[1][5];
 			$Page->total_ppn->SumValue = $Page->Smry[1][5]; // Load SUM
 			$Page->RowTotalSubType = EWR_ROWTOTAL_SUM;
@@ -2373,7 +2391,8 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="no_referensi"<?php echo $Page->tgl_invoice->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->ppn_nilai->Visible) { ?>
-		<td data-field="ppn_nilai"<?php echo $Page->tgl_invoice->CellAttributes() ?>>&nbsp;</td>
+		<td data-field="ppn_nilai"<?php echo $Page->total_ppn->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_Report4_ppn_nilai"<?php echo $Page->ppn_nilai->ViewAttributes() ?>><?php echo $Page->ppn_nilai->SumViewValue ?></span></td>
 <?php } ?>
 <?php if ($Page->total_ppn->Visible) { ?>
 		<td data-field="total_ppn"<?php echo $Page->total_ppn->CellAttributes() ?>>
@@ -2420,6 +2439,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes(); ?>><td colspan="<?php echo ($Page->GrpFldCount + $Page->DtlFldCount) ?>"><?php echo $ReportLanguage->Phrase("RptPageTotal") ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[0][0],0,-2,-2,-2); ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td></tr>
 <?php
 	$Page->ResetAttrs();
+	$Page->ppn_nilai->Count = $Page->Cnt[0][4];
+	$Page->ppn_nilai->SumValue = $Page->Smry[0][4]; // Load SUM
+	$Page->RowTotalSubType = EWR_ROWTOTAL_SUM;
 	$Page->total_ppn->Count = $Page->Cnt[0][5];
 	$Page->total_ppn->SumValue = $Page->Smry[0][5]; // Load SUM
 	$Page->RowTotalSubType = EWR_ROWTOTAL_SUM;
@@ -2440,7 +2462,8 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="no_referensi"<?php echo $Page->no_referensi->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->ppn_nilai->Visible) { ?>
-		<td data-field="ppn_nilai"<?php echo $Page->ppn_nilai->CellAttributes() ?>>&nbsp;</td>
+		<td data-field="ppn_nilai"<?php echo $Page->ppn_nilai->CellAttributes() ?>>
+<span data-class="tpps_Report4_ppn_nilai"<?php echo $Page->ppn_nilai->ViewAttributes() ?>><?php echo $Page->ppn_nilai->SumViewValue ?></span></td>
 <?php } ?>
 <?php if ($Page->total_ppn->Visible) { ?>
 		<td data-field="total_ppn"<?php echo $Page->total_ppn->CellAttributes() ?>>
@@ -2459,6 +2482,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes(); ?>><td colspan="<?php echo ($Page->GrpFldCount + $Page->DtlFldCount) ?>"><?php echo $ReportLanguage->Phrase("RptGrandTotal") ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->TotCount,0,-2,-2,-2); ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td></tr>
 <?php
 	$Page->ResetAttrs();
+	$Page->ppn_nilai->Count = $Page->GrandCnt[4];
+	$Page->ppn_nilai->SumValue = $Page->GrandSmry[4]; // Load SUM
+	$Page->RowTotalSubType = EWR_ROWTOTAL_SUM;
 	$Page->total_ppn->Count = $Page->GrandCnt[5];
 	$Page->total_ppn->SumValue = $Page->GrandSmry[5]; // Load SUM
 	$Page->RowTotalSubType = EWR_ROWTOTAL_SUM;
@@ -2479,7 +2505,8 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="no_referensi"<?php echo $Page->no_referensi->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->ppn_nilai->Visible) { ?>
-		<td data-field="ppn_nilai"<?php echo $Page->ppn_nilai->CellAttributes() ?>>&nbsp;</td>
+		<td data-field="ppn_nilai"<?php echo $Page->ppn_nilai->CellAttributes() ?>>
+<span data-class="tpts_Report4_ppn_nilai"<?php echo $Page->ppn_nilai->ViewAttributes() ?>><?php echo $Page->ppn_nilai->SumViewValue ?></span></td>
 <?php } ?>
 <?php if ($Page->total_ppn->Visible) { ?>
 		<td data-field="total_ppn"<?php echo $Page->total_ppn->CellAttributes() ?>>
