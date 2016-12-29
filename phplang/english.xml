@@ -873,6 +873,13 @@
         <phrase id="fldtagvalue2" value="0" />
         <phrase id="fldtagcaption2" value="Belum Terbayar" />
       </field>
+      <field id="pasal23">
+        <phrase id="fldcaption" value="Pasal 23" />
+        <phrase id="fldtagvalue1" value="0" />
+        <phrase id="fldtagcaption1" value="Tidak" />
+        <phrase id="fldtagvalue2" value="1" />
+        <phrase id="fldtagcaption2" value="Ya" />
+      </field>
     </table>
     <table id="view1">
       <phrase id="tblcaption" value="view 1" />

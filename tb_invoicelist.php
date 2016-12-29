@@ -397,6 +397,7 @@ class ctb_invoice_list extends ctb_invoice {
 		$this->total_ppn->SetVisibility();
 		$this->terbilang->SetVisibility();
 		$this->terbayar->SetVisibility();
+		$this->pasal23->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -743,6 +744,7 @@ class ctb_invoice_list extends ctb_invoice {
 		$sFilterList = ew_Concat($sFilterList, $this->total_ppn->AdvancedSearch->ToJSON(), ","); // Field total_ppn
 		$sFilterList = ew_Concat($sFilterList, $this->terbilang->AdvancedSearch->ToJSON(), ","); // Field terbilang
 		$sFilterList = ew_Concat($sFilterList, $this->terbayar->AdvancedSearch->ToJSON(), ","); // Field terbayar
+		$sFilterList = ew_Concat($sFilterList, $this->pasal23->AdvancedSearch->ToJSON(), ","); // Field pasal23
 		if ($this->BasicSearch->Keyword <> "") {
 			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
 			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
@@ -906,6 +908,14 @@ class ctb_invoice_list extends ctb_invoice {
 		$this->terbayar->AdvancedSearch->SearchValue2 = @$filter["y_terbayar"];
 		$this->terbayar->AdvancedSearch->SearchOperator2 = @$filter["w_terbayar"];
 		$this->terbayar->AdvancedSearch->Save();
+
+		// Field pasal23
+		$this->pasal23->AdvancedSearch->SearchValue = @$filter["x_pasal23"];
+		$this->pasal23->AdvancedSearch->SearchOperator = @$filter["z_pasal23"];
+		$this->pasal23->AdvancedSearch->SearchCondition = @$filter["v_pasal23"];
+		$this->pasal23->AdvancedSearch->SearchValue2 = @$filter["y_pasal23"];
+		$this->pasal23->AdvancedSearch->SearchOperator2 = @$filter["w_pasal23"];
+		$this->pasal23->AdvancedSearch->Save();
 		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
 		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
 	}
@@ -1097,6 +1107,7 @@ class ctb_invoice_list extends ctb_invoice {
 			$this->UpdateSort($this->total_ppn); // total_ppn
 			$this->UpdateSort($this->terbilang); // terbilang
 			$this->UpdateSort($this->terbayar); // terbayar
+			$this->UpdateSort($this->pasal23); // pasal23
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -1143,6 +1154,7 @@ class ctb_invoice_list extends ctb_invoice {
 				$this->total_ppn->setSort("");
 				$this->terbilang->setSort("");
 				$this->terbayar->setSort("");
+				$this->pasal23->setSort("");
 			}
 
 			// Reset start position
@@ -1704,6 +1716,7 @@ class ctb_invoice_list extends ctb_invoice {
 		$this->total_ppn->setDbValue($rs->fields('total_ppn'));
 		$this->terbilang->setDbValue($rs->fields('terbilang'));
 		$this->terbayar->setDbValue($rs->fields('terbayar'));
+		$this->pasal23->setDbValue($rs->fields('pasal23'));
 	}
 
 	// Load DbValue from recordset
@@ -1725,6 +1738,7 @@ class ctb_invoice_list extends ctb_invoice {
 		$this->total_ppn->DbValue = $row['total_ppn'];
 		$this->terbilang->DbValue = $row['terbilang'];
 		$this->terbayar->DbValue = $row['terbayar'];
+		$this->pasal23->DbValue = $row['pasal23'];
 	}
 
 	// Load old record
@@ -1789,6 +1803,7 @@ class ctb_invoice_list extends ctb_invoice {
 		// total_ppn
 		// terbilang
 		// terbayar
+		// pasal23
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1877,6 +1892,14 @@ class ctb_invoice_list extends ctb_invoice {
 		}
 		$this->terbayar->ViewCustomAttributes = "";
 
+		// pasal23
+		if (strval($this->pasal23->CurrentValue) <> "") {
+			$this->pasal23->ViewValue = $this->pasal23->OptionCaption($this->pasal23->CurrentValue);
+		} else {
+			$this->pasal23->ViewValue = NULL;
+		}
+		$this->pasal23->ViewCustomAttributes = "";
+
 			// customer_id
 			$this->customer_id->LinkCustomAttributes = "";
 			$this->customer_id->HrefValue = "";
@@ -1946,6 +1969,11 @@ class ctb_invoice_list extends ctb_invoice {
 			$this->terbayar->LinkCustomAttributes = "";
 			$this->terbayar->HrefValue = "";
 			$this->terbayar->TooltipValue = "";
+
+			// pasal23
+			$this->pasal23->LinkCustomAttributes = "";
+			$this->pasal23->HrefValue = "";
+			$this->pasal23->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -2418,6 +2446,8 @@ ftb_invoicelist.ValidateRequired = false;
 ftb_invoicelist.Lists["x_customer_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"tb_customer"};
 ftb_invoicelist.Lists["x_terbayar"] = {"LinkField":"","Ajax":null,"AutoFill":false,"DisplayFields":["","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":""};
 ftb_invoicelist.Lists["x_terbayar"].Options = <?php echo json_encode($tb_invoice->terbayar->Options()) ?>;
+ftb_invoicelist.Lists["x_pasal23"] = {"LinkField":"","Ajax":null,"AutoFill":false,"DisplayFields":["","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":""};
+ftb_invoicelist.Lists["x_pasal23"].Options = <?php echo json_encode($tb_invoice->pasal23->Options()) ?>;
 
 // Form object for search
 var CurrentSearchForm = ftb_invoicelistsrch = new ew_Form("ftb_invoicelistsrch");
@@ -2654,6 +2684,15 @@ $tb_invoice_list->ListOptions->Render("header", "left");
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
+<?php if ($tb_invoice->pasal23->Visible) { // pasal23 ?>
+	<?php if ($tb_invoice->SortUrl($tb_invoice->pasal23) == "") { ?>
+		<th data-name="pasal23"><div id="elh_tb_invoice_pasal23" class="tb_invoice_pasal23"><div class="ewTableHeaderCaption"><?php echo $tb_invoice->pasal23->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="pasal23"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_invoice->SortUrl($tb_invoice->pasal23) ?>',1);"><div id="elh_tb_invoice_pasal23" class="tb_invoice_pasal23">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_invoice->pasal23->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($tb_invoice->pasal23->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_invoice->pasal23->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
 <?php
 
 // Render list options (header, right)
@@ -2828,6 +2867,14 @@ $tb_invoice_list->ListOptions->Render("body", "left", $tb_invoice_list->RowCnt);
 <span id="el<?php echo $tb_invoice_list->RowCnt ?>_tb_invoice_terbayar" class="tb_invoice_terbayar">
 <span<?php echo $tb_invoice->terbayar->ViewAttributes() ?>>
 <?php echo $tb_invoice->terbayar->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($tb_invoice->pasal23->Visible) { // pasal23 ?>
+		<td data-name="pasal23"<?php echo $tb_invoice->pasal23->CellAttributes() ?>>
+<span id="el<?php echo $tb_invoice_list->RowCnt ?>_tb_invoice_pasal23" class="tb_invoice_pasal23">
+<span<?php echo $tb_invoice->pasal23->ViewAttributes() ?>>
+<?php echo $tb_invoice->pasal23->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>

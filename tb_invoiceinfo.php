@@ -22,6 +22,7 @@ class ctb_invoice extends cTable {
 	var $total_ppn;
 	var $terbilang;
 	var $terbayar;
+	var $pasal23;
 
 	//
 	// Table class constructor
@@ -138,6 +139,13 @@ class ctb_invoice extends cTable {
 		$this->terbayar->OptionCount = 2;
 		$this->terbayar->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['terbayar'] = &$this->terbayar;
+
+		// pasal23
+		$this->pasal23 = new cField('tb_invoice', 'tb_invoice', 'x_pasal23', 'pasal23', '`pasal23`', '`pasal23`', 16, -1, FALSE, '`pasal23`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'RADIO');
+		$this->pasal23->Sortable = TRUE; // Allow sort
+		$this->pasal23->OptionCount = 2;
+		$this->pasal23->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['pasal23'] = &$this->pasal23;
 	}
 
 	// Set Field Visibility
@@ -665,6 +673,7 @@ class ctb_invoice extends cTable {
 		$this->total_ppn->setDbValue($rs->fields('total_ppn'));
 		$this->terbilang->setDbValue($rs->fields('terbilang'));
 		$this->terbayar->setDbValue($rs->fields('terbayar'));
+		$this->pasal23->setDbValue($rs->fields('pasal23'));
 	}
 
 	// Render list row values
@@ -690,6 +699,7 @@ class ctb_invoice extends cTable {
 		// total_ppn
 		// terbilang
 		// terbayar
+		// pasal23
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
@@ -780,6 +790,14 @@ class ctb_invoice extends cTable {
 		}
 		$this->terbayar->ViewCustomAttributes = "";
 
+		// pasal23
+		if (strval($this->pasal23->CurrentValue) <> "") {
+			$this->pasal23->ViewValue = $this->pasal23->OptionCaption($this->pasal23->CurrentValue);
+		} else {
+			$this->pasal23->ViewValue = NULL;
+		}
+		$this->pasal23->ViewCustomAttributes = "";
+
 		// id
 		$this->id->LinkCustomAttributes = "";
 		$this->id->HrefValue = "";
@@ -854,6 +872,11 @@ class ctb_invoice extends cTable {
 		$this->terbayar->LinkCustomAttributes = "";
 		$this->terbayar->HrefValue = "";
 		$this->terbayar->TooltipValue = "";
+
+		// pasal23
+		$this->pasal23->LinkCustomAttributes = "";
+		$this->pasal23->HrefValue = "";
+		$this->pasal23->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -954,6 +977,10 @@ class ctb_invoice extends cTable {
 		$this->terbayar->EditCustomAttributes = "";
 		$this->terbayar->EditValue = $this->terbayar->Options(FALSE);
 
+		// pasal23
+		$this->pasal23->EditCustomAttributes = "";
+		$this->pasal23->EditValue = $this->pasal23->Options(FALSE);
+
 		// Call Row Rendered event
 		$this->Row_Rendered();
 	}
@@ -995,6 +1022,7 @@ class ctb_invoice extends cTable {
 					if ($this->total_ppn->Exportable) $Doc->ExportCaption($this->total_ppn);
 					if ($this->terbilang->Exportable) $Doc->ExportCaption($this->terbilang);
 					if ($this->terbayar->Exportable) $Doc->ExportCaption($this->terbayar);
+					if ($this->pasal23->Exportable) $Doc->ExportCaption($this->pasal23);
 				} else {
 					if ($this->customer_id->Exportable) $Doc->ExportCaption($this->customer_id);
 					if ($this->no_invoice->Exportable) $Doc->ExportCaption($this->no_invoice);
@@ -1010,6 +1038,7 @@ class ctb_invoice extends cTable {
 					if ($this->total_ppn->Exportable) $Doc->ExportCaption($this->total_ppn);
 					if ($this->terbilang->Exportable) $Doc->ExportCaption($this->terbilang);
 					if ($this->terbayar->Exportable) $Doc->ExportCaption($this->terbayar);
+					if ($this->pasal23->Exportable) $Doc->ExportCaption($this->pasal23);
 				}
 				$Doc->EndExportRow();
 			}
@@ -1055,6 +1084,7 @@ class ctb_invoice extends cTable {
 						if ($this->total_ppn->Exportable) $Doc->ExportField($this->total_ppn);
 						if ($this->terbilang->Exportable) $Doc->ExportField($this->terbilang);
 						if ($this->terbayar->Exportable) $Doc->ExportField($this->terbayar);
+						if ($this->pasal23->Exportable) $Doc->ExportField($this->pasal23);
 					} else {
 						if ($this->customer_id->Exportable) $Doc->ExportField($this->customer_id);
 						if ($this->no_invoice->Exportable) $Doc->ExportField($this->no_invoice);
@@ -1070,6 +1100,7 @@ class ctb_invoice extends cTable {
 						if ($this->total_ppn->Exportable) $Doc->ExportField($this->total_ppn);
 						if ($this->terbilang->Exportable) $Doc->ExportField($this->terbilang);
 						if ($this->terbayar->Exportable) $Doc->ExportField($this->terbayar);
+						if ($this->pasal23->Exportable) $Doc->ExportField($this->pasal23);
 					}
 					$Doc->EndExportRow();
 				}
