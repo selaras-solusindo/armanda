@@ -588,10 +588,6 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// kuitansi_id
-		$this->kuitansi_id->ViewValue = $this->kuitansi_id->CurrentValue;
-		$this->kuitansi_id->ViewCustomAttributes = "";
-
 		// invoice_id
 		if ($this->invoice_id->VirtualValue <> "") {
 			$this->invoice_id->ViewValue = $this->invoice_id->VirtualValue;
@@ -601,7 +597,7 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->invoice_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
 		$sWhereWrk = "";
-		$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
+		$this->invoice_id->LookupFilters = array("dx1" => "`no_invoice`");
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -643,7 +639,7 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 				$sFilterWrk = "`id`" . ew_SearchString("=", $this->invoice_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 			$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
 			$sWhereWrk = "";
-			$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
+			$this->invoice_id->LookupFilters = array("dx1" => "`no_invoice`");
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -799,8 +795,8 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `id` AS `LinkFld`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
 			$sWhereWrk = "{filter}";
-			$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$this->invoice_id->LookupFilters = array("dx1" => "`no_invoice`");
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => "`id` = {filter_value}", "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -819,7 +815,7 @@ class ctb_kuitansi_add extends ctb_kuitansi {
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld` FROM `tb_invoice`";
 			$sWhereWrk = "`no_invoice` LIKE '{query_value}%'";
-			$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
+			$this->invoice_id->LookupFilters = array("dx1" => "`no_invoice`");
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
@@ -1053,21 +1049,12 @@ $tb_kuitansi_add->ShowMessage();
 		<label id="elh_tb_kuitansi_invoice_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_kuitansi->invoice_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
 		<div class="col-sm-10"><div<?php echo $tb_kuitansi->invoice_id->CellAttributes() ?>>
 <span id="el_tb_kuitansi_invoice_id">
-<?php
-$wrkonchange = trim(" " . @$tb_kuitansi->invoice_id->EditAttrs["onchange"]);
-if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
-$tb_kuitansi->invoice_id->EditAttrs["onchange"] = "";
-?>
-<span id="as_x_invoice_id" style="white-space: nowrap; z-index: 8980">
-	<input type="text" name="sv_x_invoice_id" id="sv_x_invoice_id" value="<?php echo $tb_kuitansi->invoice_id->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($tb_kuitansi->invoice_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($tb_kuitansi->invoice_id->getPlaceHolder()) ?>"<?php echo $tb_kuitansi->invoice_id->EditAttributes() ?>>
+<span class="ewLookupList">
+	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_invoice_id"><?php echo (strval($tb_kuitansi->invoice_id->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $tb_kuitansi->invoice_id->ViewValue); ?></span>
 </span>
-<input type="hidden" data-table="tb_kuitansi" data-field="x_invoice_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $tb_kuitansi->invoice_id->DisplayValueSeparatorAttribute() ?>" name="x_invoice_id" id="x_invoice_id" value="<?php echo ew_HtmlEncode($tb_kuitansi->invoice_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
-<input type="hidden" name="q_x_invoice_id" id="q_x_invoice_id" value="<?php echo $tb_kuitansi->invoice_id->LookupFilterQuery(true) ?>">
-<script type="text/javascript">
-ftb_kuitansiadd.CreateAutoSuggest({"id":"x_invoice_id","forceSelect":true});
-</script>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_kuitansi->invoice_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_invoice_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" name="s_x_invoice_id" id="s_x_invoice_id" value="<?php echo $tb_kuitansi->invoice_id->LookupFilterQuery(false) ?>">
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_kuitansi->invoice_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_invoice_id',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<input type="hidden" data-table="tb_kuitansi" data-field="x_invoice_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $tb_kuitansi->invoice_id->DisplayValueSeparatorAttribute() ?>" name="x_invoice_id" id="x_invoice_id" value="<?php echo $tb_kuitansi->invoice_id->CurrentValue ?>"<?php echo $tb_kuitansi->invoice_id->EditAttributes() ?>>
+<input type="hidden" name="s_x_invoice_id" id="s_x_invoice_id" value="<?php echo $tb_kuitansi->invoice_id->LookupFilterQuery() ?>">
 </span>
 <?php echo $tb_kuitansi->invoice_id->CustomMsg ?></div></div>
 	</div>

@@ -719,7 +719,7 @@ class ctb_fee extends cTable {
 			$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 		$sWhereWrk = "";
-		$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+		$this->barang_id->LookupFilters = array("dx1" => "`nama`");
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -896,7 +896,6 @@ class ctb_fee extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
-					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->invoice_id->Exportable) $Doc->ExportCaption($this->invoice_id);
 					if ($this->barang_id->Exportable) $Doc->ExportCaption($this->barang_id);
 					if ($this->harga->Exportable) $Doc->ExportCaption($this->harga);
@@ -904,7 +903,6 @@ class ctb_fee extends cTable {
 					if ($this->satuan->Exportable) $Doc->ExportCaption($this->satuan);
 					if ($this->keterangan->Exportable) $Doc->ExportCaption($this->keterangan);
 				} else {
-					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->invoice_id->Exportable) $Doc->ExportCaption($this->invoice_id);
 					if ($this->barang_id->Exportable) $Doc->ExportCaption($this->barang_id);
 					if ($this->harga->Exportable) $Doc->ExportCaption($this->harga);
@@ -943,7 +941,6 @@ class ctb_fee extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
-						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->invoice_id->Exportable) $Doc->ExportField($this->invoice_id);
 						if ($this->barang_id->Exportable) $Doc->ExportField($this->barang_id);
 						if ($this->harga->Exportable) $Doc->ExportField($this->harga);
@@ -951,7 +948,6 @@ class ctb_fee extends cTable {
 						if ($this->satuan->Exportable) $Doc->ExportField($this->satuan);
 						if ($this->keterangan->Exportable) $Doc->ExportField($this->keterangan);
 					} else {
-						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->invoice_id->Exportable) $Doc->ExportField($this->invoice_id);
 						if ($this->barang_id->Exportable) $Doc->ExportField($this->barang_id);
 						if ($this->harga->Exportable) $Doc->ExportField($this->harga);

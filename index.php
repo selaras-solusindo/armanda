@@ -280,8 +280,6 @@ class cdefault {
 			$this->Page_Terminate("tb_kuitansilist.php");
 		if ($Security->AllowList(CurrentProjectID() . 'kuitansi.php'))
 			$this->Page_Terminate("kuitansi.php");
-		if ($Security->AllowList(CurrentProjectID() . 'Report1'))
-			$this->Page_Terminate("Report1report.php");
 		if ($Security->AllowList(CurrentProjectID() . 'tb_user'))
 			$this->Page_Terminate("tb_userlist.php");
 		if ($Security->IsLoggedIn()) {

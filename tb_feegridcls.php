@@ -313,8 +313,6 @@ class ctb_fee_grid extends ctb_fee {
 
 		// Set up list options
 		$this->SetupListOptions();
-		$this->id->SetVisibility();
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->invoice_id->SetVisibility();
 		$this->barang_id->SetVisibility();
 		$this->harga->SetVisibility();
@@ -965,6 +963,14 @@ class ctb_fee_grid extends ctb_fee {
 		$item->Visible = $Security->CanDelete();
 		$item->OnLeft = FALSE;
 
+		// "sequence"
+		$item = &$this->ListOptions->Add("sequence");
+		$item->CssStyle = "white-space: nowrap;";
+		$item->Visible = TRUE;
+		$item->OnLeft = TRUE; // Always on left
+		$item->ShowInDropDown = FALSE;
+		$item->ShowInButtonGroup = FALSE;
+
 		// Drop down button for ListOptions
 		$this->ListOptions->UseImageAndText = TRUE;
 		$this->ListOptions->UseDropDownButton = FALSE;
@@ -1017,6 +1023,10 @@ class ctb_fee_grid extends ctb_fee {
 				}
 			}
 		}
+
+		// "sequence"
+		$oListOpt = &$this->ListOptions->Items["sequence"];
+		$oListOpt->Body = ew_FormatSeqNo($this->RecCnt);
 		if ($this->CurrentMode == "view") { // View mode
 
 		// "view"
@@ -1158,8 +1168,6 @@ class ctb_fee_grid extends ctb_fee {
 
 	// Load default values
 	function LoadDefaultValues() {
-		$this->id->CurrentValue = NULL;
-		$this->id->OldValue = $this->id->CurrentValue;
 		$this->invoice_id->CurrentValue = NULL;
 		$this->invoice_id->OldValue = $this->invoice_id->CurrentValue;
 		$this->barang_id->CurrentValue = NULL;
@@ -1182,8 +1190,6 @@ class ctb_fee_grid extends ctb_fee {
 		// Load from form
 		global $objForm;
 		$objForm->FormName = $this->FormName;
-		if (!$this->id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
-			$this->id->setFormValue($objForm->GetValue("x_id"));
 		if (!$this->invoice_id->FldIsDetailKey) {
 			$this->invoice_id->setFormValue($objForm->GetValue("x_invoice_id"));
 		}
@@ -1212,6 +1218,8 @@ class ctb_fee_grid extends ctb_fee {
 			$this->keterangan->setFormValue($objForm->GetValue("x_keterangan"));
 		}
 		$this->keterangan->setOldValue($objForm->GetValue("o_keterangan"));
+		if (!$this->id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
+			$this->id->setFormValue($objForm->GetValue("x_id"));
 	}
 
 	// Restore form values
@@ -1374,10 +1382,6 @@ class ctb_fee_grid extends ctb_fee {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// id
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
-
 		// invoice_id
 		$this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
 		$this->invoice_id->ViewCustomAttributes = "";
@@ -1391,7 +1395,7 @@ class ctb_fee_grid extends ctb_fee {
 			$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 		$sWhereWrk = "";
-		$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+		$this->barang_id->LookupFilters = array("dx1" => "`nama`");
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1434,11 +1438,6 @@ class ctb_fee_grid extends ctb_fee {
 		$this->keterangan->ViewValue = $this->keterangan->CurrentValue;
 		$this->keterangan->ViewCustomAttributes = "";
 
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
-
 			// invoice_id
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
@@ -1475,9 +1474,7 @@ class ctb_fee_grid extends ctb_fee {
 			$this->keterangan->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
-			// id
 			// invoice_id
-
 			$this->invoice_id->EditAttrs["class"] = "form-control";
 			$this->invoice_id->EditCustomAttributes = "";
 			if ($this->invoice_id->getSessionValue() <> "") {
@@ -1498,7 +1495,7 @@ class ctb_fee_grid extends ctb_fee {
 				$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 			$sWhereWrk = "";
-			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+			$this->barang_id->LookupFilters = array("dx1" => "`nama`");
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1555,12 +1552,8 @@ class ctb_fee_grid extends ctb_fee {
 			$this->keterangan->PlaceHolder = ew_RemoveHtml($this->keterangan->FldCaption());
 
 			// Add refer script
-			// id
-
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-
 			// invoice_id
+
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
 
@@ -1589,12 +1582,6 @@ class ctb_fee_grid extends ctb_fee {
 			$this->keterangan->HrefValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
-			// id
-			$this->id->EditAttrs["class"] = "form-control";
-			$this->id->EditCustomAttributes = "";
-			$this->id->EditValue = $this->id->CurrentValue;
-			$this->id->ViewCustomAttributes = "";
-
 			// invoice_id
 			$this->invoice_id->EditAttrs["class"] = "form-control";
 			$this->invoice_id->EditCustomAttributes = "";
@@ -1616,7 +1603,7 @@ class ctb_fee_grid extends ctb_fee {
 				$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 			$sWhereWrk = "";
-			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+			$this->barang_id->LookupFilters = array("dx1" => "`nama`");
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1673,12 +1660,8 @@ class ctb_fee_grid extends ctb_fee {
 			$this->keterangan->PlaceHolder = ew_RemoveHtml($this->keterangan->FldCaption());
 
 			// Edit refer script
-			// id
-
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-
 			// invoice_id
+
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
 
@@ -2011,8 +1994,8 @@ class ctb_fee_grid extends ctb_fee {
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `barang_id` AS `LinkFld`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 			$sWhereWrk = "{filter}";
-			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`barang_id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$this->barang_id->LookupFilters = array("dx1" => "`nama`");
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => "`barang_id` = {filter_value}", "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -2031,7 +2014,7 @@ class ctb_fee_grid extends ctb_fee {
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld` FROM `tb_barang`";
 			$sWhereWrk = "`nama` LIKE '{query_value}%'";
-			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+			$this->barang_id->LookupFilters = array("dx1" => "`nama`");
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting

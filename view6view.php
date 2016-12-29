@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "tb_baranginfo.php" ?>
+<?php include_once "view6info.php" ?>
 <?php include_once "tb_userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$tb_barang_view = NULL; // Initialize page object first
+$view6_view = NULL; // Initialize page object first
 
-class ctb_barang_view extends ctb_barang {
+class cview6_view extends cview6 {
 
 	// Page ID
 	var $PageID = 'view';
@@ -25,10 +25,10 @@ class ctb_barang_view extends ctb_barang {
 	var $ProjectID = "{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}";
 
 	// Table name
-	var $TableName = 'tb_barang';
+	var $TableName = 'view6';
 
 	// Page object name
-	var $PageObjName = 'tb_barang_view';
+	var $PageObjName = 'view6_view';
 
 	// Page name
 	function PageName() {
@@ -73,12 +73,6 @@ class ctb_barang_view extends ctb_barang {
 	var $GridEditUrl;
 	var $MultiDeleteUrl;
 	var $MultiUpdateUrl;
-	var $AuditTrailOnAdd = FALSE;
-	var $AuditTrailOnEdit = FALSE;
-	var $AuditTrailOnDelete = FALSE;
-	var $AuditTrailOnView = FALSE;
-	var $AuditTrailOnViewData = FALSE;
-	var $AuditTrailOnSearch = FALSE;
 
 	// Message
 	function getMessage() {
@@ -264,15 +258,15 @@ class ctb_barang_view extends ctb_barang {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (tb_barang)
-		if (!isset($GLOBALS["tb_barang"]) || get_class($GLOBALS["tb_barang"]) == "ctb_barang") {
-			$GLOBALS["tb_barang"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["tb_barang"];
+		// Table object (view6)
+		if (!isset($GLOBALS["view6"]) || get_class($GLOBALS["view6"]) == "cview6") {
+			$GLOBALS["view6"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["view6"];
 		}
 		$KeyUrl = "";
-		if (@$_GET["barang_id"] <> "") {
-			$this->RecKey["barang_id"] = $_GET["barang_id"];
-			$KeyUrl .= "&amp;barang_id=" . urlencode($this->RecKey["barang_id"]);
+		if (@$_GET["id"] <> "") {
+			$this->RecKey["id"] = $_GET["id"];
+			$KeyUrl .= "&amp;id=" . urlencode($this->RecKey["id"]);
 		}
 		$this->ExportPrintUrl = $this->PageUrl() . "export=print" . $KeyUrl;
 		$this->ExportHtmlUrl = $this->PageUrl() . "export=html" . $KeyUrl;
@@ -291,7 +285,7 @@ class ctb_barang_view extends ctb_barang {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'tb_barang', TRUE);
+			define("EW_TABLE_NAME", 'view6', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -335,7 +329,7 @@ class ctb_barang_view extends ctb_barang {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
 			if ($Security->CanList())
-				$this->Page_Terminate(ew_GetUrl("tb_baranglist.php"));
+				$this->Page_Terminate(ew_GetUrl("view6list.php"));
 			else
 				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
@@ -356,9 +350,9 @@ class ctb_barang_view extends ctb_barang {
 			$this->setExportReturnUrl(ew_CurrentUrl());
 		}
 		$gsExportFile = $this->TableVar; // Get export file, used in header
-		if (@$_GET["barang_id"] <> "") {
+		if (@$_GET["id"] <> "") {
 			if ($gsExportFile <> "") $gsExportFile .= "_";
-			$gsExportFile .= ew_StripSlashes($_GET["barang_id"]);
+			$gsExportFile .= ew_StripSlashes($_GET["id"]);
 		}
 
 		// Get custom export parameters
@@ -384,7 +378,23 @@ class ctb_barang_view extends ctb_barang {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->nama->SetVisibility();
+		$this->id->SetVisibility();
+		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
+		$this->customer_id->SetVisibility();
+		$this->no_invoice->SetVisibility();
+		$this->tgl_invoice->SetVisibility();
+		$this->no_order->SetVisibility();
+		$this->no_referensi->SetVisibility();
+		$this->kegiatan->SetVisibility();
+		$this->tgl_pelaksanaan->SetVisibility();
+		$this->no_sertifikat->SetVisibility();
+		$this->keterangan->SetVisibility();
+		$this->total->SetVisibility();
+		$this->ppn->SetVisibility();
+		$this->total_ppn->SetVisibility();
+		$this->terbilang->SetVisibility();
+		$this->terbayar->SetVisibility();
+		$this->pasal23->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -416,13 +426,13 @@ class ctb_barang_view extends ctb_barang {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $tb_barang;
+		global $EW_EXPORT, $view6;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($tb_barang);
+				$doc = new $class($view6);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -488,14 +498,14 @@ class ctb_barang_view extends ctb_barang {
 		if ($this->Export == "")
 			$this->SetupBreadcrumb();
 		if ($this->IsPageRequest()) { // Validate request
-			if (@$_GET["barang_id"] <> "") {
-				$this->barang_id->setQueryStringValue($_GET["barang_id"]);
-				$this->RecKey["barang_id"] = $this->barang_id->QueryStringValue;
-			} elseif (@$_POST["barang_id"] <> "") {
-				$this->barang_id->setFormValue($_POST["barang_id"]);
-				$this->RecKey["barang_id"] = $this->barang_id->FormValue;
+			if (@$_GET["id"] <> "") {
+				$this->id->setQueryStringValue($_GET["id"]);
+				$this->RecKey["id"] = $this->id->QueryStringValue;
+			} elseif (@$_POST["id"] <> "") {
+				$this->id->setFormValue($_POST["id"]);
+				$this->RecKey["id"] = $this->id->FormValue;
 			} else {
-				$sReturnUrl = "tb_baranglist.php"; // Return to list
+				$sReturnUrl = "view6list.php"; // Return to list
 			}
 
 			// Get action
@@ -505,7 +515,7 @@ class ctb_barang_view extends ctb_barang {
 					if (!$this->LoadRow()) { // Load record based on key
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$sReturnUrl = "tb_baranglist.php"; // No matching record, return to list
+						$sReturnUrl = "view6list.php"; // No matching record, return to list
 					}
 			}
 
@@ -516,7 +526,7 @@ class ctb_barang_view extends ctb_barang {
 				exit();
 			}
 		} else {
-			$sReturnUrl = "tb_baranglist.php"; // Not page request, return to list
+			$sReturnUrl = "view6list.php"; // Not page request, return to list
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
@@ -550,15 +560,6 @@ class ctb_barang_view extends ctb_barang {
 		else
 			$item->Body = "<a class=\"ewAction ewEdit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("ViewPageEditLink") . "</a>";
 		$item->Visible = ($this->EditUrl <> "" && $Security->CanEdit());
-
-		// Copy
-		$item = &$option->Add("copy");
-		$copycaption = ew_HtmlTitle($Language->Phrase("ViewPageCopyLink"));
-		if ($this->IsModal) // Modal
-			$item->Body = "<a class=\"ewAction ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"javascript:void(0);\" onclick=\"ew_ModalDialogShow({lnk:this,url:'" . ew_HtmlEncode($this->CopyUrl) . "',caption:'" . $copycaption . "'});\">" . $Language->Phrase("ViewPageCopyLink") . "</a>";
-		else
-			$item->Body = "<a class=\"ewAction ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("ViewPageCopyLink") . "</a>";
-		$item->Visible = ($this->CopyUrl <> "" && $Security->CanAdd());
 
 		// Delete
 		$item = &$option->Add("delete");
@@ -670,17 +671,44 @@ class ctb_barang_view extends ctb_barang {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		if ($this->AuditTrailOnView) $this->WriteAuditTrailOnView($row);
-		$this->barang_id->setDbValue($rs->fields('barang_id'));
-		$this->nama->setDbValue($rs->fields('nama'));
+		$this->id->setDbValue($rs->fields('id'));
+		$this->customer_id->setDbValue($rs->fields('customer_id'));
+		$this->no_invoice->setDbValue($rs->fields('no_invoice'));
+		$this->tgl_invoice->setDbValue($rs->fields('tgl_invoice'));
+		$this->no_order->setDbValue($rs->fields('no_order'));
+		$this->no_referensi->setDbValue($rs->fields('no_referensi'));
+		$this->kegiatan->setDbValue($rs->fields('kegiatan'));
+		$this->tgl_pelaksanaan->setDbValue($rs->fields('tgl_pelaksanaan'));
+		$this->no_sertifikat->setDbValue($rs->fields('no_sertifikat'));
+		$this->keterangan->setDbValue($rs->fields('keterangan'));
+		$this->total->setDbValue($rs->fields('total'));
+		$this->ppn->setDbValue($rs->fields('ppn'));
+		$this->total_ppn->setDbValue($rs->fields('total_ppn'));
+		$this->terbilang->setDbValue($rs->fields('terbilang'));
+		$this->terbayar->setDbValue($rs->fields('terbayar'));
+		$this->pasal23->setDbValue($rs->fields('pasal23'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->barang_id->DbValue = $row['barang_id'];
-		$this->nama->DbValue = $row['nama'];
+		$this->id->DbValue = $row['id'];
+		$this->customer_id->DbValue = $row['customer_id'];
+		$this->no_invoice->DbValue = $row['no_invoice'];
+		$this->tgl_invoice->DbValue = $row['tgl_invoice'];
+		$this->no_order->DbValue = $row['no_order'];
+		$this->no_referensi->DbValue = $row['no_referensi'];
+		$this->kegiatan->DbValue = $row['kegiatan'];
+		$this->tgl_pelaksanaan->DbValue = $row['tgl_pelaksanaan'];
+		$this->no_sertifikat->DbValue = $row['no_sertifikat'];
+		$this->keterangan->DbValue = $row['keterangan'];
+		$this->total->DbValue = $row['total'];
+		$this->ppn->DbValue = $row['ppn'];
+		$this->total_ppn->DbValue = $row['total_ppn'];
+		$this->terbilang->DbValue = $row['terbilang'];
+		$this->terbayar->DbValue = $row['terbayar'];
+		$this->pasal23->DbValue = $row['pasal23'];
 	}
 
 	// Render row values based on field settings
@@ -695,23 +723,182 @@ class ctb_barang_view extends ctb_barang {
 		$this->ListUrl = $this->GetListUrl();
 		$this->SetupOtherOptions();
 
+		// Convert decimal values if posted back
+		if ($this->total->FormValue == $this->total->CurrentValue && is_numeric(ew_StrToFloat($this->total->CurrentValue)))
+			$this->total->CurrentValue = ew_StrToFloat($this->total->CurrentValue);
+
+		// Convert decimal values if posted back
+		if ($this->total_ppn->FormValue == $this->total_ppn->CurrentValue && is_numeric(ew_StrToFloat($this->total_ppn->CurrentValue)))
+			$this->total_ppn->CurrentValue = ew_StrToFloat($this->total_ppn->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// barang_id
-		// nama
+		// id
+		// customer_id
+		// no_invoice
+		// tgl_invoice
+		// no_order
+		// no_referensi
+		// kegiatan
+		// tgl_pelaksanaan
+		// no_sertifikat
+		// keterangan
+		// total
+		// ppn
+		// total_ppn
+		// terbilang
+		// terbayar
+		// pasal23
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// nama
-		$this->nama->ViewValue = $this->nama->CurrentValue;
-		$this->nama->ViewCustomAttributes = "";
+		// id
+		$this->id->ViewValue = $this->id->CurrentValue;
+		$this->id->ViewCustomAttributes = "";
 
-			// nama
-			$this->nama->LinkCustomAttributes = "";
-			$this->nama->HrefValue = "";
-			$this->nama->TooltipValue = "";
+		// customer_id
+		$this->customer_id->ViewValue = $this->customer_id->CurrentValue;
+		$this->customer_id->ViewCustomAttributes = "";
+
+		// no_invoice
+		$this->no_invoice->ViewValue = $this->no_invoice->CurrentValue;
+		$this->no_invoice->ViewCustomAttributes = "";
+
+		// tgl_invoice
+		$this->tgl_invoice->ViewValue = $this->tgl_invoice->CurrentValue;
+		$this->tgl_invoice->ViewValue = ew_FormatDateTime($this->tgl_invoice->ViewValue, 0);
+		$this->tgl_invoice->ViewCustomAttributes = "";
+
+		// no_order
+		$this->no_order->ViewValue = $this->no_order->CurrentValue;
+		$this->no_order->ViewCustomAttributes = "";
+
+		// no_referensi
+		$this->no_referensi->ViewValue = $this->no_referensi->CurrentValue;
+		$this->no_referensi->ViewCustomAttributes = "";
+
+		// kegiatan
+		$this->kegiatan->ViewValue = $this->kegiatan->CurrentValue;
+		$this->kegiatan->ViewCustomAttributes = "";
+
+		// tgl_pelaksanaan
+		$this->tgl_pelaksanaan->ViewValue = $this->tgl_pelaksanaan->CurrentValue;
+		$this->tgl_pelaksanaan->ViewValue = ew_FormatDateTime($this->tgl_pelaksanaan->ViewValue, 0);
+		$this->tgl_pelaksanaan->ViewCustomAttributes = "";
+
+		// no_sertifikat
+		$this->no_sertifikat->ViewValue = $this->no_sertifikat->CurrentValue;
+		$this->no_sertifikat->ViewCustomAttributes = "";
+
+		// keterangan
+		$this->keterangan->ViewValue = $this->keterangan->CurrentValue;
+		$this->keterangan->ViewCustomAttributes = "";
+
+		// total
+		$this->total->ViewValue = $this->total->CurrentValue;
+		$this->total->ViewCustomAttributes = "";
+
+		// ppn
+		$this->ppn->ViewValue = $this->ppn->CurrentValue;
+		$this->ppn->ViewCustomAttributes = "";
+
+		// total_ppn
+		$this->total_ppn->ViewValue = $this->total_ppn->CurrentValue;
+		$this->total_ppn->ViewCustomAttributes = "";
+
+		// terbilang
+		$this->terbilang->ViewValue = $this->terbilang->CurrentValue;
+		$this->terbilang->ViewCustomAttributes = "";
+
+		// terbayar
+		$this->terbayar->ViewValue = $this->terbayar->CurrentValue;
+		$this->terbayar->ViewCustomAttributes = "";
+
+		// pasal23
+		$this->pasal23->ViewValue = $this->pasal23->CurrentValue;
+		$this->pasal23->ViewCustomAttributes = "";
+
+			// id
+			$this->id->LinkCustomAttributes = "";
+			$this->id->HrefValue = "";
+			$this->id->TooltipValue = "";
+
+			// customer_id
+			$this->customer_id->LinkCustomAttributes = "";
+			$this->customer_id->HrefValue = "";
+			$this->customer_id->TooltipValue = "";
+
+			// no_invoice
+			$this->no_invoice->LinkCustomAttributes = "";
+			$this->no_invoice->HrefValue = "";
+			$this->no_invoice->TooltipValue = "";
+
+			// tgl_invoice
+			$this->tgl_invoice->LinkCustomAttributes = "";
+			$this->tgl_invoice->HrefValue = "";
+			$this->tgl_invoice->TooltipValue = "";
+
+			// no_order
+			$this->no_order->LinkCustomAttributes = "";
+			$this->no_order->HrefValue = "";
+			$this->no_order->TooltipValue = "";
+
+			// no_referensi
+			$this->no_referensi->LinkCustomAttributes = "";
+			$this->no_referensi->HrefValue = "";
+			$this->no_referensi->TooltipValue = "";
+
+			// kegiatan
+			$this->kegiatan->LinkCustomAttributes = "";
+			$this->kegiatan->HrefValue = "";
+			$this->kegiatan->TooltipValue = "";
+
+			// tgl_pelaksanaan
+			$this->tgl_pelaksanaan->LinkCustomAttributes = "";
+			$this->tgl_pelaksanaan->HrefValue = "";
+			$this->tgl_pelaksanaan->TooltipValue = "";
+
+			// no_sertifikat
+			$this->no_sertifikat->LinkCustomAttributes = "";
+			$this->no_sertifikat->HrefValue = "";
+			$this->no_sertifikat->TooltipValue = "";
+
+			// keterangan
+			$this->keterangan->LinkCustomAttributes = "";
+			$this->keterangan->HrefValue = "";
+			$this->keterangan->TooltipValue = "";
+
+			// total
+			$this->total->LinkCustomAttributes = "";
+			$this->total->HrefValue = "";
+			$this->total->TooltipValue = "";
+
+			// ppn
+			$this->ppn->LinkCustomAttributes = "";
+			$this->ppn->HrefValue = "";
+			$this->ppn->TooltipValue = "";
+
+			// total_ppn
+			$this->total_ppn->LinkCustomAttributes = "";
+			$this->total_ppn->HrefValue = "";
+			$this->total_ppn->TooltipValue = "";
+
+			// terbilang
+			$this->terbilang->LinkCustomAttributes = "";
+			$this->terbilang->HrefValue = "";
+			$this->terbilang->TooltipValue = "";
+
+			// terbayar
+			$this->terbayar->LinkCustomAttributes = "";
+			$this->terbayar->HrefValue = "";
+			$this->terbayar->TooltipValue = "";
+
+			// pasal23
+			$this->pasal23->LinkCustomAttributes = "";
+			$this->pasal23->HrefValue = "";
+			$this->pasal23->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -761,7 +948,7 @@ class ctb_barang_view extends ctb_barang {
 		// Export to Email
 		$item = &$this->ExportOptions->Add("email");
 		$url = "";
-		$item->Body = "<button id=\"emf_tb_barang\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_tb_barang',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ftb_barangview,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
+		$item->Body = "<button id=\"emf_view6\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_view6',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.fview6view,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
 		$item->Visible = TRUE;
 
 		// Drop down button for export
@@ -971,7 +1158,7 @@ class ctb_barang_view extends ctb_barang {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("tb_baranglist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("view6list.php"), "", $this->TableVar, TRUE);
 		$PageId = "view";
 		$Breadcrumb->Add("view", $PageId, $url);
 	}
@@ -990,13 +1177,6 @@ class ctb_barang_view extends ctb_barang {
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
 		}
-	}
-
-	// Write Audit Trail start/end for grid update
-	function WriteAuditTrailDummy($typ) {
-		$table = 'tb_barang';
-		$usr = CurrentUserName();
-		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
 	// Page Load event
@@ -1090,30 +1270,30 @@ class ctb_barang_view extends ctb_barang {
 <?php
 
 // Create page object
-if (!isset($tb_barang_view)) $tb_barang_view = new ctb_barang_view();
+if (!isset($view6_view)) $view6_view = new cview6_view();
 
 // Page init
-$tb_barang_view->Page_Init();
+$view6_view->Page_Init();
 
 // Page main
-$tb_barang_view->Page_Main();
+$view6_view->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$tb_barang_view->Page_Render();
+$view6_view->Page_Render();
 ?>
 <?php include_once "header.php" ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($view6->Export == "") { ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "view";
-var CurrentForm = ftb_barangview = new ew_Form("ftb_barangview", "view");
+var CurrentForm = fview6view = new ew_Form("fview6view", "view");
 
 // Form_CustomValidate event
-ftb_barangview.Form_CustomValidate = 
+fview6view.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -1122,9 +1302,9 @@ ftb_barangview.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ftb_barangview.ValidateRequired = true;
+fview6view.ValidateRequired = true;
 <?php } else { ?>
-ftb_barangview.ValidateRequired = false; 
+fview6view.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
@@ -1136,63 +1316,228 @@ ftb_barangview.ValidateRequired = false;
 // Write your client script here, no need to add script tags.
 </script>
 <?php } ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($view6->Export == "") { ?>
 <div class="ewToolbar">
-<?php if (!$tb_barang_view->IsModal) { ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if (!$view6_view->IsModal) { ?>
+<?php if ($view6->Export == "") { ?>
 <?php $Breadcrumb->Render(); ?>
 <?php } ?>
 <?php } ?>
-<?php $tb_barang_view->ExportOptions->Render("body") ?>
+<?php $view6_view->ExportOptions->Render("body") ?>
 <?php
-	foreach ($tb_barang_view->OtherOptions as &$option)
+	foreach ($view6_view->OtherOptions as &$option)
 		$option->Render("body");
 ?>
-<?php if (!$tb_barang_view->IsModal) { ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if (!$view6_view->IsModal) { ?>
+<?php if ($view6->Export == "") { ?>
 <?php echo $Language->SelectionForm(); ?>
 <?php } ?>
 <?php } ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<?php $tb_barang_view->ShowPageHeader(); ?>
+<?php $view6_view->ShowPageHeader(); ?>
 <?php
-$tb_barang_view->ShowMessage();
+$view6_view->ShowMessage();
 ?>
-<form name="ftb_barangview" id="ftb_barangview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($tb_barang_view->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_barang_view->Token ?>">
+<form name="fview6view" id="fview6view" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($view6_view->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $view6_view->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="tb_barang">
-<?php if ($tb_barang_view->IsModal) { ?>
+<input type="hidden" name="t" value="view6">
+<?php if ($view6_view->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <table class="table table-bordered table-striped ewViewTable">
-<?php if ($tb_barang->nama->Visible) { // nama ?>
-	<tr id="r_nama">
-		<td><span id="elh_tb_barang_nama"><?php echo $tb_barang->nama->FldCaption() ?></span></td>
-		<td data-name="nama"<?php echo $tb_barang->nama->CellAttributes() ?>>
-<span id="el_tb_barang_nama">
-<span<?php echo $tb_barang->nama->ViewAttributes() ?>>
-<?php echo $tb_barang->nama->ViewValue ?></span>
+<?php if ($view6->id->Visible) { // id ?>
+	<tr id="r_id">
+		<td><span id="elh_view6_id"><?php echo $view6->id->FldCaption() ?></span></td>
+		<td data-name="id"<?php echo $view6->id->CellAttributes() ?>>
+<span id="el_view6_id">
+<span<?php echo $view6->id->ViewAttributes() ?>>
+<?php echo $view6->id->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->customer_id->Visible) { // customer_id ?>
+	<tr id="r_customer_id">
+		<td><span id="elh_view6_customer_id"><?php echo $view6->customer_id->FldCaption() ?></span></td>
+		<td data-name="customer_id"<?php echo $view6->customer_id->CellAttributes() ?>>
+<span id="el_view6_customer_id">
+<span<?php echo $view6->customer_id->ViewAttributes() ?>>
+<?php echo $view6->customer_id->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->no_invoice->Visible) { // no_invoice ?>
+	<tr id="r_no_invoice">
+		<td><span id="elh_view6_no_invoice"><?php echo $view6->no_invoice->FldCaption() ?></span></td>
+		<td data-name="no_invoice"<?php echo $view6->no_invoice->CellAttributes() ?>>
+<span id="el_view6_no_invoice">
+<span<?php echo $view6->no_invoice->ViewAttributes() ?>>
+<?php echo $view6->no_invoice->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->tgl_invoice->Visible) { // tgl_invoice ?>
+	<tr id="r_tgl_invoice">
+		<td><span id="elh_view6_tgl_invoice"><?php echo $view6->tgl_invoice->FldCaption() ?></span></td>
+		<td data-name="tgl_invoice"<?php echo $view6->tgl_invoice->CellAttributes() ?>>
+<span id="el_view6_tgl_invoice">
+<span<?php echo $view6->tgl_invoice->ViewAttributes() ?>>
+<?php echo $view6->tgl_invoice->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->no_order->Visible) { // no_order ?>
+	<tr id="r_no_order">
+		<td><span id="elh_view6_no_order"><?php echo $view6->no_order->FldCaption() ?></span></td>
+		<td data-name="no_order"<?php echo $view6->no_order->CellAttributes() ?>>
+<span id="el_view6_no_order">
+<span<?php echo $view6->no_order->ViewAttributes() ?>>
+<?php echo $view6->no_order->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->no_referensi->Visible) { // no_referensi ?>
+	<tr id="r_no_referensi">
+		<td><span id="elh_view6_no_referensi"><?php echo $view6->no_referensi->FldCaption() ?></span></td>
+		<td data-name="no_referensi"<?php echo $view6->no_referensi->CellAttributes() ?>>
+<span id="el_view6_no_referensi">
+<span<?php echo $view6->no_referensi->ViewAttributes() ?>>
+<?php echo $view6->no_referensi->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->kegiatan->Visible) { // kegiatan ?>
+	<tr id="r_kegiatan">
+		<td><span id="elh_view6_kegiatan"><?php echo $view6->kegiatan->FldCaption() ?></span></td>
+		<td data-name="kegiatan"<?php echo $view6->kegiatan->CellAttributes() ?>>
+<span id="el_view6_kegiatan">
+<span<?php echo $view6->kegiatan->ViewAttributes() ?>>
+<?php echo $view6->kegiatan->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->tgl_pelaksanaan->Visible) { // tgl_pelaksanaan ?>
+	<tr id="r_tgl_pelaksanaan">
+		<td><span id="elh_view6_tgl_pelaksanaan"><?php echo $view6->tgl_pelaksanaan->FldCaption() ?></span></td>
+		<td data-name="tgl_pelaksanaan"<?php echo $view6->tgl_pelaksanaan->CellAttributes() ?>>
+<span id="el_view6_tgl_pelaksanaan">
+<span<?php echo $view6->tgl_pelaksanaan->ViewAttributes() ?>>
+<?php echo $view6->tgl_pelaksanaan->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->no_sertifikat->Visible) { // no_sertifikat ?>
+	<tr id="r_no_sertifikat">
+		<td><span id="elh_view6_no_sertifikat"><?php echo $view6->no_sertifikat->FldCaption() ?></span></td>
+		<td data-name="no_sertifikat"<?php echo $view6->no_sertifikat->CellAttributes() ?>>
+<span id="el_view6_no_sertifikat">
+<span<?php echo $view6->no_sertifikat->ViewAttributes() ?>>
+<?php echo $view6->no_sertifikat->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->keterangan->Visible) { // keterangan ?>
+	<tr id="r_keterangan">
+		<td><span id="elh_view6_keterangan"><?php echo $view6->keterangan->FldCaption() ?></span></td>
+		<td data-name="keterangan"<?php echo $view6->keterangan->CellAttributes() ?>>
+<span id="el_view6_keterangan">
+<span<?php echo $view6->keterangan->ViewAttributes() ?>>
+<?php echo $view6->keterangan->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->total->Visible) { // total ?>
+	<tr id="r_total">
+		<td><span id="elh_view6_total"><?php echo $view6->total->FldCaption() ?></span></td>
+		<td data-name="total"<?php echo $view6->total->CellAttributes() ?>>
+<span id="el_view6_total">
+<span<?php echo $view6->total->ViewAttributes() ?>>
+<?php echo $view6->total->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->ppn->Visible) { // ppn ?>
+	<tr id="r_ppn">
+		<td><span id="elh_view6_ppn"><?php echo $view6->ppn->FldCaption() ?></span></td>
+		<td data-name="ppn"<?php echo $view6->ppn->CellAttributes() ?>>
+<span id="el_view6_ppn">
+<span<?php echo $view6->ppn->ViewAttributes() ?>>
+<?php echo $view6->ppn->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->total_ppn->Visible) { // total_ppn ?>
+	<tr id="r_total_ppn">
+		<td><span id="elh_view6_total_ppn"><?php echo $view6->total_ppn->FldCaption() ?></span></td>
+		<td data-name="total_ppn"<?php echo $view6->total_ppn->CellAttributes() ?>>
+<span id="el_view6_total_ppn">
+<span<?php echo $view6->total_ppn->ViewAttributes() ?>>
+<?php echo $view6->total_ppn->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->terbilang->Visible) { // terbilang ?>
+	<tr id="r_terbilang">
+		<td><span id="elh_view6_terbilang"><?php echo $view6->terbilang->FldCaption() ?></span></td>
+		<td data-name="terbilang"<?php echo $view6->terbilang->CellAttributes() ?>>
+<span id="el_view6_terbilang">
+<span<?php echo $view6->terbilang->ViewAttributes() ?>>
+<?php echo $view6->terbilang->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->terbayar->Visible) { // terbayar ?>
+	<tr id="r_terbayar">
+		<td><span id="elh_view6_terbayar"><?php echo $view6->terbayar->FldCaption() ?></span></td>
+		<td data-name="terbayar"<?php echo $view6->terbayar->CellAttributes() ?>>
+<span id="el_view6_terbayar">
+<span<?php echo $view6->terbayar->ViewAttributes() ?>>
+<?php echo $view6->terbayar->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($view6->pasal23->Visible) { // pasal23 ?>
+	<tr id="r_pasal23">
+		<td><span id="elh_view6_pasal23"><?php echo $view6->pasal23->FldCaption() ?></span></td>
+		<td data-name="pasal23"<?php echo $view6->pasal23->CellAttributes() ?>>
+<span id="el_view6_pasal23">
+<span<?php echo $view6->pasal23->ViewAttributes() ?>>
+<?php echo $view6->pasal23->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
 </table>
 </form>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($view6->Export == "") { ?>
 <script type="text/javascript">
-ftb_barangview.Init();
+fview6view.Init();
 </script>
 <?php } ?>
 <?php
-$tb_barang_view->ShowPageFooter();
+$view6_view->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($view6->Export == "") { ?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
@@ -1202,5 +1547,5 @@ if (EW_DEBUG_ENABLED)
 <?php } ?>
 <?php include_once "footer.php" ?>
 <?php
-$tb_barang_view->Page_Terminate();
+$view6_view->Page_Terminate();
 ?>

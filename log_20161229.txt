@@ -7,3 +7,35 @@ date/time	script	user	action	table	field	key value	old value	new value
 2016/12/29 09:45:36	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	invoice_id	2		5
 2016/12/29 09:45:36	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	no_kuitansi	2		NK131313
 2016/12/29 09:45:36	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	kuitansi_id	2		2
+2016/12/29 12:46:50	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	invoice_id	3		4
+2016/12/29 12:46:50	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	no_kuitansi	3		cc
+2016/12/29 12:46:50	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	kuitansi_id	3		3
+2016/12/29 13:30:04	/armanda/tb_kuitansidelete.php	admin2	*** Batch delete begin ***	tb_kuitansi				
+2016/12/29 13:30:04	/armanda/tb_kuitansidelete.php	admin2	D	tb_kuitansi	kuitansi_id	3	3	
+2016/12/29 13:30:04	/armanda/tb_kuitansidelete.php	admin2	D	tb_kuitansi	invoice_id	3	4	
+2016/12/29 13:30:04	/armanda/tb_kuitansidelete.php	admin2	D	tb_kuitansi	no_kuitansi	3	cc	
+2016/12/29 13:30:04	/armanda/tb_kuitansidelete.php	admin2	*** Batch delete successful ***	tb_kuitansi				
+2016/12/29 13:30:11	/armanda/tb_kuitansidelete.php	admin2	*** Batch delete begin ***	tb_kuitansi				
+2016/12/29 13:30:11	/armanda/tb_kuitansidelete.php	admin2	D	tb_kuitansi	kuitansi_id	2	2	
+2016/12/29 13:30:11	/armanda/tb_kuitansidelete.php	admin2	D	tb_kuitansi	invoice_id	2	5	
+2016/12/29 13:30:11	/armanda/tb_kuitansidelete.php	admin2	D	tb_kuitansi	no_kuitansi	2	NK131313	
+2016/12/29 13:30:11	/armanda/tb_kuitansidelete.php	admin2	*** Batch delete successful ***	tb_kuitansi				
+2016/12/29 13:30:33	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	invoice_id	4		5
+2016/12/29 13:30:33	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	no_kuitansi	4		a1
+2016/12/29 13:30:33	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	kuitansi_id	4		4
+2016/12/29 13:43:30	/armanda/tb_kuitansidelete.php	admin2	*** Batch delete begin ***	tb_kuitansi				
+2016/12/29 13:43:30	/armanda/tb_kuitansidelete.php	admin2	D	tb_kuitansi	kuitansi_id	4	4	
+2016/12/29 13:43:30	/armanda/tb_kuitansidelete.php	admin2	D	tb_kuitansi	invoice_id	4	5	
+2016/12/29 13:43:30	/armanda/tb_kuitansidelete.php	admin2	D	tb_kuitansi	no_kuitansi	4	a1	
+2016/12/29 13:43:30	/armanda/tb_kuitansidelete.php	admin2	*** Batch delete successful ***	tb_kuitansi				
+2016/12/29 13:43:45	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	invoice_id	5		5
+2016/12/29 13:43:45	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	no_kuitansi	5		a2
+2016/12/29 13:43:45	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	kuitansi_id	5		5
+2016/12/29 13:50:07	/armanda/tb_kuitansidelete.php	admin2	*** Batch delete begin ***	tb_kuitansi				
+2016/12/29 13:50:07	/armanda/tb_kuitansidelete.php	admin2	D	tb_kuitansi	kuitansi_id	5	5	
+2016/12/29 13:50:07	/armanda/tb_kuitansidelete.php	admin2	D	tb_kuitansi	invoice_id	5	5	
+2016/12/29 13:50:07	/armanda/tb_kuitansidelete.php	admin2	D	tb_kuitansi	no_kuitansi	5	a2	
+2016/12/29 13:50:07	/armanda/tb_kuitansidelete.php	admin2	*** Batch delete successful ***	tb_kuitansi				
+2016/12/29 13:51:27	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	invoice_id	6		5
+2016/12/29 13:51:27	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	no_kuitansi	6		a3
+2016/12/29 13:51:27	/armanda/tb_kuitansiadd.php	admin2	A	tb_kuitansi	kuitansi_id	6		6

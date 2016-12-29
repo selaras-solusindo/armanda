@@ -384,8 +384,6 @@ class ctb_customer_view extends ctb_customer {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->id->SetVisibility();
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->nama->SetVisibility();
 		$this->alamat->SetVisibility();
 		$this->kota->SetVisibility();
@@ -489,6 +487,10 @@ class ctb_customer_view extends ctb_customer {
 		$bLoadCurrentRecord = FALSE;
 		$sReturnUrl = "";
 		$bMatchRecord = FALSE;
+
+		// Set up Breadcrumb
+		if ($this->Export == "")
+			$this->SetupBreadcrumb();
 		if ($this->IsPageRequest()) { // Validate request
 			if (@$_GET["id"] <> "") {
 				$this->id->setQueryStringValue($_GET["id"]);
@@ -522,10 +524,6 @@ class ctb_customer_view extends ctb_customer {
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
-
-		// Set up Breadcrumb
-		if ($this->Export == "")
-			$this->SetupBreadcrumb();
 
 		// Render row
 		$this->RowType = EW_ROWTYPE_VIEW;
@@ -722,10 +720,6 @@ class ctb_customer_view extends ctb_customer {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// id
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
-
 		// nama
 		$this->nama->ViewValue = $this->nama->CurrentValue;
 		$this->nama->ViewCustomAttributes = "";
@@ -745,11 +739,6 @@ class ctb_customer_view extends ctb_customer {
 		// no_npwp
 		$this->no_npwp->ViewValue = $this->no_npwp->CurrentValue;
 		$this->no_npwp->ViewCustomAttributes = "";
-
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
 
 			// nama
 			$this->nama->LinkCustomAttributes = "";
@@ -1232,17 +1221,6 @@ $tb_customer_view->ShowMessage();
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <table class="table table-bordered table-striped ewViewTable">
-<?php if ($tb_customer->id->Visible) { // id ?>
-	<tr id="r_id">
-		<td><span id="elh_tb_customer_id"><?php echo $tb_customer->id->FldCaption() ?></span></td>
-		<td data-name="id"<?php echo $tb_customer->id->CellAttributes() ?>>
-<span id="el_tb_customer_id">
-<span<?php echo $tb_customer->id->ViewAttributes() ?>>
-<?php echo $tb_customer->id->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
 <?php if ($tb_customer->nama->Visible) { // nama ?>
 	<tr id="r_nama">
 		<td><span id="elh_tb_customer_nama"><?php echo $tb_customer->nama->FldCaption() ?></span></td>

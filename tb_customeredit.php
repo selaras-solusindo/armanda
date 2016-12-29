@@ -286,8 +286,6 @@ class ctb_customer_edit extends ctb_customer {
 		// Create form object
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->id->SetVisibility();
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->nama->SetVisibility();
 		$this->alamat->SetVisibility();
 		$this->kota->SetVisibility();
@@ -397,6 +395,9 @@ class ctb_customer_edit extends ctb_customer {
 			$this->id->setQueryStringValue($_GET["id"]);
 		}
 
+		// Set up Breadcrumb
+		$this->SetupBreadcrumb();
+
 		// Process form if post back
 		if (@$_POST["a_edit"] <> "") {
 			$this->CurrentAction = $_POST["a_edit"]; // Get action code
@@ -442,9 +443,6 @@ class ctb_customer_edit extends ctb_customer {
 					$this->RestoreFormValues(); // Restore form values if update failed
 				}
 		}
-
-		// Set up Breadcrumb
-		$this->SetupBreadcrumb();
 
 		// Render the record
 		$this->RowType = EW_ROWTYPE_EDIT; // Render as Edit
@@ -500,8 +498,6 @@ class ctb_customer_edit extends ctb_customer {
 
 		// Load from form
 		global $objForm;
-		if (!$this->id->FldIsDetailKey)
-			$this->id->setFormValue($objForm->GetValue("x_id"));
 		if (!$this->nama->FldIsDetailKey) {
 			$this->nama->setFormValue($objForm->GetValue("x_nama"));
 		}
@@ -517,6 +513,8 @@ class ctb_customer_edit extends ctb_customer {
 		if (!$this->no_npwp->FldIsDetailKey) {
 			$this->no_npwp->setFormValue($objForm->GetValue("x_no_npwp"));
 		}
+		if (!$this->id->FldIsDetailKey)
+			$this->id->setFormValue($objForm->GetValue("x_id"));
 	}
 
 	// Restore form values
@@ -599,10 +597,6 @@ class ctb_customer_edit extends ctb_customer {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// id
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
-
 		// nama
 		$this->nama->ViewValue = $this->nama->CurrentValue;
 		$this->nama->ViewCustomAttributes = "";
@@ -622,11 +616,6 @@ class ctb_customer_edit extends ctb_customer {
 		// no_npwp
 		$this->no_npwp->ViewValue = $this->no_npwp->CurrentValue;
 		$this->no_npwp->ViewCustomAttributes = "";
-
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
 
 			// nama
 			$this->nama->LinkCustomAttributes = "";
@@ -653,12 +642,6 @@ class ctb_customer_edit extends ctb_customer {
 			$this->no_npwp->HrefValue = "";
 			$this->no_npwp->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
-
-			// id
-			$this->id->EditAttrs["class"] = "form-control";
-			$this->id->EditCustomAttributes = "";
-			$this->id->EditValue = $this->id->CurrentValue;
-			$this->id->ViewCustomAttributes = "";
 
 			// nama
 			$this->nama->EditAttrs["class"] = "form-control";
@@ -691,12 +674,8 @@ class ctb_customer_edit extends ctb_customer {
 			$this->no_npwp->PlaceHolder = ew_RemoveHtml($this->no_npwp->FldCaption());
 
 			// Edit refer script
-			// id
-
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-
 			// nama
+
 			$this->nama->LinkCustomAttributes = "";
 			$this->nama->HrefValue = "";
 
@@ -1102,18 +1081,6 @@ $tb_customer_edit->ShowMessage();
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <div>
-<?php if ($tb_customer->id->Visible) { // id ?>
-	<div id="r_id" class="form-group">
-		<label id="elh_tb_customer_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_customer->id->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $tb_customer->id->CellAttributes() ?>>
-<span id="el_tb_customer_id">
-<span<?php echo $tb_customer->id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $tb_customer->id->EditValue ?></p></span>
-</span>
-<input type="hidden" data-table="tb_customer" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($tb_customer->id->CurrentValue) ?>">
-<?php echo $tb_customer->id->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
 <?php if ($tb_customer->nama->Visible) { // nama ?>
 	<div id="r_nama" class="form-group">
 		<label id="elh_tb_customer_nama" for="x_nama" class="col-sm-2 control-label ewLabel"><?php echo $tb_customer->nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
@@ -1165,6 +1132,7 @@ $tb_customer_edit->ShowMessage();
 	</div>
 <?php } ?>
 </div>
+<input type="hidden" data-table="tb_customer" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($tb_customer->id->CurrentValue) ?>">
 <?php if (!$tb_customer_edit->IsModal) { ?>
 <div class="form-group">
 	<div class="col-sm-offset-2 col-sm-10">

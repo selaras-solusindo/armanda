@@ -411,8 +411,6 @@ class ctb_barang_list extends ctb_barang {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->barang_id->SetVisibility();
-		$this->barang_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->nama->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
@@ -761,16 +759,9 @@ class ctb_barang_list extends ctb_barang {
 	// Process filter list
 	function ProcessFilterList() {
 		global $UserProfile;
-		if (@$_POST["ajax"] == "savefilters") { // Save filter request (Ajax)
+		if (@$_POST["cmd"] == "savefilters") {
 			$filters = ew_StripSlashes(@$_POST["filters"]);
 			$UserProfile->SetSearchFilters(CurrentUserName(), "ftb_baranglistsrch", $filters);
-
-			// Clean output buffer
-			if (!EW_DEBUG_ENABLED && ob_get_length())
-				ob_end_clean();
-			echo ew_ArrayToJson(array(array("success" => TRUE))); // Success
-			$this->Page_Terminate();
-			exit();
 		} elseif (@$_POST["cmd"] == "resetfilter") {
 			$this->RestoreFilterList();
 		}
@@ -812,7 +803,7 @@ class ctb_barang_list extends ctb_barang {
 	}
 
 	// Build basic search SQL
-	function BuildBasicSearchSQL(&$Where, &$Fld, $arKeywords, $type) {
+	function BuildBasicSearchSql(&$Where, &$Fld, $arKeywords, $type) {
 		$sDefCond = ($type == "OR") ? "OR" : "AND";
 		$arSQL = array(); // Array for SQL parts
 		$arCond = array(); // Array for search conditions
@@ -837,7 +828,7 @@ class ctb_barang_list extends ctb_barang {
 						$sWrk = $Fld->FldExpression . " IS NULL";
 					} elseif ($Keyword == EW_NOT_NULL_VALUE) {
 						$sWrk = $Fld->FldExpression . " IS NOT NULL";
-					} elseif ($Fld->FldIsVirtual) {
+					} elseif ($Fld->FldIsVirtual && $Fld->FldVirtualSearch) {
 						$sWrk = $Fld->FldVirtualExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
 					} elseif ($Fld->FldDataType != EW_DATATYPE_NUMBER || is_numeric($Keyword)) {
 						$sWrk = $Fld->FldBasicSearchExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
@@ -972,7 +963,6 @@ class ctb_barang_list extends ctb_barang {
 		if (@$_GET["order"] <> "") {
 			$this->CurrentOrder = ew_StripSlashes(@$_GET["order"]);
 			$this->CurrentOrderType = @$_GET["ordertype"];
-			$this->UpdateSort($this->barang_id); // barang_id
 			$this->UpdateSort($this->nama); // nama
 			$this->setStartRecordNumber(1); // Reset start position
 		}
@@ -1006,7 +996,6 @@ class ctb_barang_list extends ctb_barang {
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
-				$this->barang_id->setSort("");
 				$this->nama->setSort("");
 			}
 
@@ -1066,6 +1055,14 @@ class ctb_barang_list extends ctb_barang {
 		$item->ShowInDropDown = FALSE;
 		$item->ShowInButtonGroup = FALSE;
 
+		// "sequence"
+		$item = &$this->ListOptions->Add("sequence");
+		$item->CssStyle = "white-space: nowrap;";
+		$item->Visible = TRUE;
+		$item->OnLeft = TRUE; // Always on left
+		$item->ShowInDropDown = FALSE;
+		$item->ShowInButtonGroup = FALSE;
+
 		// Drop down button for ListOptions
 		$this->ListOptions->UseImageAndText = TRUE;
 		$this->ListOptions->UseDropDownButton = FALSE;
@@ -1086,6 +1083,10 @@ class ctb_barang_list extends ctb_barang {
 	function RenderListOptions() {
 		global $Security, $Language, $objForm;
 		$this->ListOptions->LoadDefault();
+
+		// "sequence"
+		$oListOpt = &$this->ListOptions->Items["sequence"];
+		$oListOpt->Body = ew_FormatSeqNo($this->RecCnt);
 
 		// "view"
 		$oListOpt = &$this->ListOptions->Items["view"];
@@ -1510,18 +1511,9 @@ class ctb_barang_list extends ctb_barang {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// barang_id
-		$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
-		$this->barang_id->ViewCustomAttributes = "";
-
 		// nama
 		$this->nama->ViewValue = $this->nama->CurrentValue;
 		$this->nama->ViewCustomAttributes = "";
-
-			// barang_id
-			$this->barang_id->LinkCustomAttributes = "";
-			$this->barang_id->HrefValue = "";
-			$this->barang_id->TooltipValue = "";
 
 			// nama
 			$this->nama->LinkCustomAttributes = "";
@@ -2124,15 +2116,6 @@ $tb_barang_list->RenderListOptions();
 // Render list options (header, left)
 $tb_barang_list->ListOptions->Render("header", "left");
 ?>
-<?php if ($tb_barang->barang_id->Visible) { // barang_id ?>
-	<?php if ($tb_barang->SortUrl($tb_barang->barang_id) == "") { ?>
-		<th data-name="barang_id"><div id="elh_tb_barang_barang_id" class="tb_barang_barang_id"><div class="ewTableHeaderCaption"><?php echo $tb_barang->barang_id->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="barang_id"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_barang->SortUrl($tb_barang->barang_id) ?>',1);"><div id="elh_tb_barang_barang_id" class="tb_barang_barang_id">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_barang->barang_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($tb_barang->barang_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_barang->barang_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
 <?php if ($tb_barang->nama->Visible) { // nama ?>
 	<?php if ($tb_barang->SortUrl($tb_barang->nama) == "") { ?>
 		<th data-name="nama"><div id="elh_tb_barang_nama" class="tb_barang_nama"><div class="ewTableHeaderCaption"><?php echo $tb_barang->nama->FldCaption() ?></div></div></th>
@@ -2207,21 +2190,13 @@ while ($tb_barang_list->RecCnt < $tb_barang_list->StopRec) {
 // Render list options (body, left)
 $tb_barang_list->ListOptions->Render("body", "left", $tb_barang_list->RowCnt);
 ?>
-	<?php if ($tb_barang->barang_id->Visible) { // barang_id ?>
-		<td data-name="barang_id"<?php echo $tb_barang->barang_id->CellAttributes() ?>>
-<span id="el<?php echo $tb_barang_list->RowCnt ?>_tb_barang_barang_id" class="tb_barang_barang_id">
-<span<?php echo $tb_barang->barang_id->ViewAttributes() ?>>
-<?php echo $tb_barang->barang_id->ListViewValue() ?></span>
-</span>
-<a id="<?php echo $tb_barang_list->PageObjName . "_row_" . $tb_barang_list->RowCnt ?>"></a></td>
-	<?php } ?>
 	<?php if ($tb_barang->nama->Visible) { // nama ?>
 		<td data-name="nama"<?php echo $tb_barang->nama->CellAttributes() ?>>
 <span id="el<?php echo $tb_barang_list->RowCnt ?>_tb_barang_nama" class="tb_barang_nama">
 <span<?php echo $tb_barang->nama->ViewAttributes() ?>>
 <?php echo $tb_barang->nama->ListViewValue() ?></span>
 </span>
-</td>
+<a id="<?php echo $tb_barang_list->PageObjName . "_row_" . $tb_barang_list->RowCnt ?>"></a></td>
 	<?php } ?>
 <?php
 

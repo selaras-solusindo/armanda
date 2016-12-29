@@ -613,10 +613,6 @@ class ctb_customer_add extends ctb_customer {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// id
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
-
 		// nama
 		$this->nama->ViewValue = $this->nama->CurrentValue;
 		$this->nama->ViewCustomAttributes = "";

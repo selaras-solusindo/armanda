@@ -495,6 +495,10 @@
 </field>
 <field id="no_sertifikat"><phrase id="fldcaption" value="no sertifikat"/>
 </field>
+<field id="pasal23"><phrase id="fldcaption" value="pasal 23"/>
+</field>
+<field id="total"><phrase id="fldcaption" value="total"/>
+</field>
 </table>
 <table id="view3"><phrase id="tblcaption" value="view 3"/>
 <field id="id"><phrase id="fldcaption" value="id"/>

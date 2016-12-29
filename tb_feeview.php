@@ -388,8 +388,6 @@ class ctb_fee_view extends ctb_fee {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->id->SetVisibility();
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->invoice_id->SetVisibility();
 		$this->barang_id->SetVisibility();
 		$this->harga->SetVisibility();
@@ -497,6 +495,10 @@ class ctb_fee_view extends ctb_fee {
 
 		// Set up master/detail parameters
 		$this->SetUpMasterParms();
+
+		// Set up Breadcrumb
+		if ($this->Export == "")
+			$this->SetupBreadcrumb();
 		if ($this->IsPageRequest()) { // Validate request
 			if (@$_GET["id"] <> "") {
 				$this->id->setQueryStringValue($_GET["id"]);
@@ -530,10 +532,6 @@ class ctb_fee_view extends ctb_fee {
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
-
-		// Set up Breadcrumb
-		if ($this->Export == "")
-			$this->SetupBreadcrumb();
 
 		// Render row
 		$this->RowType = EW_ROWTYPE_VIEW;
@@ -745,10 +743,6 @@ class ctb_fee_view extends ctb_fee {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// id
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
-
 		// invoice_id
 		$this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
 		$this->invoice_id->ViewCustomAttributes = "";
@@ -762,7 +756,7 @@ class ctb_fee_view extends ctb_fee {
 			$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 		$sWhereWrk = "";
-		$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+		$this->barang_id->LookupFilters = array("dx1" => "`nama`");
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -804,11 +798,6 @@ class ctb_fee_view extends ctb_fee {
 		// keterangan
 		$this->keterangan->ViewValue = $this->keterangan->CurrentValue;
 		$this->keterangan->ViewCustomAttributes = "";
-
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
 
 			// invoice_id
 			$this->invoice_id->LinkCustomAttributes = "";
@@ -1358,17 +1347,6 @@ $tb_fee_view->ShowMessage();
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <table class="table table-bordered table-striped ewViewTable">
-<?php if ($tb_fee->id->Visible) { // id ?>
-	<tr id="r_id">
-		<td><span id="elh_tb_fee_id"><?php echo $tb_fee->id->FldCaption() ?></span></td>
-		<td data-name="id"<?php echo $tb_fee->id->CellAttributes() ?>>
-<span id="el_tb_fee_id">
-<span<?php echo $tb_fee->id->ViewAttributes() ?>>
-<?php echo $tb_fee->id->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
 <?php if ($tb_fee->invoice_id->Visible) { // invoice_id ?>
 	<tr id="r_invoice_id">
 		<td><span id="elh_tb_fee_invoice_id"><?php echo $tb_fee->invoice_id->FldCaption() ?></span></td>

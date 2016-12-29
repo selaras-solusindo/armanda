@@ -583,22 +583,19 @@
   <project>
     <phrase id="footertext" value="CV. Armanda Nusantara" />
     <menu id="10035">
-      <phrase id="menutext" value="view 4" />
+      <phrase id="menutext" value="view 1" />
     </menu>
-    <menu id="10034">
-      <phrase id="menutext" value="User" />
-    </menu>
-    <menu id="10025">
-      <phrase id="menutext" value="view 5" />
-    </menu>
-    <menu id="10016">
-      <phrase id="menutext" value="view 3" />
-    </menu>
-    <menu id="10014">
+    <menu id="10036">
       <phrase id="menutext" value="view 2" />
     </menu>
-    <menu id="10009">
-      <phrase id="menutext" value="view 1" />
+    <menu id="10037">
+      <phrase id="menutext" value="view 3" />
+    </menu>
+    <menu id="10038">
+      <phrase id="menutext" value="view 4" />
+    </menu>
+    <menu id="10039">
+      <phrase id="menutext" value="view 5" />
     </menu>
     <menu id="1">
       <phrase id="menutext" value="option values" />
@@ -629,9 +626,6 @@
     </menu>
     <menu id="10015">
       <phrase id="menutext" value="Cetak Kwitansi" />
-    </menu>
-    <menu id="10017">
-      <phrase id="menutext" value="Rekap. Invoice" />
     </menu>
     <menu id="10026">
       <phrase id="menutext" value="view 5" />
@@ -683,6 +677,9 @@
     </menu>
     <menu id="10033">
       <phrase id="menutext" value="view 3" />
+    </menu>
+    <menu id="10034">
+      <phrase id="menutext" value="User" />
     </menu>
     <table id="option_values">
       <phrase id="tblcaption" value="option values" />
@@ -893,87 +890,6 @@
         <phrase id="fldtagcaption2" value="Ya" />
       </field>
     </table>
-    <table id="view1">
-      <phrase id="tblcaption" value="view 1" />
-      <field id="nama">
-        <phrase id="fldcaption" value="nama" />
-      </field>
-      <field id="alamat">
-        <phrase id="fldcaption" value="alamat" />
-      </field>
-      <field id="kota">
-        <phrase id="fldcaption" value="kota" />
-      </field>
-      <field id="kodepos">
-        <phrase id="fldcaption" value="kodepos" />
-      </field>
-      <field id="no_npwp">
-        <phrase id="fldcaption" value="no npwp" />
-      </field>
-      <field id="id">
-        <phrase id="fldcaption" value="id" />
-      </field>
-      <field id="customer_id">
-        <phrase id="fldcaption" value="customer id" />
-      </field>
-      <field id="no_invoice">
-        <phrase id="fldcaption" value="no invoice" />
-      </field>
-      <field id="tgl_invoice">
-        <phrase id="fldcaption" value="tgl invoice" />
-      </field>
-      <field id="no_order">
-        <phrase id="fldcaption" value="no order" />
-      </field>
-      <field id="no_referensi">
-        <phrase id="fldcaption" value="no referensi" />
-      </field>
-      <field id="kegiatan">
-        <phrase id="fldcaption" value="kegiatan" />
-      </field>
-      <field id="tgl_pelaksanaan">
-        <phrase id="fldcaption" value="tgl pelaksanaan" />
-      </field>
-      <field id="no_sertifikat">
-        <phrase id="fldcaption" value="no sertifikat" />
-      </field>
-      <field id="keterangan">
-        <phrase id="fldcaption" value="keterangan" />
-      </field>
-      <field id="total">
-        <phrase id="fldcaption" value="total" />
-      </field>
-      <field id="ppn">
-        <phrase id="fldcaption" value="ppn" />
-      </field>
-      <field id="total_ppn">
-        <phrase id="fldcaption" value="total ppn" />
-      </field>
-      <field id="terbilang">
-        <phrase id="fldcaption" value="terbilang" />
-      </field>
-      <field id="harga">
-        <phrase id="fldcaption" value="harga" />
-      </field>
-      <field id="qty">
-        <phrase id="fldcaption" value="qty" />
-      </field>
-      <field id="satuan">
-        <phrase id="fldcaption" value="satuan" />
-      </field>
-      <field id="jumlah">
-        <phrase id="fldcaption" value="jumlah" />
-      </field>
-      <field id="keterangan1">
-        <phrase id="fldcaption" value="keterangan 1" />
-      </field>
-      <field id="nama1">
-        <phrase id="fldcaption" value="nama 1" />
-      </field>
-      <field id="pasal23">
-        <phrase id="fldcaption" value="pasal 23" />
-      </field>
-    </table>
     <table id="cetak2_php">
       <phrase id="tblcaption" value="Cetak Invoice" />
     </table>
@@ -998,16 +914,125 @@
         <phrase id="fldcaption" value="No. Kwitansi" />
       </field>
     </table>
+    <table id="kuitansi_php">
+      <phrase id="tblcaption" value="Cetak Kuitansi" />
+    </table>
+    <table id="tb_user">
+      <phrase id="tblcaption" value="User" />
+      <field id="user_id">
+        <phrase id="fldcaption" value="user id" />
+      </field>
+      <field id="username">
+        <phrase id="fldcaption" value="User Name" />
+      </field>
+      <field id="password">
+        <phrase id="fldcaption" value="Password" />
+      </field>
+      <field id="userlevel">
+        <phrase id="fldcaption" value="User Level" />
+        <phrase id="fldtagvalue1" value="-2" />
+        <phrase id="fldtagcaption1" value="Anonymous" />
+        <phrase id="fldtagvalue2" value="-1" />
+        <phrase id="fldtagcaption2" value="Administrator" />
+        <phrase id="fldtagvalue3" value="0" />
+        <phrase id="fldtagcaption3" value="Default" />
+      </field>
+    </table>
+    <table id="view1">
+      <phrase id="tblcaption" value="view 1" />
+      <field id="nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+      <field id="alamat">
+        <phrase id="fldcaption" value="Alamat" />
+      </field>
+      <field id="kota">
+        <phrase id="fldcaption" value="Kota" />
+      </field>
+      <field id="kodepos">
+        <phrase id="fldcaption" value="Kode Pos" />
+      </field>
+      <field id="no_npwp">
+        <phrase id="fldcaption" value="No. NPWP" />
+      </field>
+      <field id="id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="customer_id">
+        <phrase id="fldcaption" value="Customer" />
+      </field>
+      <field id="no_invoice">
+        <phrase id="fldcaption" value="No. Invoice" />
+      </field>
+      <field id="tgl_invoice">
+        <phrase id="fldcaption" value="Tgl. Invoice" />
+      </field>
+      <field id="no_order">
+        <phrase id="fldcaption" value="No. Order" />
+      </field>
+      <field id="no_referensi">
+        <phrase id="fldcaption" value="No. Seri Faktur Pajak" />
+      </field>
+      <field id="kegiatan">
+        <phrase id="fldcaption" value="Kegiatan" />
+      </field>
+      <field id="tgl_pelaksanaan">
+        <phrase id="fldcaption" value="Tgl. Pelaksanaan" />
+      </field>
+      <field id="no_sertifikat">
+        <phrase id="fldcaption" value="No. Sertifikat" />
+      </field>
+      <field id="keterangan">
+        <phrase id="fldcaption" value="Keterangan" />
+      </field>
+      <field id="total">
+        <phrase id="fldcaption" value="Total" />
+      </field>
+      <field id="ppn">
+        <phrase id="fldcaption" value="PPN" />
+      </field>
+      <field id="total_ppn">
+        <phrase id="fldcaption" value="Total PPN" />
+      </field>
+      <field id="terbilang">
+        <phrase id="fldcaption" value="Terbilang" />
+      </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="Harga" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="Qty." />
+      </field>
+      <field id="satuan">
+        <phrase id="fldcaption" value="Satuan" />
+      </field>
+      <field id="jumlah">
+        <phrase id="fldcaption" value="Jumlah" />
+      </field>
+      <field id="keterangan1">
+        <phrase id="fldcaption" value="Keterangan" />
+      </field>
+      <field id="nama1">
+        <phrase id="fldcaption" value="Fee" />
+      </field>
+      <field id="pasal23">
+        <phrase id="fldcaption" value="Pasal 23" />
+        <phrase id="fldtagvalue1" value="0" />
+        <phrase id="fldtagcaption1" value="Tidak" />
+        <phrase id="fldtagvalue2" value="1" />
+        <phrase id="fldtagcaption2" value="Ya" />
+      </field>
+    </table>
     <table id="view2">
       <phrase id="tblcaption" value="view 2" />
       <field id="kuitansi_id">
-        <phrase id="fldcaption" value="kuitansi id" />
+        <phrase id="fldcaption" value="ID" />
       </field>
       <field id="invoice_id">
-        <phrase id="fldcaption" value="invoice id" />
+        <phrase id="fldcaption" value="No. Invoice" />
       </field>
       <field id="no_kuitansi">
-        <phrase id="fldcaption" value="no kuitansi" />
+        <phrase id="fldcaption" value="No. Kwitansi" />
       </field>
       <field id="nama">
         <phrase id="fldcaption" value="Nama" />
@@ -1031,205 +1056,134 @@
         <phrase id="fldcaption" value="No. Sertifikat" />
       </field>
       <field id="pasal23">
-        <phrase id="fldcaption" value="pasal 23" />
+        <phrase id="fldcaption" value="Pasal 23" />
+        <phrase id="fldtagvalue1" value="0" />
+        <phrase id="fldtagcaption1" value="Tidak" />
+        <phrase id="fldtagvalue2" value="1" />
+        <phrase id="fldtagcaption2" value="Ya" />
       </field>
       <field id="total">
-        <phrase id="fldcaption" value="total" />
+        <phrase id="fldcaption" value="Total" />
       </field>
-    </table>
-    <table id="kuitansi_php">
-      <phrase id="tblcaption" value="Cetak Kuitansi" />
     </table>
     <table id="view3">
       <phrase id="tblcaption" value="view 3" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="ID" />
       </field>
       <field id="customer_id">
-        <phrase id="fldcaption" value="customer id" />
+        <phrase id="fldcaption" value="Customer" />
       </field>
       <field id="no_invoice">
-        <phrase id="fldcaption" value="no invoice" />
-      </field>
-      <field id="tgl_invoice">
-        <phrase id="fldcaption" value="tgl invoice" />
-      </field>
-      <field id="no_order">
-        <phrase id="fldcaption" value="no order" />
-      </field>
-      <field id="no_referensi">
-        <phrase id="fldcaption" value="no referensi" />
-      </field>
-      <field id="kegiatan">
-        <phrase id="fldcaption" value="kegiatan" />
-      </field>
-      <field id="tgl_pelaksanaan">
-        <phrase id="fldcaption" value="tgl pelaksanaan" />
-      </field>
-      <field id="no_sertifikat">
-        <phrase id="fldcaption" value="no sertifikat" />
-      </field>
-      <field id="keterangan">
-        <phrase id="fldcaption" value="keterangan" />
-      </field>
-      <field id="total">
-        <phrase id="fldcaption" value="total" />
-      </field>
-      <field id="ppn">
-        <phrase id="fldcaption" value="ppn" />
-      </field>
-      <field id="total_ppn">
-        <phrase id="fldcaption" value="total ppn" />
-      </field>
-      <field id="terbilang">
-        <phrase id="fldcaption" value="terbilang" />
-      </field>
-      <field id="nama">
-        <phrase id="fldcaption" value="Nama" />
-      </field>
-      <field id="no_kuitansi">
-        <phrase id="fldcaption" value="No. Kuitansi" />
-      </field>
-    </table>
-    <table id="report1">
-      <phrase id="tblcaption" value="Report 1" />
-      <field id="nama">
-        <phrase id="fldcaption" value="Nama" />
-      </field>
-      <field id="no_kuitansi">
-        <phrase id="fldcaption" value="No. KW" />
-      </field>
-      <field id="no_invoice">
-        <phrase id="fldcaption" value="No. INV" />
-      </field>
-      <field id="no_sertifikat">
-        <phrase id="fldcaption" value="No. Sertifikat" />
-      </field>
-      <field id="tgl_pelaksanaan">
-        <phrase id="fldcaption" value="Tgl. Pelaksanaan" />
-      </field>
-      <field id="id">
-        <phrase id="fldcaption" value="id" />
-      </field>
-      <field id="customer_id">
-        <phrase id="fldcaption" value="customer id" />
+        <phrase id="fldcaption" value="No. Invoice" />
       </field>
       <field id="tgl_invoice">
         <phrase id="fldcaption" value="Tgl. Invoice" />
       </field>
       <field id="no_order">
-        <phrase id="fldcaption" value="no order" />
+        <phrase id="fldcaption" value="No. Order" />
       </field>
       <field id="no_referensi">
-        <phrase id="fldcaption" value="no referensi" />
+        <phrase id="fldcaption" value="No. Seri Faktur Pajak" />
       </field>
       <field id="kegiatan">
-        <phrase id="fldcaption" value="kegiatan" />
+        <phrase id="fldcaption" value="Kegiatan" />
+      </field>
+      <field id="tgl_pelaksanaan">
+        <phrase id="fldcaption" value="Tgl. Pelaksanaan" />
+      </field>
+      <field id="no_sertifikat">
+        <phrase id="fldcaption" value="No. Sertifikat" />
       </field>
       <field id="keterangan">
-        <phrase id="fldcaption" value="keterangan" />
+        <phrase id="fldcaption" value="Keterangan" />
       </field>
       <field id="total">
-        <phrase id="fldcaption" value="total" />
+        <phrase id="fldcaption" value="Total" />
       </field>
       <field id="ppn">
-        <phrase id="fldcaption" value="ppn" />
+        <phrase id="fldcaption" value="PPN" />
       </field>
       <field id="total_ppn">
-        <phrase id="fldcaption" value="Jumlah" />
+        <phrase id="fldcaption" value="Total PPN" />
       </field>
       <field id="terbilang">
-        <phrase id="fldcaption" value="terbilang" />
+        <phrase id="fldcaption" value="Terbilang" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+      <field id="no_kuitansi">
+        <phrase id="fldcaption" value="No. Kwitansi" />
       </field>
     </table>
     <table id="view4">
       <phrase id="tblcaption" value="view 4" />
       <field id="nama">
-        <phrase id="fldcaption" value="nama" />
+        <phrase id="fldcaption" value="Nama" />
       </field>
       <field id="no_kuitansi">
-        <phrase id="fldcaption" value="no kuitansi" />
+        <phrase id="fldcaption" value="No. Kwitansi" />
       </field>
       <field id="no_invoice">
-        <phrase id="fldcaption" value="no invoice" />
+        <phrase id="fldcaption" value="No. Invoice" />
       </field>
       <field id="total_ppn">
-        <phrase id="fldcaption" value="total ppn" />
+        <phrase id="fldcaption" value="Total PPN" />
       </field>
       <field id="tgl_pelaksanaan">
-        <phrase id="fldcaption" value="tgl pelaksanaan" />
+        <phrase id="fldcaption" value="Tgl. Pelaksanaan" />
       </field>
     </table>
     <table id="view5">
       <phrase id="tblcaption" value="view 5" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="ID" />
       </field>
       <field id="customer_id">
-        <phrase id="fldcaption" value="customer id" />
+        <phrase id="fldcaption" value="Customer" />
       </field>
       <field id="no_invoice">
-        <phrase id="fldcaption" value="no invoice" />
+        <phrase id="fldcaption" value="No. Invoice" />
       </field>
       <field id="tgl_invoice">
-        <phrase id="fldcaption" value="tgl invoice" />
+        <phrase id="fldcaption" value="Tgl. Invoice" />
       </field>
       <field id="no_order">
-        <phrase id="fldcaption" value="no order" />
+        <phrase id="fldcaption" value="No. Order" />
       </field>
       <field id="no_referensi">
-        <phrase id="fldcaption" value="no referensi" />
+        <phrase id="fldcaption" value="No. Seri Faktur Pajak" />
       </field>
       <field id="kegiatan">
-        <phrase id="fldcaption" value="kegiatan" />
+        <phrase id="fldcaption" value="Kegiatan" />
       </field>
       <field id="tgl_pelaksanaan">
-        <phrase id="fldcaption" value="tgl pelaksanaan" />
+        <phrase id="fldcaption" value="Tgl. Pelaksanaan" />
       </field>
       <field id="no_sertifikat">
-        <phrase id="fldcaption" value="no sertifikat" />
+        <phrase id="fldcaption" value="No. Sertifikat" />
       </field>
       <field id="keterangan">
-        <phrase id="fldcaption" value="keterangan" />
+        <phrase id="fldcaption" value="Keterangan" />
       </field>
       <field id="total">
-        <phrase id="fldcaption" value="total" />
+        <phrase id="fldcaption" value="Total" />
       </field>
       <field id="ppn">
-        <phrase id="fldcaption" value="ppn" />
+        <phrase id="fldcaption" value="PPN" />
       </field>
       <field id="total_ppn">
-        <phrase id="fldcaption" value="total ppn" />
+        <phrase id="fldcaption" value="Total PPN" />
       </field>
       <field id="terbilang">
-        <phrase id="fldcaption" value="terbilang" />
+        <phrase id="fldcaption" value="Terbilang" />
       </field>
       <field id="nama">
-        <phrase id="fldcaption" value="nama" />
+        <phrase id="fldcaption" value="Nama" />
       </field>
       <field id="no_kuitansi">
-        <phrase id="fldcaption" value="no kuitansi" />
-      </field>
-    </table>
-    <table id="tb_user">
-      <phrase id="tblcaption" value="User" />
-      <field id="user_id">
-        <phrase id="fldcaption" value="user id" />
-      </field>
-      <field id="username">
-        <phrase id="fldcaption" value="User Name" />
-      </field>
-      <field id="password">
-        <phrase id="fldcaption" value="Password" />
-      </field>
-      <field id="userlevel">
-        <phrase id="fldcaption" value="User Level" />
-        <phrase id="fldtagvalue1" value="-2" />
-        <phrase id="fldtagcaption1" value="Anonymous" />
-        <phrase id="fldtagvalue2" value="-1" />
-        <phrase id="fldtagcaption2" value="Administrator" />
-        <phrase id="fldtagvalue3" value="0" />
-        <phrase id="fldtagcaption3" value="Default" />
+        <phrase id="fldcaption" value="No. Kwitansi" />
       </field>
     </table>
   </project>

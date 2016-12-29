@@ -620,7 +620,7 @@ class ctb_kuitansi extends cTable {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->invoice_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
 		$sWhereWrk = "";
-		$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
+		$this->invoice_id->LookupFilters = array("dx1" => "`no_invoice`");
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -714,11 +714,9 @@ class ctb_kuitansi extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
-					if ($this->kuitansi_id->Exportable) $Doc->ExportCaption($this->kuitansi_id);
 					if ($this->invoice_id->Exportable) $Doc->ExportCaption($this->invoice_id);
 					if ($this->no_kuitansi->Exportable) $Doc->ExportCaption($this->no_kuitansi);
 				} else {
-					if ($this->kuitansi_id->Exportable) $Doc->ExportCaption($this->kuitansi_id);
 					if ($this->invoice_id->Exportable) $Doc->ExportCaption($this->invoice_id);
 					if ($this->no_kuitansi->Exportable) $Doc->ExportCaption($this->no_kuitansi);
 				}
@@ -752,11 +750,9 @@ class ctb_kuitansi extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
-						if ($this->kuitansi_id->Exportable) $Doc->ExportField($this->kuitansi_id);
 						if ($this->invoice_id->Exportable) $Doc->ExportField($this->invoice_id);
 						if ($this->no_kuitansi->Exportable) $Doc->ExportField($this->no_kuitansi);
 					} else {
-						if ($this->kuitansi_id->Exportable) $Doc->ExportField($this->kuitansi_id);
 						if ($this->invoice_id->Exportable) $Doc->ExportField($this->invoice_id);
 						if ($this->no_kuitansi->Exportable) $Doc->ExportField($this->no_kuitansi);
 					}

@@ -384,8 +384,6 @@ class ctb_kuitansi_view extends ctb_kuitansi {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->kuitansi_id->SetVisibility();
-		$this->kuitansi_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->invoice_id->SetVisibility();
 		$this->no_kuitansi->SetVisibility();
 
@@ -486,6 +484,10 @@ class ctb_kuitansi_view extends ctb_kuitansi {
 		$bLoadCurrentRecord = FALSE;
 		$sReturnUrl = "";
 		$bMatchRecord = FALSE;
+
+		// Set up Breadcrumb
+		if ($this->Export == "")
+			$this->SetupBreadcrumb();
 		if ($this->IsPageRequest()) { // Validate request
 			if (@$_GET["kuitansi_id"] <> "") {
 				$this->kuitansi_id->setQueryStringValue($_GET["kuitansi_id"]);
@@ -519,10 +521,6 @@ class ctb_kuitansi_view extends ctb_kuitansi {
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
-
-		// Set up Breadcrumb
-		if ($this->Export == "")
-			$this->SetupBreadcrumb();
 
 		// Render row
 		$this->RowType = EW_ROWTYPE_VIEW;
@@ -715,10 +713,6 @@ class ctb_kuitansi_view extends ctb_kuitansi {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// kuitansi_id
-		$this->kuitansi_id->ViewValue = $this->kuitansi_id->CurrentValue;
-		$this->kuitansi_id->ViewCustomAttributes = "";
-
 		// invoice_id
 		if ($this->invoice_id->VirtualValue <> "") {
 			$this->invoice_id->ViewValue = $this->invoice_id->VirtualValue;
@@ -728,7 +722,7 @@ class ctb_kuitansi_view extends ctb_kuitansi {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->invoice_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
 		$sWhereWrk = "";
-		$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
+		$this->invoice_id->LookupFilters = array("dx1" => "`no_invoice`");
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -750,11 +744,6 @@ class ctb_kuitansi_view extends ctb_kuitansi {
 		// no_kuitansi
 		$this->no_kuitansi->ViewValue = $this->no_kuitansi->CurrentValue;
 		$this->no_kuitansi->ViewCustomAttributes = "";
-
-			// kuitansi_id
-			$this->kuitansi_id->LinkCustomAttributes = "";
-			$this->kuitansi_id->HrefValue = "";
-			$this->kuitansi_id->TooltipValue = "";
 
 			// invoice_id
 			$this->invoice_id->LinkCustomAttributes = "";
@@ -1223,17 +1212,6 @@ $tb_kuitansi_view->ShowMessage();
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <table class="table table-bordered table-striped ewViewTable">
-<?php if ($tb_kuitansi->kuitansi_id->Visible) { // kuitansi_id ?>
-	<tr id="r_kuitansi_id">
-		<td><span id="elh_tb_kuitansi_kuitansi_id"><?php echo $tb_kuitansi->kuitansi_id->FldCaption() ?></span></td>
-		<td data-name="kuitansi_id"<?php echo $tb_kuitansi->kuitansi_id->CellAttributes() ?>>
-<span id="el_tb_kuitansi_kuitansi_id">
-<span<?php echo $tb_kuitansi->kuitansi_id->ViewAttributes() ?>>
-<?php echo $tb_kuitansi->kuitansi_id->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
 <?php if ($tb_kuitansi->invoice_id->Visible) { // invoice_id ?>
 	<tr id="r_invoice_id">
 		<td><span id="elh_tb_kuitansi_invoice_id"><?php echo $tb_kuitansi->invoice_id->FldCaption() ?></span></td>

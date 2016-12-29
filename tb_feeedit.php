@@ -290,8 +290,6 @@ class ctb_fee_edit extends ctb_fee {
 		// Create form object
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->id->SetVisibility();
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->invoice_id->SetVisibility();
 		$this->barang_id->SetVisibility();
 		$this->harga->SetVisibility();
@@ -405,6 +403,9 @@ class ctb_fee_edit extends ctb_fee {
 		// Set up master detail parameters
 		$this->SetUpMasterParms();
 
+		// Set up Breadcrumb
+		$this->SetupBreadcrumb();
+
 		// Process form if post back
 		if (@$_POST["a_edit"] <> "") {
 			$this->CurrentAction = $_POST["a_edit"]; // Get action code
@@ -450,9 +451,6 @@ class ctb_fee_edit extends ctb_fee {
 					$this->RestoreFormValues(); // Restore form values if update failed
 				}
 		}
-
-		// Set up Breadcrumb
-		$this->SetupBreadcrumb();
 
 		// Render the record
 		$this->RowType = EW_ROWTYPE_EDIT; // Render as Edit
@@ -508,8 +506,6 @@ class ctb_fee_edit extends ctb_fee {
 
 		// Load from form
 		global $objForm;
-		if (!$this->id->FldIsDetailKey)
-			$this->id->setFormValue($objForm->GetValue("x_id"));
 		if (!$this->invoice_id->FldIsDetailKey) {
 			$this->invoice_id->setFormValue($objForm->GetValue("x_invoice_id"));
 		}
@@ -528,6 +524,8 @@ class ctb_fee_edit extends ctb_fee {
 		if (!$this->keterangan->FldIsDetailKey) {
 			$this->keterangan->setFormValue($objForm->GetValue("x_keterangan"));
 		}
+		if (!$this->id->FldIsDetailKey)
+			$this->id->setFormValue($objForm->GetValue("x_id"));
 	}
 
 	// Restore form values
@@ -626,10 +624,6 @@ class ctb_fee_edit extends ctb_fee {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// id
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
-
 		// invoice_id
 		$this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
 		$this->invoice_id->ViewCustomAttributes = "";
@@ -643,7 +637,7 @@ class ctb_fee_edit extends ctb_fee {
 			$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 		$sWhereWrk = "";
-		$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+		$this->barang_id->LookupFilters = array("dx1" => "`nama`");
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -686,11 +680,6 @@ class ctb_fee_edit extends ctb_fee {
 		$this->keterangan->ViewValue = $this->keterangan->CurrentValue;
 		$this->keterangan->ViewCustomAttributes = "";
 
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
-
 			// invoice_id
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
@@ -722,12 +711,6 @@ class ctb_fee_edit extends ctb_fee {
 			$this->keterangan->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
-			// id
-			$this->id->EditAttrs["class"] = "form-control";
-			$this->id->EditCustomAttributes = "";
-			$this->id->EditValue = $this->id->CurrentValue;
-			$this->id->ViewCustomAttributes = "";
-
 			// invoice_id
 			$this->invoice_id->EditAttrs["class"] = "form-control";
 			$this->invoice_id->EditCustomAttributes = "";
@@ -748,7 +731,7 @@ class ctb_fee_edit extends ctb_fee {
 				$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 			$sWhereWrk = "";
-			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+			$this->barang_id->LookupFilters = array("dx1" => "`nama`");
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -792,12 +775,8 @@ class ctb_fee_edit extends ctb_fee {
 			$this->keterangan->PlaceHolder = ew_RemoveHtml($this->keterangan->FldCaption());
 
 			// Edit refer script
-			// id
-
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-
 			// invoice_id
+
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
 
@@ -1023,8 +1002,8 @@ class ctb_fee_edit extends ctb_fee {
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `barang_id` AS `LinkFld`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 			$sWhereWrk = "{filter}";
-			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`barang_id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$this->barang_id->LookupFilters = array("dx1" => "`nama`");
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => "`barang_id` = {filter_value}", "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1043,7 +1022,7 @@ class ctb_fee_edit extends ctb_fee {
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld` FROM `tb_barang`";
 			$sWhereWrk = "`nama` LIKE '{query_value}%'";
-			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+			$this->barang_id->LookupFilters = array("dx1" => "`nama`");
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
@@ -1295,18 +1274,6 @@ $tb_fee_edit->ShowMessage();
 <input type="hidden" name="fk_id" value="<?php echo $tb_fee->invoice_id->getSessionValue() ?>">
 <?php } ?>
 <div>
-<?php if ($tb_fee->id->Visible) { // id ?>
-	<div id="r_id" class="form-group">
-		<label id="elh_tb_fee_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_fee->id->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $tb_fee->id->CellAttributes() ?>>
-<span id="el_tb_fee_id">
-<span<?php echo $tb_fee->id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $tb_fee->id->EditValue ?></p></span>
-</span>
-<input type="hidden" data-table="tb_fee" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($tb_fee->id->CurrentValue) ?>">
-<?php echo $tb_fee->id->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
 <?php if ($tb_fee->invoice_id->Visible) { // invoice_id ?>
 	<div id="r_invoice_id" class="form-group">
 		<label id="elh_tb_fee_invoice_id" for="x_invoice_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_fee->invoice_id->FldCaption() ?></label>
@@ -1330,21 +1297,12 @@ $tb_fee_edit->ShowMessage();
 		<label id="elh_tb_fee_barang_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_fee->barang_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
 		<div class="col-sm-10"><div<?php echo $tb_fee->barang_id->CellAttributes() ?>>
 <span id="el_tb_fee_barang_id">
-<?php
-$wrkonchange = trim(" " . @$tb_fee->barang_id->EditAttrs["onchange"]);
-if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
-$tb_fee->barang_id->EditAttrs["onchange"] = "";
-?>
-<span id="as_x_barang_id" style="white-space: nowrap; z-index: 8970">
-	<input type="text" name="sv_x_barang_id" id="sv_x_barang_id" value="<?php echo $tb_fee->barang_id->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($tb_fee->barang_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($tb_fee->barang_id->getPlaceHolder()) ?>"<?php echo $tb_fee->barang_id->EditAttributes() ?>>
+<span class="ewLookupList">
+	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_barang_id"><?php echo (strval($tb_fee->barang_id->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $tb_fee->barang_id->ViewValue); ?></span>
 </span>
-<input type="hidden" data-table="tb_fee" data-field="x_barang_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $tb_fee->barang_id->DisplayValueSeparatorAttribute() ?>" name="x_barang_id" id="x_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
-<input type="hidden" name="q_x_barang_id" id="q_x_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(true) ?>">
-<script type="text/javascript">
-ftb_feeedit.CreateAutoSuggest({"id":"x_barang_id","forceSelect":true});
-</script>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_fee->barang_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_barang_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" name="s_x_barang_id" id="s_x_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery(false) ?>">
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_fee->barang_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_barang_id',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<input type="hidden" data-table="tb_fee" data-field="x_barang_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $tb_fee->barang_id->DisplayValueSeparatorAttribute() ?>" name="x_barang_id" id="x_barang_id" value="<?php echo $tb_fee->barang_id->CurrentValue ?>"<?php echo $tb_fee->barang_id->EditAttributes() ?>>
+<input type="hidden" name="s_x_barang_id" id="s_x_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery() ?>">
 </span>
 <?php echo $tb_fee->barang_id->CustomMsg ?></div></div>
 	</div>
@@ -1390,6 +1348,7 @@ ftb_feeedit.CreateAutoSuggest({"id":"x_barang_id","forceSelect":true});
 	</div>
 <?php } ?>
 </div>
+<input type="hidden" data-table="tb_fee" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($tb_fee->id->CurrentValue) ?>">
 <?php if (!$tb_fee_edit->IsModal) { ?>
 <div class="form-group">
 	<div class="col-sm-offset-2 col-sm-10">

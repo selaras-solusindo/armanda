@@ -283,8 +283,6 @@ class ctb_customer_delete extends ctb_customer {
 				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->id->SetVisibility();
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->nama->SetVisibility();
 		$this->alamat->SetVisibility();
 		$this->kota->SetVisibility();
@@ -503,10 +501,6 @@ class ctb_customer_delete extends ctb_customer {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// id
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
-
 		// nama
 		$this->nama->ViewValue = $this->nama->CurrentValue;
 		$this->nama->ViewCustomAttributes = "";
@@ -526,11 +520,6 @@ class ctb_customer_delete extends ctb_customer {
 		// no_npwp
 		$this->no_npwp->ViewValue = $this->no_npwp->CurrentValue;
 		$this->no_npwp->ViewCustomAttributes = "";
-
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
 
 			// nama
 			$this->nama->LinkCustomAttributes = "";
@@ -855,9 +844,6 @@ $tb_customer_delete->ShowMessage();
 <?php echo $tb_customer->TableCustomInnerHtml ?>
 	<thead>
 	<tr class="ewTableHeader">
-<?php if ($tb_customer->id->Visible) { // id ?>
-		<th><span id="elh_tb_customer_id" class="tb_customer_id"><?php echo $tb_customer->id->FldCaption() ?></span></th>
-<?php } ?>
 <?php if ($tb_customer->nama->Visible) { // nama ?>
 		<th><span id="elh_tb_customer_nama" class="tb_customer_nama"><?php echo $tb_customer->nama->FldCaption() ?></span></th>
 <?php } ?>
@@ -894,14 +880,6 @@ while (!$tb_customer_delete->Recordset->EOF) {
 	$tb_customer_delete->RenderRow();
 ?>
 	<tr<?php echo $tb_customer->RowAttributes() ?>>
-<?php if ($tb_customer->id->Visible) { // id ?>
-		<td<?php echo $tb_customer->id->CellAttributes() ?>>
-<span id="el<?php echo $tb_customer_delete->RowCnt ?>_tb_customer_id" class="tb_customer_id">
-<span<?php echo $tb_customer->id->ViewAttributes() ?>>
-<?php echo $tb_customer->id->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($tb_customer->nama->Visible) { // nama ?>
 		<td<?php echo $tb_customer->nama->CellAttributes() ?>>
 <span id="el<?php echo $tb_customer_delete->RowCnt ?>_tb_customer_nama" class="tb_customer_nama">

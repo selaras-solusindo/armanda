@@ -286,8 +286,6 @@ class ctb_barang_edit extends ctb_barang {
 		// Create form object
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->barang_id->SetVisibility();
-		$this->barang_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->nama->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
@@ -393,6 +391,9 @@ class ctb_barang_edit extends ctb_barang {
 			$this->barang_id->setQueryStringValue($_GET["barang_id"]);
 		}
 
+		// Set up Breadcrumb
+		$this->SetupBreadcrumb();
+
 		// Process form if post back
 		if (@$_POST["a_edit"] <> "") {
 			$this->CurrentAction = $_POST["a_edit"]; // Get action code
@@ -438,9 +439,6 @@ class ctb_barang_edit extends ctb_barang {
 					$this->RestoreFormValues(); // Restore form values if update failed
 				}
 		}
-
-		// Set up Breadcrumb
-		$this->SetupBreadcrumb();
 
 		// Render the record
 		$this->RowType = EW_ROWTYPE_EDIT; // Render as Edit
@@ -496,11 +494,11 @@ class ctb_barang_edit extends ctb_barang {
 
 		// Load from form
 		global $objForm;
-		if (!$this->barang_id->FldIsDetailKey)
-			$this->barang_id->setFormValue($objForm->GetValue("x_barang_id"));
 		if (!$this->nama->FldIsDetailKey) {
 			$this->nama->setFormValue($objForm->GetValue("x_nama"));
 		}
+		if (!$this->barang_id->FldIsDetailKey)
+			$this->barang_id->setFormValue($objForm->GetValue("x_barang_id"));
 	}
 
 	// Restore form values
@@ -567,30 +565,15 @@ class ctb_barang_edit extends ctb_barang {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// barang_id
-		$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
-		$this->barang_id->ViewCustomAttributes = "";
-
 		// nama
 		$this->nama->ViewValue = $this->nama->CurrentValue;
 		$this->nama->ViewCustomAttributes = "";
-
-			// barang_id
-			$this->barang_id->LinkCustomAttributes = "";
-			$this->barang_id->HrefValue = "";
-			$this->barang_id->TooltipValue = "";
 
 			// nama
 			$this->nama->LinkCustomAttributes = "";
 			$this->nama->HrefValue = "";
 			$this->nama->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
-
-			// barang_id
-			$this->barang_id->EditAttrs["class"] = "form-control";
-			$this->barang_id->EditCustomAttributes = "";
-			$this->barang_id->EditValue = $this->barang_id->CurrentValue;
-			$this->barang_id->ViewCustomAttributes = "";
 
 			// nama
 			$this->nama->EditAttrs["class"] = "form-control";
@@ -599,12 +582,8 @@ class ctb_barang_edit extends ctb_barang {
 			$this->nama->PlaceHolder = ew_RemoveHtml($this->nama->FldCaption());
 
 			// Edit refer script
-			// barang_id
-
-			$this->barang_id->LinkCustomAttributes = "";
-			$this->barang_id->HrefValue = "";
-
 			// nama
+
 			$this->nama->LinkCustomAttributes = "";
 			$this->nama->HrefValue = "";
 		}
@@ -958,18 +937,6 @@ $tb_barang_edit->ShowMessage();
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <div>
-<?php if ($tb_barang->barang_id->Visible) { // barang_id ?>
-	<div id="r_barang_id" class="form-group">
-		<label id="elh_tb_barang_barang_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_barang->barang_id->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $tb_barang->barang_id->CellAttributes() ?>>
-<span id="el_tb_barang_barang_id">
-<span<?php echo $tb_barang->barang_id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $tb_barang->barang_id->EditValue ?></p></span>
-</span>
-<input type="hidden" data-table="tb_barang" data-field="x_barang_id" name="x_barang_id" id="x_barang_id" value="<?php echo ew_HtmlEncode($tb_barang->barang_id->CurrentValue) ?>">
-<?php echo $tb_barang->barang_id->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
 <?php if ($tb_barang->nama->Visible) { // nama ?>
 	<div id="r_nama" class="form-group">
 		<label id="elh_tb_barang_nama" for="x_nama" class="col-sm-2 control-label ewLabel"><?php echo $tb_barang->nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
@@ -981,6 +948,7 @@ $tb_barang_edit->ShowMessage();
 	</div>
 <?php } ?>
 </div>
+<input type="hidden" data-table="tb_barang" data-field="x_barang_id" name="x_barang_id" id="x_barang_id" value="<?php echo ew_HtmlEncode($tb_barang->barang_id->CurrentValue) ?>">
 <?php if (!$tb_barang_edit->IsModal) { ?>
 <div class="form-group">
 	<div class="col-sm-offset-2 col-sm-10">

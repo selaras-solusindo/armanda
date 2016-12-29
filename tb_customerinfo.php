@@ -707,14 +707,12 @@ class ctb_customer extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
-					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->nama->Exportable) $Doc->ExportCaption($this->nama);
 					if ($this->alamat->Exportable) $Doc->ExportCaption($this->alamat);
 					if ($this->kota->Exportable) $Doc->ExportCaption($this->kota);
 					if ($this->kodepos->Exportable) $Doc->ExportCaption($this->kodepos);
 					if ($this->no_npwp->Exportable) $Doc->ExportCaption($this->no_npwp);
 				} else {
-					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->nama->Exportable) $Doc->ExportCaption($this->nama);
 					if ($this->alamat->Exportable) $Doc->ExportCaption($this->alamat);
 					if ($this->kota->Exportable) $Doc->ExportCaption($this->kota);
@@ -751,14 +749,12 @@ class ctb_customer extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
-						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->nama->Exportable) $Doc->ExportField($this->nama);
 						if ($this->alamat->Exportable) $Doc->ExportField($this->alamat);
 						if ($this->kota->Exportable) $Doc->ExportField($this->kota);
 						if ($this->kodepos->Exportable) $Doc->ExportField($this->kodepos);
 						if ($this->no_npwp->Exportable) $Doc->ExportField($this->no_npwp);
 					} else {
-						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->nama->Exportable) $Doc->ExportField($this->nama);
 						if ($this->alamat->Exportable) $Doc->ExportField($this->alamat);
 						if ($this->kota->Exportable) $Doc->ExportField($this->kota);

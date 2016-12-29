@@ -411,8 +411,6 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->kuitansi_id->SetVisibility();
-		$this->kuitansi_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->invoice_id->SetVisibility();
 		$this->no_kuitansi->SetVisibility();
 
@@ -763,16 +761,9 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 	// Process filter list
 	function ProcessFilterList() {
 		global $UserProfile;
-		if (@$_POST["ajax"] == "savefilters") { // Save filter request (Ajax)
+		if (@$_POST["cmd"] == "savefilters") {
 			$filters = ew_StripSlashes(@$_POST["filters"]);
 			$UserProfile->SetSearchFilters(CurrentUserName(), "ftb_kuitansilistsrch", $filters);
-
-			// Clean output buffer
-			if (!EW_DEBUG_ENABLED && ob_get_length())
-				ob_end_clean();
-			echo ew_ArrayToJson(array(array("success" => TRUE))); // Success
-			$this->Page_Terminate();
-			exit();
 		} elseif (@$_POST["cmd"] == "resetfilter") {
 			$this->RestoreFilterList();
 		}
@@ -822,7 +813,7 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 	}
 
 	// Build basic search SQL
-	function BuildBasicSearchSQL(&$Where, &$Fld, $arKeywords, $type) {
+	function BuildBasicSearchSql(&$Where, &$Fld, $arKeywords, $type) {
 		$sDefCond = ($type == "OR") ? "OR" : "AND";
 		$arSQL = array(); // Array for SQL parts
 		$arCond = array(); // Array for search conditions
@@ -847,7 +838,7 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 						$sWrk = $Fld->FldExpression . " IS NULL";
 					} elseif ($Keyword == EW_NOT_NULL_VALUE) {
 						$sWrk = $Fld->FldExpression . " IS NOT NULL";
-					} elseif ($Fld->FldIsVirtual) {
+					} elseif ($Fld->FldIsVirtual && $Fld->FldVirtualSearch) {
 						$sWrk = $Fld->FldVirtualExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
 					} elseif ($Fld->FldDataType != EW_DATATYPE_NUMBER || is_numeric($Keyword)) {
 						$sWrk = $Fld->FldBasicSearchExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
@@ -982,7 +973,6 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 		if (@$_GET["order"] <> "") {
 			$this->CurrentOrder = ew_StripSlashes(@$_GET["order"]);
 			$this->CurrentOrderType = @$_GET["ordertype"];
-			$this->UpdateSort($this->kuitansi_id); // kuitansi_id
 			$this->UpdateSort($this->invoice_id); // invoice_id
 			$this->UpdateSort($this->no_kuitansi); // no_kuitansi
 			$this->setStartRecordNumber(1); // Reset start position
@@ -1018,7 +1008,6 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
 				$this->setSessionOrderByList($sOrderBy);
-				$this->kuitansi_id->setSort("");
 				$this->invoice_id->setSort("");
 				$this->no_kuitansi->setSort("");
 			}
@@ -1079,6 +1068,14 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 		$item->ShowInDropDown = FALSE;
 		$item->ShowInButtonGroup = FALSE;
 
+		// "sequence"
+		$item = &$this->ListOptions->Add("sequence");
+		$item->CssStyle = "white-space: nowrap;";
+		$item->Visible = TRUE;
+		$item->OnLeft = TRUE; // Always on left
+		$item->ShowInDropDown = FALSE;
+		$item->ShowInButtonGroup = FALSE;
+
 		// Drop down button for ListOptions
 		$this->ListOptions->UseImageAndText = TRUE;
 		$this->ListOptions->UseDropDownButton = FALSE;
@@ -1099,6 +1096,10 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 	function RenderListOptions() {
 		global $Security, $Language, $objForm;
 		$this->ListOptions->LoadDefault();
+
+		// "sequence"
+		$oListOpt = &$this->ListOptions->Items["sequence"];
+		$oListOpt->Body = ew_FormatSeqNo($this->RecCnt);
 
 		// "view"
 		$oListOpt = &$this->ListOptions->Items["view"];
@@ -1531,10 +1532,6 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// kuitansi_id
-		$this->kuitansi_id->ViewValue = $this->kuitansi_id->CurrentValue;
-		$this->kuitansi_id->ViewCustomAttributes = "";
-
 		// invoice_id
 		if ($this->invoice_id->VirtualValue <> "") {
 			$this->invoice_id->ViewValue = $this->invoice_id->VirtualValue;
@@ -1544,7 +1541,7 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->invoice_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
 		$sWhereWrk = "";
-		$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
+		$this->invoice_id->LookupFilters = array("dx1" => "`no_invoice`");
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1566,11 +1563,6 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 		// no_kuitansi
 		$this->no_kuitansi->ViewValue = $this->no_kuitansi->CurrentValue;
 		$this->no_kuitansi->ViewCustomAttributes = "";
-
-			// kuitansi_id
-			$this->kuitansi_id->LinkCustomAttributes = "";
-			$this->kuitansi_id->HrefValue = "";
-			$this->kuitansi_id->TooltipValue = "";
 
 			// invoice_id
 			$this->invoice_id->LinkCustomAttributes = "";
@@ -2179,15 +2171,6 @@ $tb_kuitansi_list->RenderListOptions();
 // Render list options (header, left)
 $tb_kuitansi_list->ListOptions->Render("header", "left");
 ?>
-<?php if ($tb_kuitansi->kuitansi_id->Visible) { // kuitansi_id ?>
-	<?php if ($tb_kuitansi->SortUrl($tb_kuitansi->kuitansi_id) == "") { ?>
-		<th data-name="kuitansi_id"><div id="elh_tb_kuitansi_kuitansi_id" class="tb_kuitansi_kuitansi_id"><div class="ewTableHeaderCaption"><?php echo $tb_kuitansi->kuitansi_id->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="kuitansi_id"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_kuitansi->SortUrl($tb_kuitansi->kuitansi_id) ?>',1);"><div id="elh_tb_kuitansi_kuitansi_id" class="tb_kuitansi_kuitansi_id">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_kuitansi->kuitansi_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($tb_kuitansi->kuitansi_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_kuitansi->kuitansi_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
 <?php if ($tb_kuitansi->invoice_id->Visible) { // invoice_id ?>
 	<?php if ($tb_kuitansi->SortUrl($tb_kuitansi->invoice_id) == "") { ?>
 		<th data-name="invoice_id"><div id="elh_tb_kuitansi_invoice_id" class="tb_kuitansi_invoice_id"><div class="ewTableHeaderCaption"><?php echo $tb_kuitansi->invoice_id->FldCaption() ?></div></div></th>
@@ -2271,21 +2254,13 @@ while ($tb_kuitansi_list->RecCnt < $tb_kuitansi_list->StopRec) {
 // Render list options (body, left)
 $tb_kuitansi_list->ListOptions->Render("body", "left", $tb_kuitansi_list->RowCnt);
 ?>
-	<?php if ($tb_kuitansi->kuitansi_id->Visible) { // kuitansi_id ?>
-		<td data-name="kuitansi_id"<?php echo $tb_kuitansi->kuitansi_id->CellAttributes() ?>>
-<span id="el<?php echo $tb_kuitansi_list->RowCnt ?>_tb_kuitansi_kuitansi_id" class="tb_kuitansi_kuitansi_id">
-<span<?php echo $tb_kuitansi->kuitansi_id->ViewAttributes() ?>>
-<?php echo $tb_kuitansi->kuitansi_id->ListViewValue() ?></span>
-</span>
-<a id="<?php echo $tb_kuitansi_list->PageObjName . "_row_" . $tb_kuitansi_list->RowCnt ?>"></a></td>
-	<?php } ?>
 	<?php if ($tb_kuitansi->invoice_id->Visible) { // invoice_id ?>
 		<td data-name="invoice_id"<?php echo $tb_kuitansi->invoice_id->CellAttributes() ?>>
 <span id="el<?php echo $tb_kuitansi_list->RowCnt ?>_tb_kuitansi_invoice_id" class="tb_kuitansi_invoice_id">
 <span<?php echo $tb_kuitansi->invoice_id->ViewAttributes() ?>>
 <?php echo $tb_kuitansi->invoice_id->ListViewValue() ?></span>
 </span>
-</td>
+<a id="<?php echo $tb_kuitansi_list->PageObjName . "_row_" . $tb_kuitansi_list->RowCnt ?>"></a></td>
 	<?php } ?>
 	<?php if ($tb_kuitansi->no_kuitansi->Visible) { // no_kuitansi ?>
 		<td data-name="no_kuitansi"<?php echo $tb_kuitansi->no_kuitansi->CellAttributes() ?>>

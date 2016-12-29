@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "tb_customerinfo.php" ?>
+<?php include_once "view6info.php" ?>
 <?php include_once "tb_userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$tb_customer_list = NULL; // Initialize page object first
+$view6_list = NULL; // Initialize page object first
 
-class ctb_customer_list extends ctb_customer {
+class cview6_list extends cview6 {
 
 	// Page ID
 	var $PageID = 'list';
@@ -25,13 +25,13 @@ class ctb_customer_list extends ctb_customer {
 	var $ProjectID = "{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}";
 
 	// Table name
-	var $TableName = 'tb_customer';
+	var $TableName = 'view6';
 
 	// Page object name
-	var $PageObjName = 'tb_customer_list';
+	var $PageObjName = 'view6_list';
 
 	// Grid form hidden field names
-	var $FormName = 'ftb_customerlist';
+	var $FormName = 'fview6list';
 	var $FormActionName = 'k_action';
 	var $FormKeyName = 'k_key';
 	var $FormOldKeyName = 'k_oldkey';
@@ -81,12 +81,6 @@ class ctb_customer_list extends ctb_customer {
 	var $GridEditUrl;
 	var $MultiDeleteUrl;
 	var $MultiUpdateUrl;
-	var $AuditTrailOnAdd = FALSE;
-	var $AuditTrailOnEdit = FALSE;
-	var $AuditTrailOnDelete = FALSE;
-	var $AuditTrailOnView = FALSE;
-	var $AuditTrailOnViewData = FALSE;
-	var $AuditTrailOnSearch = FALSE;
 
 	// Message
 	function getMessage() {
@@ -272,10 +266,10 @@ class ctb_customer_list extends ctb_customer {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (tb_customer)
-		if (!isset($GLOBALS["tb_customer"]) || get_class($GLOBALS["tb_customer"]) == "ctb_customer") {
-			$GLOBALS["tb_customer"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["tb_customer"];
+		// Table object (view6)
+		if (!isset($GLOBALS["view6"]) || get_class($GLOBALS["view6"]) == "cview6") {
+			$GLOBALS["view6"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["view6"];
 		}
 
 		// Initialize URLs
@@ -286,12 +280,12 @@ class ctb_customer_list extends ctb_customer {
 		$this->ExportXmlUrl = $this->PageUrl() . "export=xml";
 		$this->ExportCsvUrl = $this->PageUrl() . "export=csv";
 		$this->ExportPdfUrl = $this->PageUrl() . "export=pdf";
-		$this->AddUrl = "tb_customeradd.php";
+		$this->AddUrl = "view6add.php";
 		$this->InlineAddUrl = $this->PageUrl() . "a=add";
 		$this->GridAddUrl = $this->PageUrl() . "a=gridadd";
 		$this->GridEditUrl = $this->PageUrl() . "a=gridedit";
-		$this->MultiDeleteUrl = "tb_customerdelete.php";
-		$this->MultiUpdateUrl = "tb_customerupdate.php";
+		$this->MultiDeleteUrl = "view6delete.php";
+		$this->MultiUpdateUrl = "view6update.php";
 
 		// Table object (tb_user)
 		if (!isset($GLOBALS['tb_user'])) $GLOBALS['tb_user'] = new ctb_user();
@@ -302,7 +296,7 @@ class ctb_customer_list extends ctb_customer {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'tb_customer', TRUE);
+			define("EW_TABLE_NAME", 'view6', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -339,7 +333,7 @@ class ctb_customer_list extends ctb_customer {
 		// Filter options
 		$this->FilterOptions = new cListOptions();
 		$this->FilterOptions->Tag = "div";
-		$this->FilterOptions->TagClassName = "ewFilterOption ftb_customerlistsrch";
+		$this->FilterOptions->TagClassName = "ewFilterOption fview6listsrch";
 
 		// List actions
 		$this->ListActions = new cListActions();
@@ -411,11 +405,20 @@ class ctb_customer_list extends ctb_customer {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->nama->SetVisibility();
-		$this->alamat->SetVisibility();
-		$this->kota->SetVisibility();
-		$this->kodepos->SetVisibility();
-		$this->no_npwp->SetVisibility();
+		$this->id->SetVisibility();
+		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
+		$this->customer_id->SetVisibility();
+		$this->no_invoice->SetVisibility();
+		$this->tgl_invoice->SetVisibility();
+		$this->no_order->SetVisibility();
+		$this->no_referensi->SetVisibility();
+		$this->tgl_pelaksanaan->SetVisibility();
+		$this->no_sertifikat->SetVisibility();
+		$this->total->SetVisibility();
+		$this->ppn->SetVisibility();
+		$this->total_ppn->SetVisibility();
+		$this->terbayar->SetVisibility();
+		$this->pasal23->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -476,13 +479,13 @@ class ctb_customer_list extends ctb_customer {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $tb_customer;
+		global $EW_EXPORT, $view6;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($tb_customer);
+				$doc = new $class($view6);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -734,7 +737,7 @@ class ctb_customer_list extends ctb_customer {
 
 		// Load server side filters
 		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ftb_customerlistsrch");
+			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "fview6listsrch");
 		} else {
 			$sSavedFilterList = "";
 		}
@@ -742,11 +745,21 @@ class ctb_customer_list extends ctb_customer {
 		// Initialize
 		$sFilterList = "";
 		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJSON(), ","); // Field id
-		$sFilterList = ew_Concat($sFilterList, $this->nama->AdvancedSearch->ToJSON(), ","); // Field nama
-		$sFilterList = ew_Concat($sFilterList, $this->alamat->AdvancedSearch->ToJSON(), ","); // Field alamat
-		$sFilterList = ew_Concat($sFilterList, $this->kota->AdvancedSearch->ToJSON(), ","); // Field kota
-		$sFilterList = ew_Concat($sFilterList, $this->kodepos->AdvancedSearch->ToJSON(), ","); // Field kodepos
-		$sFilterList = ew_Concat($sFilterList, $this->no_npwp->AdvancedSearch->ToJSON(), ","); // Field no_npwp
+		$sFilterList = ew_Concat($sFilterList, $this->customer_id->AdvancedSearch->ToJSON(), ","); // Field customer_id
+		$sFilterList = ew_Concat($sFilterList, $this->no_invoice->AdvancedSearch->ToJSON(), ","); // Field no_invoice
+		$sFilterList = ew_Concat($sFilterList, $this->tgl_invoice->AdvancedSearch->ToJSON(), ","); // Field tgl_invoice
+		$sFilterList = ew_Concat($sFilterList, $this->no_order->AdvancedSearch->ToJSON(), ","); // Field no_order
+		$sFilterList = ew_Concat($sFilterList, $this->no_referensi->AdvancedSearch->ToJSON(), ","); // Field no_referensi
+		$sFilterList = ew_Concat($sFilterList, $this->kegiatan->AdvancedSearch->ToJSON(), ","); // Field kegiatan
+		$sFilterList = ew_Concat($sFilterList, $this->tgl_pelaksanaan->AdvancedSearch->ToJSON(), ","); // Field tgl_pelaksanaan
+		$sFilterList = ew_Concat($sFilterList, $this->no_sertifikat->AdvancedSearch->ToJSON(), ","); // Field no_sertifikat
+		$sFilterList = ew_Concat($sFilterList, $this->keterangan->AdvancedSearch->ToJSON(), ","); // Field keterangan
+		$sFilterList = ew_Concat($sFilterList, $this->total->AdvancedSearch->ToJSON(), ","); // Field total
+		$sFilterList = ew_Concat($sFilterList, $this->ppn->AdvancedSearch->ToJSON(), ","); // Field ppn
+		$sFilterList = ew_Concat($sFilterList, $this->total_ppn->AdvancedSearch->ToJSON(), ","); // Field total_ppn
+		$sFilterList = ew_Concat($sFilterList, $this->terbilang->AdvancedSearch->ToJSON(), ","); // Field terbilang
+		$sFilterList = ew_Concat($sFilterList, $this->terbayar->AdvancedSearch->ToJSON(), ","); // Field terbayar
+		$sFilterList = ew_Concat($sFilterList, $this->pasal23->AdvancedSearch->ToJSON(), ","); // Field pasal23
 		if ($this->BasicSearch->Keyword <> "") {
 			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
 			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
@@ -769,7 +782,7 @@ class ctb_customer_list extends ctb_customer {
 		global $UserProfile;
 		if (@$_POST["cmd"] == "savefilters") {
 			$filters = ew_StripSlashes(@$_POST["filters"]);
-			$UserProfile->SetSearchFilters(CurrentUserName(), "ftb_customerlistsrch", $filters);
+			$UserProfile->SetSearchFilters(CurrentUserName(), "fview6listsrch", $filters);
 		} elseif (@$_POST["cmd"] == "resetfilter") {
 			$this->RestoreFilterList();
 		}
@@ -792,45 +805,125 @@ class ctb_customer_list extends ctb_customer {
 		$this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
 		$this->id->AdvancedSearch->Save();
 
-		// Field nama
-		$this->nama->AdvancedSearch->SearchValue = @$filter["x_nama"];
-		$this->nama->AdvancedSearch->SearchOperator = @$filter["z_nama"];
-		$this->nama->AdvancedSearch->SearchCondition = @$filter["v_nama"];
-		$this->nama->AdvancedSearch->SearchValue2 = @$filter["y_nama"];
-		$this->nama->AdvancedSearch->SearchOperator2 = @$filter["w_nama"];
-		$this->nama->AdvancedSearch->Save();
+		// Field customer_id
+		$this->customer_id->AdvancedSearch->SearchValue = @$filter["x_customer_id"];
+		$this->customer_id->AdvancedSearch->SearchOperator = @$filter["z_customer_id"];
+		$this->customer_id->AdvancedSearch->SearchCondition = @$filter["v_customer_id"];
+		$this->customer_id->AdvancedSearch->SearchValue2 = @$filter["y_customer_id"];
+		$this->customer_id->AdvancedSearch->SearchOperator2 = @$filter["w_customer_id"];
+		$this->customer_id->AdvancedSearch->Save();
 
-		// Field alamat
-		$this->alamat->AdvancedSearch->SearchValue = @$filter["x_alamat"];
-		$this->alamat->AdvancedSearch->SearchOperator = @$filter["z_alamat"];
-		$this->alamat->AdvancedSearch->SearchCondition = @$filter["v_alamat"];
-		$this->alamat->AdvancedSearch->SearchValue2 = @$filter["y_alamat"];
-		$this->alamat->AdvancedSearch->SearchOperator2 = @$filter["w_alamat"];
-		$this->alamat->AdvancedSearch->Save();
+		// Field no_invoice
+		$this->no_invoice->AdvancedSearch->SearchValue = @$filter["x_no_invoice"];
+		$this->no_invoice->AdvancedSearch->SearchOperator = @$filter["z_no_invoice"];
+		$this->no_invoice->AdvancedSearch->SearchCondition = @$filter["v_no_invoice"];
+		$this->no_invoice->AdvancedSearch->SearchValue2 = @$filter["y_no_invoice"];
+		$this->no_invoice->AdvancedSearch->SearchOperator2 = @$filter["w_no_invoice"];
+		$this->no_invoice->AdvancedSearch->Save();
 
-		// Field kota
-		$this->kota->AdvancedSearch->SearchValue = @$filter["x_kota"];
-		$this->kota->AdvancedSearch->SearchOperator = @$filter["z_kota"];
-		$this->kota->AdvancedSearch->SearchCondition = @$filter["v_kota"];
-		$this->kota->AdvancedSearch->SearchValue2 = @$filter["y_kota"];
-		$this->kota->AdvancedSearch->SearchOperator2 = @$filter["w_kota"];
-		$this->kota->AdvancedSearch->Save();
+		// Field tgl_invoice
+		$this->tgl_invoice->AdvancedSearch->SearchValue = @$filter["x_tgl_invoice"];
+		$this->tgl_invoice->AdvancedSearch->SearchOperator = @$filter["z_tgl_invoice"];
+		$this->tgl_invoice->AdvancedSearch->SearchCondition = @$filter["v_tgl_invoice"];
+		$this->tgl_invoice->AdvancedSearch->SearchValue2 = @$filter["y_tgl_invoice"];
+		$this->tgl_invoice->AdvancedSearch->SearchOperator2 = @$filter["w_tgl_invoice"];
+		$this->tgl_invoice->AdvancedSearch->Save();
 
-		// Field kodepos
-		$this->kodepos->AdvancedSearch->SearchValue = @$filter["x_kodepos"];
-		$this->kodepos->AdvancedSearch->SearchOperator = @$filter["z_kodepos"];
-		$this->kodepos->AdvancedSearch->SearchCondition = @$filter["v_kodepos"];
-		$this->kodepos->AdvancedSearch->SearchValue2 = @$filter["y_kodepos"];
-		$this->kodepos->AdvancedSearch->SearchOperator2 = @$filter["w_kodepos"];
-		$this->kodepos->AdvancedSearch->Save();
+		// Field no_order
+		$this->no_order->AdvancedSearch->SearchValue = @$filter["x_no_order"];
+		$this->no_order->AdvancedSearch->SearchOperator = @$filter["z_no_order"];
+		$this->no_order->AdvancedSearch->SearchCondition = @$filter["v_no_order"];
+		$this->no_order->AdvancedSearch->SearchValue2 = @$filter["y_no_order"];
+		$this->no_order->AdvancedSearch->SearchOperator2 = @$filter["w_no_order"];
+		$this->no_order->AdvancedSearch->Save();
 
-		// Field no_npwp
-		$this->no_npwp->AdvancedSearch->SearchValue = @$filter["x_no_npwp"];
-		$this->no_npwp->AdvancedSearch->SearchOperator = @$filter["z_no_npwp"];
-		$this->no_npwp->AdvancedSearch->SearchCondition = @$filter["v_no_npwp"];
-		$this->no_npwp->AdvancedSearch->SearchValue2 = @$filter["y_no_npwp"];
-		$this->no_npwp->AdvancedSearch->SearchOperator2 = @$filter["w_no_npwp"];
-		$this->no_npwp->AdvancedSearch->Save();
+		// Field no_referensi
+		$this->no_referensi->AdvancedSearch->SearchValue = @$filter["x_no_referensi"];
+		$this->no_referensi->AdvancedSearch->SearchOperator = @$filter["z_no_referensi"];
+		$this->no_referensi->AdvancedSearch->SearchCondition = @$filter["v_no_referensi"];
+		$this->no_referensi->AdvancedSearch->SearchValue2 = @$filter["y_no_referensi"];
+		$this->no_referensi->AdvancedSearch->SearchOperator2 = @$filter["w_no_referensi"];
+		$this->no_referensi->AdvancedSearch->Save();
+
+		// Field kegiatan
+		$this->kegiatan->AdvancedSearch->SearchValue = @$filter["x_kegiatan"];
+		$this->kegiatan->AdvancedSearch->SearchOperator = @$filter["z_kegiatan"];
+		$this->kegiatan->AdvancedSearch->SearchCondition = @$filter["v_kegiatan"];
+		$this->kegiatan->AdvancedSearch->SearchValue2 = @$filter["y_kegiatan"];
+		$this->kegiatan->AdvancedSearch->SearchOperator2 = @$filter["w_kegiatan"];
+		$this->kegiatan->AdvancedSearch->Save();
+
+		// Field tgl_pelaksanaan
+		$this->tgl_pelaksanaan->AdvancedSearch->SearchValue = @$filter["x_tgl_pelaksanaan"];
+		$this->tgl_pelaksanaan->AdvancedSearch->SearchOperator = @$filter["z_tgl_pelaksanaan"];
+		$this->tgl_pelaksanaan->AdvancedSearch->SearchCondition = @$filter["v_tgl_pelaksanaan"];
+		$this->tgl_pelaksanaan->AdvancedSearch->SearchValue2 = @$filter["y_tgl_pelaksanaan"];
+		$this->tgl_pelaksanaan->AdvancedSearch->SearchOperator2 = @$filter["w_tgl_pelaksanaan"];
+		$this->tgl_pelaksanaan->AdvancedSearch->Save();
+
+		// Field no_sertifikat
+		$this->no_sertifikat->AdvancedSearch->SearchValue = @$filter["x_no_sertifikat"];
+		$this->no_sertifikat->AdvancedSearch->SearchOperator = @$filter["z_no_sertifikat"];
+		$this->no_sertifikat->AdvancedSearch->SearchCondition = @$filter["v_no_sertifikat"];
+		$this->no_sertifikat->AdvancedSearch->SearchValue2 = @$filter["y_no_sertifikat"];
+		$this->no_sertifikat->AdvancedSearch->SearchOperator2 = @$filter["w_no_sertifikat"];
+		$this->no_sertifikat->AdvancedSearch->Save();
+
+		// Field keterangan
+		$this->keterangan->AdvancedSearch->SearchValue = @$filter["x_keterangan"];
+		$this->keterangan->AdvancedSearch->SearchOperator = @$filter["z_keterangan"];
+		$this->keterangan->AdvancedSearch->SearchCondition = @$filter["v_keterangan"];
+		$this->keterangan->AdvancedSearch->SearchValue2 = @$filter["y_keterangan"];
+		$this->keterangan->AdvancedSearch->SearchOperator2 = @$filter["w_keterangan"];
+		$this->keterangan->AdvancedSearch->Save();
+
+		// Field total
+		$this->total->AdvancedSearch->SearchValue = @$filter["x_total"];
+		$this->total->AdvancedSearch->SearchOperator = @$filter["z_total"];
+		$this->total->AdvancedSearch->SearchCondition = @$filter["v_total"];
+		$this->total->AdvancedSearch->SearchValue2 = @$filter["y_total"];
+		$this->total->AdvancedSearch->SearchOperator2 = @$filter["w_total"];
+		$this->total->AdvancedSearch->Save();
+
+		// Field ppn
+		$this->ppn->AdvancedSearch->SearchValue = @$filter["x_ppn"];
+		$this->ppn->AdvancedSearch->SearchOperator = @$filter["z_ppn"];
+		$this->ppn->AdvancedSearch->SearchCondition = @$filter["v_ppn"];
+		$this->ppn->AdvancedSearch->SearchValue2 = @$filter["y_ppn"];
+		$this->ppn->AdvancedSearch->SearchOperator2 = @$filter["w_ppn"];
+		$this->ppn->AdvancedSearch->Save();
+
+		// Field total_ppn
+		$this->total_ppn->AdvancedSearch->SearchValue = @$filter["x_total_ppn"];
+		$this->total_ppn->AdvancedSearch->SearchOperator = @$filter["z_total_ppn"];
+		$this->total_ppn->AdvancedSearch->SearchCondition = @$filter["v_total_ppn"];
+		$this->total_ppn->AdvancedSearch->SearchValue2 = @$filter["y_total_ppn"];
+		$this->total_ppn->AdvancedSearch->SearchOperator2 = @$filter["w_total_ppn"];
+		$this->total_ppn->AdvancedSearch->Save();
+
+		// Field terbilang
+		$this->terbilang->AdvancedSearch->SearchValue = @$filter["x_terbilang"];
+		$this->terbilang->AdvancedSearch->SearchOperator = @$filter["z_terbilang"];
+		$this->terbilang->AdvancedSearch->SearchCondition = @$filter["v_terbilang"];
+		$this->terbilang->AdvancedSearch->SearchValue2 = @$filter["y_terbilang"];
+		$this->terbilang->AdvancedSearch->SearchOperator2 = @$filter["w_terbilang"];
+		$this->terbilang->AdvancedSearch->Save();
+
+		// Field terbayar
+		$this->terbayar->AdvancedSearch->SearchValue = @$filter["x_terbayar"];
+		$this->terbayar->AdvancedSearch->SearchOperator = @$filter["z_terbayar"];
+		$this->terbayar->AdvancedSearch->SearchCondition = @$filter["v_terbayar"];
+		$this->terbayar->AdvancedSearch->SearchValue2 = @$filter["y_terbayar"];
+		$this->terbayar->AdvancedSearch->SearchOperator2 = @$filter["w_terbayar"];
+		$this->terbayar->AdvancedSearch->Save();
+
+		// Field pasal23
+		$this->pasal23->AdvancedSearch->SearchValue = @$filter["x_pasal23"];
+		$this->pasal23->AdvancedSearch->SearchOperator = @$filter["z_pasal23"];
+		$this->pasal23->AdvancedSearch->SearchCondition = @$filter["v_pasal23"];
+		$this->pasal23->AdvancedSearch->SearchValue2 = @$filter["y_pasal23"];
+		$this->pasal23->AdvancedSearch->SearchOperator2 = @$filter["w_pasal23"];
+		$this->pasal23->AdvancedSearch->Save();
 		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
 		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
 	}
@@ -838,11 +931,13 @@ class ctb_customer_list extends ctb_customer {
 	// Return basic search SQL
 	function BasicSearchSQL($arKeywords, $type) {
 		$sWhere = "";
-		$this->BuildBasicSearchSQL($sWhere, $this->nama, $arKeywords, $type);
-		$this->BuildBasicSearchSQL($sWhere, $this->alamat, $arKeywords, $type);
-		$this->BuildBasicSearchSQL($sWhere, $this->kota, $arKeywords, $type);
-		$this->BuildBasicSearchSQL($sWhere, $this->kodepos, $arKeywords, $type);
-		$this->BuildBasicSearchSQL($sWhere, $this->no_npwp, $arKeywords, $type);
+		$this->BuildBasicSearchSQL($sWhere, $this->no_invoice, $arKeywords, $type);
+		$this->BuildBasicSearchSQL($sWhere, $this->no_order, $arKeywords, $type);
+		$this->BuildBasicSearchSQL($sWhere, $this->no_referensi, $arKeywords, $type);
+		$this->BuildBasicSearchSQL($sWhere, $this->kegiatan, $arKeywords, $type);
+		$this->BuildBasicSearchSQL($sWhere, $this->no_sertifikat, $arKeywords, $type);
+		$this->BuildBasicSearchSQL($sWhere, $this->keterangan, $arKeywords, $type);
+		$this->BuildBasicSearchSQL($sWhere, $this->terbilang, $arKeywords, $type);
 		return $sWhere;
 	}
 
@@ -1007,11 +1102,19 @@ class ctb_customer_list extends ctb_customer {
 		if (@$_GET["order"] <> "") {
 			$this->CurrentOrder = ew_StripSlashes(@$_GET["order"]);
 			$this->CurrentOrderType = @$_GET["ordertype"];
-			$this->UpdateSort($this->nama); // nama
-			$this->UpdateSort($this->alamat); // alamat
-			$this->UpdateSort($this->kota); // kota
-			$this->UpdateSort($this->kodepos); // kodepos
-			$this->UpdateSort($this->no_npwp); // no_npwp
+			$this->UpdateSort($this->id); // id
+			$this->UpdateSort($this->customer_id); // customer_id
+			$this->UpdateSort($this->no_invoice); // no_invoice
+			$this->UpdateSort($this->tgl_invoice); // tgl_invoice
+			$this->UpdateSort($this->no_order); // no_order
+			$this->UpdateSort($this->no_referensi); // no_referensi
+			$this->UpdateSort($this->tgl_pelaksanaan); // tgl_pelaksanaan
+			$this->UpdateSort($this->no_sertifikat); // no_sertifikat
+			$this->UpdateSort($this->total); // total
+			$this->UpdateSort($this->ppn); // ppn
+			$this->UpdateSort($this->total_ppn); // total_ppn
+			$this->UpdateSort($this->terbayar); // terbayar
+			$this->UpdateSort($this->pasal23); // pasal23
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -1044,11 +1147,19 @@ class ctb_customer_list extends ctb_customer {
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
-				$this->nama->setSort("");
-				$this->alamat->setSort("");
-				$this->kota->setSort("");
-				$this->kodepos->setSort("");
-				$this->no_npwp->setSort("");
+				$this->id->setSort("");
+				$this->customer_id->setSort("");
+				$this->no_invoice->setSort("");
+				$this->tgl_invoice->setSort("");
+				$this->no_order->setSort("");
+				$this->no_referensi->setSort("");
+				$this->tgl_pelaksanaan->setSort("");
+				$this->no_sertifikat->setSort("");
+				$this->total->setSort("");
+				$this->ppn->setSort("");
+				$this->total_ppn->setSort("");
+				$this->terbayar->setSort("");
+				$this->pasal23->setSort("");
 			}
 
 			// Reset start position
@@ -1077,12 +1188,6 @@ class ctb_customer_list extends ctb_customer {
 		$item = &$this->ListOptions->Add("edit");
 		$item->CssStyle = "white-space: nowrap;";
 		$item->Visible = $Security->CanEdit();
-		$item->OnLeft = FALSE;
-
-		// "copy"
-		$item = &$this->ListOptions->Add("copy");
-		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->CanAdd();
 		$item->OnLeft = FALSE;
 
 		// "delete"
@@ -1154,15 +1259,6 @@ class ctb_customer_list extends ctb_customer {
 		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
 		if ($Security->CanEdit()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
-		} else {
-			$oListOpt->Body = "";
-		}
-
-		// "copy"
-		$oListOpt = &$this->ListOptions->Items["copy"];
-		$copycaption = ew_HtmlTitle($Language->Phrase("CopyLink"));
-		if ($Security->CanAdd()) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
 		}
@@ -1241,10 +1337,10 @@ class ctb_customer_list extends ctb_customer {
 
 		// Filter button
 		$item = &$this->FilterOptions->Add("savecurrentfilter");
-		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ftb_customerlistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
+		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"fview6listsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
 		$item->Visible = TRUE;
 		$item = &$this->FilterOptions->Add("deletefilter");
-		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ftb_customerlistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
+		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"fview6listsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
 		$item->Visible = TRUE;
 		$this->FilterOptions->UseDropDownButton = TRUE;
 		$this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1268,7 +1364,7 @@ class ctb_customer_list extends ctb_customer {
 					$item = &$option->Add("custom_" . $listaction->Action);
 					$caption = $listaction->Caption;
 					$icon = ($listaction->Icon <> "") ? "<span class=\"" . ew_HtmlEncode($listaction->Icon) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\"></span> " : $caption;
-					$item->Body = "<a class=\"ewAction ewListAction\" title=\"" . ew_HtmlEncode($caption) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\" href=\"\" onclick=\"ew_SubmitAction(event,jQuery.extend({f:document.ftb_customerlist}," . $listaction->ToJson(TRUE) . "));return false;\">" . $icon . "</a>";
+					$item->Body = "<a class=\"ewAction ewListAction\" title=\"" . ew_HtmlEncode($caption) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\" href=\"\" onclick=\"ew_SubmitAction(event,jQuery.extend({f:document.fview6list}," . $listaction->ToJson(TRUE) . "));return false;\">" . $icon . "</a>";
 					$item->Visible = $listaction->Allow;
 				}
 			}
@@ -1372,7 +1468,7 @@ class ctb_customer_list extends ctb_customer {
 		// Search button
 		$item = &$this->SearchOptions->Add("searchtoggle");
 		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : " active";
-		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ftb_customerlistsrch\">" . $Language->Phrase("SearchBtn") . "</button>";
+		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"fview6listsrch\">" . $Language->Phrase("SearchBtn") . "</button>";
 		$item->Visible = TRUE;
 
 		// Show all button
@@ -1508,11 +1604,21 @@ class ctb_customer_list extends ctb_customer {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
-		$this->nama->setDbValue($rs->fields('nama'));
-		$this->alamat->setDbValue($rs->fields('alamat'));
-		$this->kota->setDbValue($rs->fields('kota'));
-		$this->kodepos->setDbValue($rs->fields('kodepos'));
-		$this->no_npwp->setDbValue($rs->fields('no_npwp'));
+		$this->customer_id->setDbValue($rs->fields('customer_id'));
+		$this->no_invoice->setDbValue($rs->fields('no_invoice'));
+		$this->tgl_invoice->setDbValue($rs->fields('tgl_invoice'));
+		$this->no_order->setDbValue($rs->fields('no_order'));
+		$this->no_referensi->setDbValue($rs->fields('no_referensi'));
+		$this->kegiatan->setDbValue($rs->fields('kegiatan'));
+		$this->tgl_pelaksanaan->setDbValue($rs->fields('tgl_pelaksanaan'));
+		$this->no_sertifikat->setDbValue($rs->fields('no_sertifikat'));
+		$this->keterangan->setDbValue($rs->fields('keterangan'));
+		$this->total->setDbValue($rs->fields('total'));
+		$this->ppn->setDbValue($rs->fields('ppn'));
+		$this->total_ppn->setDbValue($rs->fields('total_ppn'));
+		$this->terbilang->setDbValue($rs->fields('terbilang'));
+		$this->terbayar->setDbValue($rs->fields('terbayar'));
+		$this->pasal23->setDbValue($rs->fields('pasal23'));
 	}
 
 	// Load DbValue from recordset
@@ -1520,11 +1626,21 @@ class ctb_customer_list extends ctb_customer {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
-		$this->nama->DbValue = $row['nama'];
-		$this->alamat->DbValue = $row['alamat'];
-		$this->kota->DbValue = $row['kota'];
-		$this->kodepos->DbValue = $row['kodepos'];
-		$this->no_npwp->DbValue = $row['no_npwp'];
+		$this->customer_id->DbValue = $row['customer_id'];
+		$this->no_invoice->DbValue = $row['no_invoice'];
+		$this->tgl_invoice->DbValue = $row['tgl_invoice'];
+		$this->no_order->DbValue = $row['no_order'];
+		$this->no_referensi->DbValue = $row['no_referensi'];
+		$this->kegiatan->DbValue = $row['kegiatan'];
+		$this->tgl_pelaksanaan->DbValue = $row['tgl_pelaksanaan'];
+		$this->no_sertifikat->DbValue = $row['no_sertifikat'];
+		$this->keterangan->DbValue = $row['keterangan'];
+		$this->total->DbValue = $row['total'];
+		$this->ppn->DbValue = $row['ppn'];
+		$this->total_ppn->DbValue = $row['total_ppn'];
+		$this->terbilang->DbValue = $row['terbilang'];
+		$this->terbayar->DbValue = $row['terbayar'];
+		$this->pasal23->DbValue = $row['pasal23'];
 	}
 
 	// Load old record
@@ -1562,63 +1678,155 @@ class ctb_customer_list extends ctb_customer {
 		$this->InlineCopyUrl = $this->GetInlineCopyUrl();
 		$this->DeleteUrl = $this->GetDeleteUrl();
 
+		// Convert decimal values if posted back
+		if ($this->total->FormValue == $this->total->CurrentValue && is_numeric(ew_StrToFloat($this->total->CurrentValue)))
+			$this->total->CurrentValue = ew_StrToFloat($this->total->CurrentValue);
+
+		// Convert decimal values if posted back
+		if ($this->total_ppn->FormValue == $this->total_ppn->CurrentValue && is_numeric(ew_StrToFloat($this->total_ppn->CurrentValue)))
+			$this->total_ppn->CurrentValue = ew_StrToFloat($this->total_ppn->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
 		// id
-		// nama
-		// alamat
-		// kota
-		// kodepos
-		// no_npwp
+		// customer_id
+		// no_invoice
+		// tgl_invoice
+		// no_order
+		// no_referensi
+		// kegiatan
+		// tgl_pelaksanaan
+		// no_sertifikat
+		// keterangan
+		// total
+		// ppn
+		// total_ppn
+		// terbilang
+		// terbayar
+		// pasal23
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// nama
-		$this->nama->ViewValue = $this->nama->CurrentValue;
-		$this->nama->ViewCustomAttributes = "";
+		// id
+		$this->id->ViewValue = $this->id->CurrentValue;
+		$this->id->ViewCustomAttributes = "";
 
-		// alamat
-		$this->alamat->ViewValue = $this->alamat->CurrentValue;
-		$this->alamat->ViewCustomAttributes = "";
+		// customer_id
+		$this->customer_id->ViewValue = $this->customer_id->CurrentValue;
+		$this->customer_id->ViewCustomAttributes = "";
 
-		// kota
-		$this->kota->ViewValue = $this->kota->CurrentValue;
-		$this->kota->ViewCustomAttributes = "";
+		// no_invoice
+		$this->no_invoice->ViewValue = $this->no_invoice->CurrentValue;
+		$this->no_invoice->ViewCustomAttributes = "";
 
-		// kodepos
-		$this->kodepos->ViewValue = $this->kodepos->CurrentValue;
-		$this->kodepos->ViewCustomAttributes = "";
+		// tgl_invoice
+		$this->tgl_invoice->ViewValue = $this->tgl_invoice->CurrentValue;
+		$this->tgl_invoice->ViewValue = ew_FormatDateTime($this->tgl_invoice->ViewValue, 0);
+		$this->tgl_invoice->ViewCustomAttributes = "";
 
-		// no_npwp
-		$this->no_npwp->ViewValue = $this->no_npwp->CurrentValue;
-		$this->no_npwp->ViewCustomAttributes = "";
+		// no_order
+		$this->no_order->ViewValue = $this->no_order->CurrentValue;
+		$this->no_order->ViewCustomAttributes = "";
 
-			// nama
-			$this->nama->LinkCustomAttributes = "";
-			$this->nama->HrefValue = "";
-			$this->nama->TooltipValue = "";
+		// no_referensi
+		$this->no_referensi->ViewValue = $this->no_referensi->CurrentValue;
+		$this->no_referensi->ViewCustomAttributes = "";
 
-			// alamat
-			$this->alamat->LinkCustomAttributes = "";
-			$this->alamat->HrefValue = "";
-			$this->alamat->TooltipValue = "";
+		// tgl_pelaksanaan
+		$this->tgl_pelaksanaan->ViewValue = $this->tgl_pelaksanaan->CurrentValue;
+		$this->tgl_pelaksanaan->ViewValue = ew_FormatDateTime($this->tgl_pelaksanaan->ViewValue, 0);
+		$this->tgl_pelaksanaan->ViewCustomAttributes = "";
 
-			// kota
-			$this->kota->LinkCustomAttributes = "";
-			$this->kota->HrefValue = "";
-			$this->kota->TooltipValue = "";
+		// no_sertifikat
+		$this->no_sertifikat->ViewValue = $this->no_sertifikat->CurrentValue;
+		$this->no_sertifikat->ViewCustomAttributes = "";
 
-			// kodepos
-			$this->kodepos->LinkCustomAttributes = "";
-			$this->kodepos->HrefValue = "";
-			$this->kodepos->TooltipValue = "";
+		// total
+		$this->total->ViewValue = $this->total->CurrentValue;
+		$this->total->ViewCustomAttributes = "";
 
-			// no_npwp
-			$this->no_npwp->LinkCustomAttributes = "";
-			$this->no_npwp->HrefValue = "";
-			$this->no_npwp->TooltipValue = "";
+		// ppn
+		$this->ppn->ViewValue = $this->ppn->CurrentValue;
+		$this->ppn->ViewCustomAttributes = "";
+
+		// total_ppn
+		$this->total_ppn->ViewValue = $this->total_ppn->CurrentValue;
+		$this->total_ppn->ViewCustomAttributes = "";
+
+		// terbayar
+		$this->terbayar->ViewValue = $this->terbayar->CurrentValue;
+		$this->terbayar->ViewCustomAttributes = "";
+
+		// pasal23
+		$this->pasal23->ViewValue = $this->pasal23->CurrentValue;
+		$this->pasal23->ViewCustomAttributes = "";
+
+			// id
+			$this->id->LinkCustomAttributes = "";
+			$this->id->HrefValue = "";
+			$this->id->TooltipValue = "";
+
+			// customer_id
+			$this->customer_id->LinkCustomAttributes = "";
+			$this->customer_id->HrefValue = "";
+			$this->customer_id->TooltipValue = "";
+
+			// no_invoice
+			$this->no_invoice->LinkCustomAttributes = "";
+			$this->no_invoice->HrefValue = "";
+			$this->no_invoice->TooltipValue = "";
+
+			// tgl_invoice
+			$this->tgl_invoice->LinkCustomAttributes = "";
+			$this->tgl_invoice->HrefValue = "";
+			$this->tgl_invoice->TooltipValue = "";
+
+			// no_order
+			$this->no_order->LinkCustomAttributes = "";
+			$this->no_order->HrefValue = "";
+			$this->no_order->TooltipValue = "";
+
+			// no_referensi
+			$this->no_referensi->LinkCustomAttributes = "";
+			$this->no_referensi->HrefValue = "";
+			$this->no_referensi->TooltipValue = "";
+
+			// tgl_pelaksanaan
+			$this->tgl_pelaksanaan->LinkCustomAttributes = "";
+			$this->tgl_pelaksanaan->HrefValue = "";
+			$this->tgl_pelaksanaan->TooltipValue = "";
+
+			// no_sertifikat
+			$this->no_sertifikat->LinkCustomAttributes = "";
+			$this->no_sertifikat->HrefValue = "";
+			$this->no_sertifikat->TooltipValue = "";
+
+			// total
+			$this->total->LinkCustomAttributes = "";
+			$this->total->HrefValue = "";
+			$this->total->TooltipValue = "";
+
+			// ppn
+			$this->ppn->LinkCustomAttributes = "";
+			$this->ppn->HrefValue = "";
+			$this->ppn->TooltipValue = "";
+
+			// total_ppn
+			$this->total_ppn->LinkCustomAttributes = "";
+			$this->total_ppn->HrefValue = "";
+			$this->total_ppn->TooltipValue = "";
+
+			// terbayar
+			$this->terbayar->LinkCustomAttributes = "";
+			$this->terbayar->HrefValue = "";
+			$this->terbayar->TooltipValue = "";
+
+			// pasal23
+			$this->pasal23->LinkCustomAttributes = "";
+			$this->pasal23->HrefValue = "";
+			$this->pasal23->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1668,7 +1876,7 @@ class ctb_customer_list extends ctb_customer {
 		// Export to Email
 		$item = &$this->ExportOptions->Add("email");
 		$url = "";
-		$item->Body = "<button id=\"emf_tb_customer\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_tb_customer',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ftb_customerlist,sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
+		$item->Body = "<button id=\"emf_view6\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_view6',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.fview6list,sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
 		$item->Visible = TRUE;
 
 		// Drop down button for export
@@ -1925,13 +2133,6 @@ class ctb_customer_list extends ctb_customer {
 		}
 	}
 
-	// Write Audit Trail start/end for grid update
-	function WriteAuditTrailDummy($typ) {
-		$table = 'tb_customer';
-		$usr = CurrentUserName();
-		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
-	}
-
 	// Page Load event
 	function Page_Load() {
 
@@ -2056,31 +2257,31 @@ class ctb_customer_list extends ctb_customer {
 <?php
 
 // Create page object
-if (!isset($tb_customer_list)) $tb_customer_list = new ctb_customer_list();
+if (!isset($view6_list)) $view6_list = new cview6_list();
 
 // Page init
-$tb_customer_list->Page_Init();
+$view6_list->Page_Init();
 
 // Page main
-$tb_customer_list->Page_Main();
+$view6_list->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$tb_customer_list->Page_Render();
+$view6_list->Page_Render();
 ?>
 <?php include_once "header.php" ?>
-<?php if ($tb_customer->Export == "") { ?>
+<?php if ($view6->Export == "") { ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "list";
-var CurrentForm = ftb_customerlist = new ew_Form("ftb_customerlist", "list");
-ftb_customerlist.FormKeyCountName = '<?php echo $tb_customer_list->FormKeyCountName ?>';
+var CurrentForm = fview6list = new ew_Form("fview6list", "list");
+fview6list.FormKeyCountName = '<?php echo $view6_list->FormKeyCountName ?>';
 
 // Form_CustomValidate event
-ftb_customerlist.Form_CustomValidate = 
+fview6list.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -2089,95 +2290,88 @@ ftb_customerlist.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ftb_customerlist.ValidateRequired = true;
+fview6list.ValidateRequired = true;
 <?php } else { ?>
-ftb_customerlist.ValidateRequired = false; 
+fview6list.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
 // Form object for search
 
-var CurrentSearchForm = ftb_customerlistsrch = new ew_Form("ftb_customerlistsrch");
+var CurrentSearchForm = fview6listsrch = new ew_Form("fview6listsrch");
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
 <?php } ?>
-<?php if ($tb_customer->Export == "") { ?>
+<?php if ($view6->Export == "") { ?>
 <div class="ewToolbar">
-<?php if ($tb_customer->Export == "") { ?>
+<?php if ($view6->Export == "") { ?>
 <?php $Breadcrumb->Render(); ?>
 <?php } ?>
-<?php if ($tb_customer_list->TotalRecs > 0 && $tb_customer_list->ExportOptions->Visible()) { ?>
-<?php $tb_customer_list->ExportOptions->Render("body") ?>
+<?php if ($view6_list->TotalRecs > 0 && $view6_list->ExportOptions->Visible()) { ?>
+<?php $view6_list->ExportOptions->Render("body") ?>
 <?php } ?>
-<?php if ($tb_customer_list->SearchOptions->Visible()) { ?>
-<?php $tb_customer_list->SearchOptions->Render("body") ?>
+<?php if ($view6_list->SearchOptions->Visible()) { ?>
+<?php $view6_list->SearchOptions->Render("body") ?>
 <?php } ?>
-<?php if ($tb_customer_list->FilterOptions->Visible()) { ?>
-<?php $tb_customer_list->FilterOptions->Render("body") ?>
+<?php if ($view6_list->FilterOptions->Visible()) { ?>
+<?php $view6_list->FilterOptions->Render("body") ?>
 <?php } ?>
-<?php if ($tb_customer->Export == "") { ?>
+<?php if ($view6->Export == "") { ?>
 <?php echo $Language->SelectionForm(); ?>
 <?php } ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
 <?php
-	$bSelectLimit = $tb_customer_list->UseSelectLimit;
+	$bSelectLimit = $view6_list->UseSelectLimit;
 	if ($bSelectLimit) {
-		if ($tb_customer_list->TotalRecs <= 0)
-			$tb_customer_list->TotalRecs = $tb_customer->SelectRecordCount();
+		if ($view6_list->TotalRecs <= 0)
+			$view6_list->TotalRecs = $view6->SelectRecordCount();
 	} else {
-		if (!$tb_customer_list->Recordset && ($tb_customer_list->Recordset = $tb_customer_list->LoadRecordset()))
-			$tb_customer_list->TotalRecs = $tb_customer_list->Recordset->RecordCount();
+		if (!$view6_list->Recordset && ($view6_list->Recordset = $view6_list->LoadRecordset()))
+			$view6_list->TotalRecs = $view6_list->Recordset->RecordCount();
 	}
-	$tb_customer_list->StartRec = 1;
-	if ($tb_customer_list->DisplayRecs <= 0 || ($tb_customer->Export <> "" && $tb_customer->ExportAll)) // Display all records
-		$tb_customer_list->DisplayRecs = $tb_customer_list->TotalRecs;
-	if (!($tb_customer->Export <> "" && $tb_customer->ExportAll))
-		$tb_customer_list->SetUpStartRec(); // Set up start record position
+	$view6_list->StartRec = 1;
+	if ($view6_list->DisplayRecs <= 0 || ($view6->Export <> "" && $view6->ExportAll)) // Display all records
+		$view6_list->DisplayRecs = $view6_list->TotalRecs;
+	if (!($view6->Export <> "" && $view6->ExportAll))
+		$view6_list->SetUpStartRec(); // Set up start record position
 	if ($bSelectLimit)
-		$tb_customer_list->Recordset = $tb_customer_list->LoadRecordset($tb_customer_list->StartRec-1, $tb_customer_list->DisplayRecs);
+		$view6_list->Recordset = $view6_list->LoadRecordset($view6_list->StartRec-1, $view6_list->DisplayRecs);
 
 	// Set no record found message
-	if ($tb_customer->CurrentAction == "" && $tb_customer_list->TotalRecs == 0) {
+	if ($view6->CurrentAction == "" && $view6_list->TotalRecs == 0) {
 		if (!$Security->CanList())
-			$tb_customer_list->setWarningMessage(ew_DeniedMsg());
-		if ($tb_customer_list->SearchWhere == "0=101")
-			$tb_customer_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
+			$view6_list->setWarningMessage(ew_DeniedMsg());
+		if ($view6_list->SearchWhere == "0=101")
+			$view6_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
-			$tb_customer_list->setWarningMessage($Language->Phrase("NoRecord"));
+			$view6_list->setWarningMessage($Language->Phrase("NoRecord"));
 	}
-
-	// Audit trail on search
-	if ($tb_customer_list->AuditTrailOnSearch && $tb_customer_list->Command == "search" && !$tb_customer_list->RestoreSearch) {
-		$searchparm = ew_ServerVar("QUERY_STRING");
-		$searchsql = $tb_customer_list->getSessionWhere();
-		$tb_customer_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
-	}
-$tb_customer_list->RenderOtherOptions();
+$view6_list->RenderOtherOptions();
 ?>
 <?php if ($Security->CanSearch()) { ?>
-<?php if ($tb_customer->Export == "" && $tb_customer->CurrentAction == "") { ?>
-<form name="ftb_customerlistsrch" id="ftb_customerlistsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
-<?php $SearchPanelClass = ($tb_customer_list->SearchWhere <> "") ? " in" : " in"; ?>
-<div id="ftb_customerlistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
+<?php if ($view6->Export == "" && $view6->CurrentAction == "") { ?>
+<form name="fview6listsrch" id="fview6listsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
+<?php $SearchPanelClass = ($view6_list->SearchWhere <> "") ? " in" : " in"; ?>
+<div id="fview6listsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
 <input type="hidden" name="cmd" value="search">
-<input type="hidden" name="t" value="tb_customer">
+<input type="hidden" name="t" value="view6">
 	<div class="ewBasicSearch">
 <div id="xsr_1" class="ewRow">
 	<div class="ewQuickSearch input-group">
-	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="form-control" value="<?php echo ew_HtmlEncode($tb_customer_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo ew_HtmlEncode($Language->Phrase("Search")) ?>">
-	<input type="hidden" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" id="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="<?php echo ew_HtmlEncode($tb_customer_list->BasicSearch->getType()) ?>">
+	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="form-control" value="<?php echo ew_HtmlEncode($view6_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo ew_HtmlEncode($Language->Phrase("Search")) ?>">
+	<input type="hidden" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" id="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="<?php echo ew_HtmlEncode($view6_list->BasicSearch->getType()) ?>">
 	<div class="input-group-btn">
-		<button type="button" data-toggle="dropdown" class="btn btn-default"><span id="searchtype"><?php echo $tb_customer_list->BasicSearch->getTypeNameShort() ?></span><span class="caret"></span></button>
+		<button type="button" data-toggle="dropdown" class="btn btn-default"><span id="searchtype"><?php echo $view6_list->BasicSearch->getTypeNameShort() ?></span><span class="caret"></span></button>
 		<ul class="dropdown-menu pull-right" role="menu">
-			<li<?php if ($tb_customer_list->BasicSearch->getType() == "") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this)"><?php echo $Language->Phrase("QuickSearchAuto") ?></a></li>
-			<li<?php if ($tb_customer_list->BasicSearch->getType() == "=") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'=')"><?php echo $Language->Phrase("QuickSearchExact") ?></a></li>
-			<li<?php if ($tb_customer_list->BasicSearch->getType() == "AND") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'AND')"><?php echo $Language->Phrase("QuickSearchAll") ?></a></li>
-			<li<?php if ($tb_customer_list->BasicSearch->getType() == "OR") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'OR')"><?php echo $Language->Phrase("QuickSearchAny") ?></a></li>
+			<li<?php if ($view6_list->BasicSearch->getType() == "") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this)"><?php echo $Language->Phrase("QuickSearchAuto") ?></a></li>
+			<li<?php if ($view6_list->BasicSearch->getType() == "=") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'=')"><?php echo $Language->Phrase("QuickSearchExact") ?></a></li>
+			<li<?php if ($view6_list->BasicSearch->getType() == "AND") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'AND')"><?php echo $Language->Phrase("QuickSearchAll") ?></a></li>
+			<li<?php if ($view6_list->BasicSearch->getType() == "OR") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'OR')"><?php echo $Language->Phrase("QuickSearchAny") ?></a></li>
 		</ul>
 	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit"><?php echo $Language->Phrase("QuickSearchBtn") ?></button>
 	</div>
@@ -2188,200 +2382,336 @@ $tb_customer_list->RenderOtherOptions();
 </form>
 <?php } ?>
 <?php } ?>
-<?php $tb_customer_list->ShowPageHeader(); ?>
+<?php $view6_list->ShowPageHeader(); ?>
 <?php
-$tb_customer_list->ShowMessage();
+$view6_list->ShowMessage();
 ?>
-<?php if ($tb_customer_list->TotalRecs > 0 || $tb_customer->CurrentAction <> "") { ?>
-<div class="panel panel-default ewGrid tb_customer">
-<form name="ftb_customerlist" id="ftb_customerlist" class="form-inline ewForm ewListForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($tb_customer_list->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_customer_list->Token ?>">
+<?php if ($view6_list->TotalRecs > 0 || $view6->CurrentAction <> "") { ?>
+<div class="panel panel-default ewGrid view6">
+<form name="fview6list" id="fview6list" class="form-inline ewForm ewListForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($view6_list->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $view6_list->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="tb_customer">
-<div id="gmp_tb_customer" class="<?php if (ew_IsResponsiveLayout()) { echo "table-responsive "; } ?>ewGridMiddlePanel">
-<?php if ($tb_customer_list->TotalRecs > 0) { ?>
-<table id="tbl_tb_customerlist" class="table ewTable">
-<?php echo $tb_customer->TableCustomInnerHtml ?>
+<input type="hidden" name="t" value="view6">
+<div id="gmp_view6" class="<?php if (ew_IsResponsiveLayout()) { echo "table-responsive "; } ?>ewGridMiddlePanel">
+<?php if ($view6_list->TotalRecs > 0) { ?>
+<table id="tbl_view6list" class="table ewTable">
+<?php echo $view6->TableCustomInnerHtml ?>
 <thead><!-- Table header -->
 	<tr class="ewTableHeader">
 <?php
 
 // Header row
-$tb_customer_list->RowType = EW_ROWTYPE_HEADER;
+$view6_list->RowType = EW_ROWTYPE_HEADER;
 
 // Render list options
-$tb_customer_list->RenderListOptions();
+$view6_list->RenderListOptions();
 
 // Render list options (header, left)
-$tb_customer_list->ListOptions->Render("header", "left");
+$view6_list->ListOptions->Render("header", "left");
 ?>
-<?php if ($tb_customer->nama->Visible) { // nama ?>
-	<?php if ($tb_customer->SortUrl($tb_customer->nama) == "") { ?>
-		<th data-name="nama"><div id="elh_tb_customer_nama" class="tb_customer_nama"><div class="ewTableHeaderCaption"><?php echo $tb_customer->nama->FldCaption() ?></div></div></th>
+<?php if ($view6->id->Visible) { // id ?>
+	<?php if ($view6->SortUrl($view6->id) == "") { ?>
+		<th data-name="id"><div id="elh_view6_id" class="view6_id"><div class="ewTableHeaderCaption"><?php echo $view6->id->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="nama"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_customer->SortUrl($tb_customer->nama) ?>',1);"><div id="elh_tb_customer_nama" class="tb_customer_nama">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_customer->nama->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($tb_customer->nama->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_customer->nama->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="id"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $view6->SortUrl($view6->id) ?>',1);"><div id="elh_view6_id" class="view6_id">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $view6->id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($view6->id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($view6->id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
-<?php if ($tb_customer->alamat->Visible) { // alamat ?>
-	<?php if ($tb_customer->SortUrl($tb_customer->alamat) == "") { ?>
-		<th data-name="alamat"><div id="elh_tb_customer_alamat" class="tb_customer_alamat"><div class="ewTableHeaderCaption"><?php echo $tb_customer->alamat->FldCaption() ?></div></div></th>
+<?php if ($view6->customer_id->Visible) { // customer_id ?>
+	<?php if ($view6->SortUrl($view6->customer_id) == "") { ?>
+		<th data-name="customer_id"><div id="elh_view6_customer_id" class="view6_customer_id"><div class="ewTableHeaderCaption"><?php echo $view6->customer_id->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="alamat"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_customer->SortUrl($tb_customer->alamat) ?>',1);"><div id="elh_tb_customer_alamat" class="tb_customer_alamat">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_customer->alamat->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($tb_customer->alamat->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_customer->alamat->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="customer_id"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $view6->SortUrl($view6->customer_id) ?>',1);"><div id="elh_view6_customer_id" class="view6_customer_id">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $view6->customer_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($view6->customer_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($view6->customer_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
-<?php if ($tb_customer->kota->Visible) { // kota ?>
-	<?php if ($tb_customer->SortUrl($tb_customer->kota) == "") { ?>
-		<th data-name="kota"><div id="elh_tb_customer_kota" class="tb_customer_kota"><div class="ewTableHeaderCaption"><?php echo $tb_customer->kota->FldCaption() ?></div></div></th>
+<?php if ($view6->no_invoice->Visible) { // no_invoice ?>
+	<?php if ($view6->SortUrl($view6->no_invoice) == "") { ?>
+		<th data-name="no_invoice"><div id="elh_view6_no_invoice" class="view6_no_invoice"><div class="ewTableHeaderCaption"><?php echo $view6->no_invoice->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="kota"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_customer->SortUrl($tb_customer->kota) ?>',1);"><div id="elh_tb_customer_kota" class="tb_customer_kota">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_customer->kota->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($tb_customer->kota->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_customer->kota->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="no_invoice"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $view6->SortUrl($view6->no_invoice) ?>',1);"><div id="elh_view6_no_invoice" class="view6_no_invoice">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $view6->no_invoice->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($view6->no_invoice->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($view6->no_invoice->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
-<?php if ($tb_customer->kodepos->Visible) { // kodepos ?>
-	<?php if ($tb_customer->SortUrl($tb_customer->kodepos) == "") { ?>
-		<th data-name="kodepos"><div id="elh_tb_customer_kodepos" class="tb_customer_kodepos"><div class="ewTableHeaderCaption"><?php echo $tb_customer->kodepos->FldCaption() ?></div></div></th>
+<?php if ($view6->tgl_invoice->Visible) { // tgl_invoice ?>
+	<?php if ($view6->SortUrl($view6->tgl_invoice) == "") { ?>
+		<th data-name="tgl_invoice"><div id="elh_view6_tgl_invoice" class="view6_tgl_invoice"><div class="ewTableHeaderCaption"><?php echo $view6->tgl_invoice->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="kodepos"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_customer->SortUrl($tb_customer->kodepos) ?>',1);"><div id="elh_tb_customer_kodepos" class="tb_customer_kodepos">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_customer->kodepos->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($tb_customer->kodepos->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_customer->kodepos->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="tgl_invoice"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $view6->SortUrl($view6->tgl_invoice) ?>',1);"><div id="elh_view6_tgl_invoice" class="view6_tgl_invoice">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $view6->tgl_invoice->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($view6->tgl_invoice->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($view6->tgl_invoice->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
-<?php if ($tb_customer->no_npwp->Visible) { // no_npwp ?>
-	<?php if ($tb_customer->SortUrl($tb_customer->no_npwp) == "") { ?>
-		<th data-name="no_npwp"><div id="elh_tb_customer_no_npwp" class="tb_customer_no_npwp"><div class="ewTableHeaderCaption"><?php echo $tb_customer->no_npwp->FldCaption() ?></div></div></th>
+<?php if ($view6->no_order->Visible) { // no_order ?>
+	<?php if ($view6->SortUrl($view6->no_order) == "") { ?>
+		<th data-name="no_order"><div id="elh_view6_no_order" class="view6_no_order"><div class="ewTableHeaderCaption"><?php echo $view6->no_order->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="no_npwp"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_customer->SortUrl($tb_customer->no_npwp) ?>',1);"><div id="elh_tb_customer_no_npwp" class="tb_customer_no_npwp">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_customer->no_npwp->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($tb_customer->no_npwp->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_customer->no_npwp->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="no_order"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $view6->SortUrl($view6->no_order) ?>',1);"><div id="elh_view6_no_order" class="view6_no_order">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $view6->no_order->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($view6->no_order->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($view6->no_order->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($view6->no_referensi->Visible) { // no_referensi ?>
+	<?php if ($view6->SortUrl($view6->no_referensi) == "") { ?>
+		<th data-name="no_referensi"><div id="elh_view6_no_referensi" class="view6_no_referensi"><div class="ewTableHeaderCaption"><?php echo $view6->no_referensi->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="no_referensi"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $view6->SortUrl($view6->no_referensi) ?>',1);"><div id="elh_view6_no_referensi" class="view6_no_referensi">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $view6->no_referensi->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($view6->no_referensi->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($view6->no_referensi->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($view6->tgl_pelaksanaan->Visible) { // tgl_pelaksanaan ?>
+	<?php if ($view6->SortUrl($view6->tgl_pelaksanaan) == "") { ?>
+		<th data-name="tgl_pelaksanaan"><div id="elh_view6_tgl_pelaksanaan" class="view6_tgl_pelaksanaan"><div class="ewTableHeaderCaption"><?php echo $view6->tgl_pelaksanaan->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="tgl_pelaksanaan"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $view6->SortUrl($view6->tgl_pelaksanaan) ?>',1);"><div id="elh_view6_tgl_pelaksanaan" class="view6_tgl_pelaksanaan">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $view6->tgl_pelaksanaan->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($view6->tgl_pelaksanaan->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($view6->tgl_pelaksanaan->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($view6->no_sertifikat->Visible) { // no_sertifikat ?>
+	<?php if ($view6->SortUrl($view6->no_sertifikat) == "") { ?>
+		<th data-name="no_sertifikat"><div id="elh_view6_no_sertifikat" class="view6_no_sertifikat"><div class="ewTableHeaderCaption"><?php echo $view6->no_sertifikat->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="no_sertifikat"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $view6->SortUrl($view6->no_sertifikat) ?>',1);"><div id="elh_view6_no_sertifikat" class="view6_no_sertifikat">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $view6->no_sertifikat->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($view6->no_sertifikat->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($view6->no_sertifikat->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($view6->total->Visible) { // total ?>
+	<?php if ($view6->SortUrl($view6->total) == "") { ?>
+		<th data-name="total"><div id="elh_view6_total" class="view6_total"><div class="ewTableHeaderCaption"><?php echo $view6->total->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="total"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $view6->SortUrl($view6->total) ?>',1);"><div id="elh_view6_total" class="view6_total">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $view6->total->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($view6->total->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($view6->total->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($view6->ppn->Visible) { // ppn ?>
+	<?php if ($view6->SortUrl($view6->ppn) == "") { ?>
+		<th data-name="ppn"><div id="elh_view6_ppn" class="view6_ppn"><div class="ewTableHeaderCaption"><?php echo $view6->ppn->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="ppn"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $view6->SortUrl($view6->ppn) ?>',1);"><div id="elh_view6_ppn" class="view6_ppn">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $view6->ppn->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($view6->ppn->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($view6->ppn->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($view6->total_ppn->Visible) { // total_ppn ?>
+	<?php if ($view6->SortUrl($view6->total_ppn) == "") { ?>
+		<th data-name="total_ppn"><div id="elh_view6_total_ppn" class="view6_total_ppn"><div class="ewTableHeaderCaption"><?php echo $view6->total_ppn->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="total_ppn"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $view6->SortUrl($view6->total_ppn) ?>',1);"><div id="elh_view6_total_ppn" class="view6_total_ppn">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $view6->total_ppn->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($view6->total_ppn->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($view6->total_ppn->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($view6->terbayar->Visible) { // terbayar ?>
+	<?php if ($view6->SortUrl($view6->terbayar) == "") { ?>
+		<th data-name="terbayar"><div id="elh_view6_terbayar" class="view6_terbayar"><div class="ewTableHeaderCaption"><?php echo $view6->terbayar->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="terbayar"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $view6->SortUrl($view6->terbayar) ?>',1);"><div id="elh_view6_terbayar" class="view6_terbayar">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $view6->terbayar->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($view6->terbayar->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($view6->terbayar->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($view6->pasal23->Visible) { // pasal23 ?>
+	<?php if ($view6->SortUrl($view6->pasal23) == "") { ?>
+		<th data-name="pasal23"><div id="elh_view6_pasal23" class="view6_pasal23"><div class="ewTableHeaderCaption"><?php echo $view6->pasal23->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="pasal23"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $view6->SortUrl($view6->pasal23) ?>',1);"><div id="elh_view6_pasal23" class="view6_pasal23">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $view6->pasal23->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($view6->pasal23->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($view6->pasal23->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
 <?php
 
 // Render list options (header, right)
-$tb_customer_list->ListOptions->Render("header", "right");
+$view6_list->ListOptions->Render("header", "right");
 ?>
 	</tr>
 </thead>
 <tbody>
 <?php
-if ($tb_customer->ExportAll && $tb_customer->Export <> "") {
-	$tb_customer_list->StopRec = $tb_customer_list->TotalRecs;
+if ($view6->ExportAll && $view6->Export <> "") {
+	$view6_list->StopRec = $view6_list->TotalRecs;
 } else {
 
 	// Set the last record to display
-	if ($tb_customer_list->TotalRecs > $tb_customer_list->StartRec + $tb_customer_list->DisplayRecs - 1)
-		$tb_customer_list->StopRec = $tb_customer_list->StartRec + $tb_customer_list->DisplayRecs - 1;
+	if ($view6_list->TotalRecs > $view6_list->StartRec + $view6_list->DisplayRecs - 1)
+		$view6_list->StopRec = $view6_list->StartRec + $view6_list->DisplayRecs - 1;
 	else
-		$tb_customer_list->StopRec = $tb_customer_list->TotalRecs;
+		$view6_list->StopRec = $view6_list->TotalRecs;
 }
-$tb_customer_list->RecCnt = $tb_customer_list->StartRec - 1;
-if ($tb_customer_list->Recordset && !$tb_customer_list->Recordset->EOF) {
-	$tb_customer_list->Recordset->MoveFirst();
-	$bSelectLimit = $tb_customer_list->UseSelectLimit;
-	if (!$bSelectLimit && $tb_customer_list->StartRec > 1)
-		$tb_customer_list->Recordset->Move($tb_customer_list->StartRec - 1);
-} elseif (!$tb_customer->AllowAddDeleteRow && $tb_customer_list->StopRec == 0) {
-	$tb_customer_list->StopRec = $tb_customer->GridAddRowCount;
+$view6_list->RecCnt = $view6_list->StartRec - 1;
+if ($view6_list->Recordset && !$view6_list->Recordset->EOF) {
+	$view6_list->Recordset->MoveFirst();
+	$bSelectLimit = $view6_list->UseSelectLimit;
+	if (!$bSelectLimit && $view6_list->StartRec > 1)
+		$view6_list->Recordset->Move($view6_list->StartRec - 1);
+} elseif (!$view6->AllowAddDeleteRow && $view6_list->StopRec == 0) {
+	$view6_list->StopRec = $view6->GridAddRowCount;
 }
 
 // Initialize aggregate
-$tb_customer->RowType = EW_ROWTYPE_AGGREGATEINIT;
-$tb_customer->ResetAttrs();
-$tb_customer_list->RenderRow();
-while ($tb_customer_list->RecCnt < $tb_customer_list->StopRec) {
-	$tb_customer_list->RecCnt++;
-	if (intval($tb_customer_list->RecCnt) >= intval($tb_customer_list->StartRec)) {
-		$tb_customer_list->RowCnt++;
+$view6->RowType = EW_ROWTYPE_AGGREGATEINIT;
+$view6->ResetAttrs();
+$view6_list->RenderRow();
+while ($view6_list->RecCnt < $view6_list->StopRec) {
+	$view6_list->RecCnt++;
+	if (intval($view6_list->RecCnt) >= intval($view6_list->StartRec)) {
+		$view6_list->RowCnt++;
 
 		// Set up key count
-		$tb_customer_list->KeyCount = $tb_customer_list->RowIndex;
+		$view6_list->KeyCount = $view6_list->RowIndex;
 
 		// Init row class and style
-		$tb_customer->ResetAttrs();
-		$tb_customer->CssClass = "";
-		if ($tb_customer->CurrentAction == "gridadd") {
+		$view6->ResetAttrs();
+		$view6->CssClass = "";
+		if ($view6->CurrentAction == "gridadd") {
 		} else {
-			$tb_customer_list->LoadRowValues($tb_customer_list->Recordset); // Load row values
+			$view6_list->LoadRowValues($view6_list->Recordset); // Load row values
 		}
-		$tb_customer->RowType = EW_ROWTYPE_VIEW; // Render view
+		$view6->RowType = EW_ROWTYPE_VIEW; // Render view
 
 		// Set up row id / data-rowindex
-		$tb_customer->RowAttrs = array_merge($tb_customer->RowAttrs, array('data-rowindex'=>$tb_customer_list->RowCnt, 'id'=>'r' . $tb_customer_list->RowCnt . '_tb_customer', 'data-rowtype'=>$tb_customer->RowType));
+		$view6->RowAttrs = array_merge($view6->RowAttrs, array('data-rowindex'=>$view6_list->RowCnt, 'id'=>'r' . $view6_list->RowCnt . '_view6', 'data-rowtype'=>$view6->RowType));
 
 		// Render row
-		$tb_customer_list->RenderRow();
+		$view6_list->RenderRow();
 
 		// Render list options
-		$tb_customer_list->RenderListOptions();
+		$view6_list->RenderListOptions();
 ?>
-	<tr<?php echo $tb_customer->RowAttributes() ?>>
+	<tr<?php echo $view6->RowAttributes() ?>>
 <?php
 
 // Render list options (body, left)
-$tb_customer_list->ListOptions->Render("body", "left", $tb_customer_list->RowCnt);
+$view6_list->ListOptions->Render("body", "left", $view6_list->RowCnt);
 ?>
-	<?php if ($tb_customer->nama->Visible) { // nama ?>
-		<td data-name="nama"<?php echo $tb_customer->nama->CellAttributes() ?>>
-<span id="el<?php echo $tb_customer_list->RowCnt ?>_tb_customer_nama" class="tb_customer_nama">
-<span<?php echo $tb_customer->nama->ViewAttributes() ?>>
-<?php echo $tb_customer->nama->ListViewValue() ?></span>
+	<?php if ($view6->id->Visible) { // id ?>
+		<td data-name="id"<?php echo $view6->id->CellAttributes() ?>>
+<span id="el<?php echo $view6_list->RowCnt ?>_view6_id" class="view6_id">
+<span<?php echo $view6->id->ViewAttributes() ?>>
+<?php echo $view6->id->ListViewValue() ?></span>
 </span>
-<a id="<?php echo $tb_customer_list->PageObjName . "_row_" . $tb_customer_list->RowCnt ?>"></a></td>
+<a id="<?php echo $view6_list->PageObjName . "_row_" . $view6_list->RowCnt ?>"></a></td>
 	<?php } ?>
-	<?php if ($tb_customer->alamat->Visible) { // alamat ?>
-		<td data-name="alamat"<?php echo $tb_customer->alamat->CellAttributes() ?>>
-<span id="el<?php echo $tb_customer_list->RowCnt ?>_tb_customer_alamat" class="tb_customer_alamat">
-<span<?php echo $tb_customer->alamat->ViewAttributes() ?>>
-<?php echo $tb_customer->alamat->ListViewValue() ?></span>
-</span>
-</td>
-	<?php } ?>
-	<?php if ($tb_customer->kota->Visible) { // kota ?>
-		<td data-name="kota"<?php echo $tb_customer->kota->CellAttributes() ?>>
-<span id="el<?php echo $tb_customer_list->RowCnt ?>_tb_customer_kota" class="tb_customer_kota">
-<span<?php echo $tb_customer->kota->ViewAttributes() ?>>
-<?php echo $tb_customer->kota->ListViewValue() ?></span>
+	<?php if ($view6->customer_id->Visible) { // customer_id ?>
+		<td data-name="customer_id"<?php echo $view6->customer_id->CellAttributes() ?>>
+<span id="el<?php echo $view6_list->RowCnt ?>_view6_customer_id" class="view6_customer_id">
+<span<?php echo $view6->customer_id->ViewAttributes() ?>>
+<?php echo $view6->customer_id->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>
-	<?php if ($tb_customer->kodepos->Visible) { // kodepos ?>
-		<td data-name="kodepos"<?php echo $tb_customer->kodepos->CellAttributes() ?>>
-<span id="el<?php echo $tb_customer_list->RowCnt ?>_tb_customer_kodepos" class="tb_customer_kodepos">
-<span<?php echo $tb_customer->kodepos->ViewAttributes() ?>>
-<?php echo $tb_customer->kodepos->ListViewValue() ?></span>
+	<?php if ($view6->no_invoice->Visible) { // no_invoice ?>
+		<td data-name="no_invoice"<?php echo $view6->no_invoice->CellAttributes() ?>>
+<span id="el<?php echo $view6_list->RowCnt ?>_view6_no_invoice" class="view6_no_invoice">
+<span<?php echo $view6->no_invoice->ViewAttributes() ?>>
+<?php echo $view6->no_invoice->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>
-	<?php if ($tb_customer->no_npwp->Visible) { // no_npwp ?>
-		<td data-name="no_npwp"<?php echo $tb_customer->no_npwp->CellAttributes() ?>>
-<span id="el<?php echo $tb_customer_list->RowCnt ?>_tb_customer_no_npwp" class="tb_customer_no_npwp">
-<span<?php echo $tb_customer->no_npwp->ViewAttributes() ?>>
-<?php echo $tb_customer->no_npwp->ListViewValue() ?></span>
+	<?php if ($view6->tgl_invoice->Visible) { // tgl_invoice ?>
+		<td data-name="tgl_invoice"<?php echo $view6->tgl_invoice->CellAttributes() ?>>
+<span id="el<?php echo $view6_list->RowCnt ?>_view6_tgl_invoice" class="view6_tgl_invoice">
+<span<?php echo $view6->tgl_invoice->ViewAttributes() ?>>
+<?php echo $view6->tgl_invoice->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($view6->no_order->Visible) { // no_order ?>
+		<td data-name="no_order"<?php echo $view6->no_order->CellAttributes() ?>>
+<span id="el<?php echo $view6_list->RowCnt ?>_view6_no_order" class="view6_no_order">
+<span<?php echo $view6->no_order->ViewAttributes() ?>>
+<?php echo $view6->no_order->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($view6->no_referensi->Visible) { // no_referensi ?>
+		<td data-name="no_referensi"<?php echo $view6->no_referensi->CellAttributes() ?>>
+<span id="el<?php echo $view6_list->RowCnt ?>_view6_no_referensi" class="view6_no_referensi">
+<span<?php echo $view6->no_referensi->ViewAttributes() ?>>
+<?php echo $view6->no_referensi->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($view6->tgl_pelaksanaan->Visible) { // tgl_pelaksanaan ?>
+		<td data-name="tgl_pelaksanaan"<?php echo $view6->tgl_pelaksanaan->CellAttributes() ?>>
+<span id="el<?php echo $view6_list->RowCnt ?>_view6_tgl_pelaksanaan" class="view6_tgl_pelaksanaan">
+<span<?php echo $view6->tgl_pelaksanaan->ViewAttributes() ?>>
+<?php echo $view6->tgl_pelaksanaan->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($view6->no_sertifikat->Visible) { // no_sertifikat ?>
+		<td data-name="no_sertifikat"<?php echo $view6->no_sertifikat->CellAttributes() ?>>
+<span id="el<?php echo $view6_list->RowCnt ?>_view6_no_sertifikat" class="view6_no_sertifikat">
+<span<?php echo $view6->no_sertifikat->ViewAttributes() ?>>
+<?php echo $view6->no_sertifikat->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($view6->total->Visible) { // total ?>
+		<td data-name="total"<?php echo $view6->total->CellAttributes() ?>>
+<span id="el<?php echo $view6_list->RowCnt ?>_view6_total" class="view6_total">
+<span<?php echo $view6->total->ViewAttributes() ?>>
+<?php echo $view6->total->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($view6->ppn->Visible) { // ppn ?>
+		<td data-name="ppn"<?php echo $view6->ppn->CellAttributes() ?>>
+<span id="el<?php echo $view6_list->RowCnt ?>_view6_ppn" class="view6_ppn">
+<span<?php echo $view6->ppn->ViewAttributes() ?>>
+<?php echo $view6->ppn->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($view6->total_ppn->Visible) { // total_ppn ?>
+		<td data-name="total_ppn"<?php echo $view6->total_ppn->CellAttributes() ?>>
+<span id="el<?php echo $view6_list->RowCnt ?>_view6_total_ppn" class="view6_total_ppn">
+<span<?php echo $view6->total_ppn->ViewAttributes() ?>>
+<?php echo $view6->total_ppn->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($view6->terbayar->Visible) { // terbayar ?>
+		<td data-name="terbayar"<?php echo $view6->terbayar->CellAttributes() ?>>
+<span id="el<?php echo $view6_list->RowCnt ?>_view6_terbayar" class="view6_terbayar">
+<span<?php echo $view6->terbayar->ViewAttributes() ?>>
+<?php echo $view6->terbayar->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($view6->pasal23->Visible) { // pasal23 ?>
+		<td data-name="pasal23"<?php echo $view6->pasal23->CellAttributes() ?>>
+<span id="el<?php echo $view6_list->RowCnt ?>_view6_pasal23" class="view6_pasal23">
+<span<?php echo $view6->pasal23->ViewAttributes() ?>>
+<?php echo $view6->pasal23->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>
 <?php
 
 // Render list options (body, right)
-$tb_customer_list->ListOptions->Render("body", "right", $tb_customer_list->RowCnt);
+$view6_list->ListOptions->Render("body", "right", $view6_list->RowCnt);
 ?>
 	</tr>
 <?php
 	}
-	if ($tb_customer->CurrentAction <> "gridadd")
-		$tb_customer_list->Recordset->MoveNext();
+	if ($view6->CurrentAction <> "gridadd")
+		$view6_list->Recordset->MoveNext();
 }
 ?>
 </tbody>
 </table>
 <?php } ?>
-<?php if ($tb_customer->CurrentAction == "") { ?>
+<?php if ($view6->CurrentAction == "") { ?>
 <input type="hidden" name="a_list" id="a_list" value="">
 <?php } ?>
 </div>
@@ -2389,61 +2719,61 @@ $tb_customer_list->ListOptions->Render("body", "right", $tb_customer_list->RowCn
 <?php
 
 // Close recordset
-if ($tb_customer_list->Recordset)
-	$tb_customer_list->Recordset->Close();
+if ($view6_list->Recordset)
+	$view6_list->Recordset->Close();
 ?>
-<?php if ($tb_customer->Export == "") { ?>
+<?php if ($view6->Export == "") { ?>
 <div class="panel-footer ewGridLowerPanel">
-<?php if ($tb_customer->CurrentAction <> "gridadd" && $tb_customer->CurrentAction <> "gridedit") { ?>
+<?php if ($view6->CurrentAction <> "gridadd" && $view6->CurrentAction <> "gridedit") { ?>
 <form name="ewPagerForm" class="ewForm form-inline ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
-<?php if (!isset($tb_customer_list->Pager)) $tb_customer_list->Pager = new cPrevNextPager($tb_customer_list->StartRec, $tb_customer_list->DisplayRecs, $tb_customer_list->TotalRecs) ?>
-<?php if ($tb_customer_list->Pager->RecordCount > 0 && $tb_customer_list->Pager->Visible) { ?>
+<?php if (!isset($view6_list->Pager)) $view6_list->Pager = new cPrevNextPager($view6_list->StartRec, $view6_list->DisplayRecs, $view6_list->TotalRecs) ?>
+<?php if ($view6_list->Pager->RecordCount > 0 && $view6_list->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($tb_customer_list->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $tb_customer_list->PageUrl() ?>start=<?php echo $tb_customer_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($view6_list->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $view6_list->PageUrl() ?>start=<?php echo $view6_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($tb_customer_list->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $tb_customer_list->PageUrl() ?>start=<?php echo $tb_customer_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($view6_list->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $view6_list->PageUrl() ?>start=<?php echo $view6_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $tb_customer_list->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $view6_list->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($tb_customer_list->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $tb_customer_list->PageUrl() ?>start=<?php echo $tb_customer_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($view6_list->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $view6_list->PageUrl() ?>start=<?php echo $view6_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($tb_customer_list->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $tb_customer_list->PageUrl() ?>start=<?php echo $tb_customer_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($view6_list->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $view6_list->PageUrl() ?>start=<?php echo $view6_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $tb_customer_list->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $view6_list->Pager->PageCount ?></span>
 </div>
 <div class="ewPager ewRec">
-	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $tb_customer_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $tb_customer_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $tb_customer_list->Pager->RecordCount ?></span>
+	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $view6_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $view6_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $view6_list->Pager->RecordCount ?></span>
 </div>
 <?php } ?>
 </form>
 <?php } ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($tb_customer_list->OtherOptions as &$option)
+	foreach ($view6_list->OtherOptions as &$option)
 		$option->Render("body", "bottom");
 ?>
 </div>
@@ -2452,10 +2782,10 @@ if ($tb_customer_list->Recordset)
 <?php } ?>
 </div>
 <?php } ?>
-<?php if ($tb_customer_list->TotalRecs == 0 && $tb_customer->CurrentAction == "") { // Show other options ?>
+<?php if ($view6_list->TotalRecs == 0 && $view6->CurrentAction == "") { // Show other options ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($tb_customer_list->OtherOptions as &$option) {
+	foreach ($view6_list->OtherOptions as &$option) {
 		$option->ButtonClass = "";
 		$option->Render("body", "");
 	}
@@ -2463,19 +2793,19 @@ if ($tb_customer_list->Recordset)
 </div>
 <div class="clearfix"></div>
 <?php } ?>
-<?php if ($tb_customer->Export == "") { ?>
+<?php if ($view6->Export == "") { ?>
 <script type="text/javascript">
-ftb_customerlistsrch.FilterList = <?php echo $tb_customer_list->GetFilterList() ?>;
-ftb_customerlistsrch.Init();
-ftb_customerlist.Init();
+fview6listsrch.FilterList = <?php echo $view6_list->GetFilterList() ?>;
+fview6listsrch.Init();
+fview6list.Init();
 </script>
 <?php } ?>
 <?php
-$tb_customer_list->ShowPageFooter();
+$view6_list->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
-<?php if ($tb_customer->Export == "") { ?>
+<?php if ($view6->Export == "") { ?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
@@ -2485,5 +2815,5 @@ if (EW_DEBUG_ENABLED)
 <?php } ?>
 <?php include_once "footer.php" ?>
 <?php
-$tb_customer_list->Page_Terminate();
+$view6_list->Page_Terminate();
 ?>

@@ -1323,10 +1323,8 @@ function ew_IsResponsiveLayout() {
 if (!function_exists('ew_Execute')) {
 
 	function ew_Execute($SQL, $fn = NULL, $c = NULL) {
-		if (is_null($c) && (is_string($fn) || is_object($fn) && method_exists($fn, "Execute")))
+		if (is_null($c) && is_object($fn) && method_exists($fn, "Execute"))
 			$c = $fn;
-		if (is_string($c))
-			$c = &Conn($c);
 		$conn = ($c) ? $c : $GLOBALS["conn"];
 		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 		$rs = $conn->Execute($SQL);
@@ -1454,8 +1452,6 @@ if (!function_exists('ew_ExecuteHtml')) {
 if (!function_exists('ew_LoadRecordset')) {
 
 	function &ew_LoadRecordset($SQL, $c = NULL) {
-		if (is_string($c))
-			$c = &Conn($c);
 		$conn = ($c) ? $c : $GLOBALS["conn"];
 		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 		$rs = $conn->Execute($SQL);
