@@ -52,7 +52,7 @@ class cReport1 extends cTableBase {
 		$this->ExportPageSize = "a4"; // Page size (PDF only)
 		$this->ExportExcelPageOrientation = ""; // Page orientation (PHPExcel only)
 		$this->ExportExcelPageSize = ""; // Page size (PHPExcel only)
-		$this->UserIDAllowSecurity = 0; // User ID Allow
+		$this->UserIDAllowSecurity = 104; // User ID Allow
 
 		// nama
 		$this->nama = new cField('Report1', 'Report1', 'x_nama', 'nama', '`nama`', '`nama`', 200, -1, FALSE, '`nama`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
@@ -522,6 +522,7 @@ class cReport1 extends cTableBase {
 	}
 }
 ?>
+<?php include_once "tb_userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -754,6 +755,7 @@ class cReport1_report extends cReport1 {
 	//
 	function __construct() {
 		global $conn, $Language;
+		global $UserTable, $UserTableConn;
 		$GLOBALS["Page"] = &$this;
 		$this->TokenTimeout = ew_SessionTimeoutTime();
 
@@ -774,6 +776,9 @@ class cReport1_report extends cReport1 {
 		$this->ExportExcelUrl = $this->PageUrl() . "export=excel";
 		$this->ExportWordUrl = $this->PageUrl() . "export=word";
 
+		// Table object (tb_user)
+		if (!isset($GLOBALS['tb_user'])) $GLOBALS['tb_user'] = new ctb_user();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'report', TRUE);
@@ -788,6 +793,12 @@ class cReport1_report extends cReport1 {
 		// Open connection
 		if (!isset($conn)) $conn = ew_Connect($this->DBID);
 
+		// User table object (tb_user)
+		if (!isset($UserTable)) {
+			$UserTable = new ctb_user();
+			$UserTableConn = Conn($UserTable->DBID);
+		}
+
 		// Export options
 		$this->ExportOptions = new cListOptions();
 		$this->ExportOptions->Tag = "div";
@@ -799,6 +810,18 @@ class cReport1_report extends cReport1 {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Security
+		$Security = new cAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
+		if (!$Security->CanReport()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			$this->Page_Terminate(ew_GetUrl("index.php"));
+		}
 
 		// Get export parameters
 		$custom = "";
@@ -1215,6 +1238,10 @@ $Report1_report->Page_Render();
 <?php
 $Report1_report->DefaultFilter = "";
 $Report1_report->ReportFilter = $Report1_report->DefaultFilter;
+if (!$Security->CanReport()) {
+	if ($Report1_report->ReportFilter <> "") $Report1_report->ReportFilter .= " AND ";
+	$Report1_report->ReportFilter .= "(0=1)";
+}
 if ($Report1_report->DbDetailFilter <> "") {
 	if ($Report1_report->ReportFilter <> "") $Report1_report->ReportFilter .= " AND ";
 	$Report1_report->ReportFilter .= "(" . $Report1_report->DbDetailFilter . ")";
@@ -1276,6 +1303,10 @@ while (!$Report1_report->Recordset->EOF) {
 		if ($Report1_report->ReportFilter <> "")
 			$Report1_report->ReportFilter .= " AND ";
 		$Report1_report->ReportFilter .= "(" . $Report1_report->DbDetailFilter . ")";
+	}
+	if (!$Security->CanReport()) {
+		if ($sFilter <> "") $sFilter .= " AND ";
+		$sFilter .= "(0=1)";
 	}
 
 	// Set up detail SQL

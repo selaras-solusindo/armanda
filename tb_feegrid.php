@@ -1,3 +1,4 @@
+<?php include_once "tb_userinfo.php" ?>
 <?php
 
 // Create page object
@@ -134,6 +135,8 @@ if ($tb_fee->CurrentAction == "gridadd") {
 
 	// Set no record found message
 	if ($tb_fee->CurrentAction == "" && $tb_fee_grid->TotalRecs == 0) {
+		if (!$Security->CanList())
+			$tb_fee_grid->setWarningMessage(ew_DeniedMsg());
 		if ($tb_fee_grid->SearchWhere == "0=101")
 			$tb_fee_grid->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else

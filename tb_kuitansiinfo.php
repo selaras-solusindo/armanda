@@ -38,7 +38,7 @@ class ctb_kuitansi extends cTable {
 		$this->ShowMultipleDetails = FALSE; // Show multiple details
 		$this->GridAddRowCount = 5;
 		$this->AllowAddDeleteRow = ew_AllowAddDeleteRow(); // Allow add/delete row
-		$this->UserIDAllowSecurity = 0; // User ID Allow
+		$this->UserIDAllowSecurity = 104; // User ID Allow
 		$this->BasicSearch = new cBasicSearch($this->TableVar);
 
 		// kuitansi_id

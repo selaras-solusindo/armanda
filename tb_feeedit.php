@@ -7,6 +7,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "phpfn13.php" ?>
 <?php include_once "tb_feeinfo.php" ?>
 <?php include_once "tb_invoiceinfo.php" ?>
+<?php include_once "tb_userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -216,6 +217,7 @@ class ctb_fee_edit extends ctb_fee {
 	//
 	function __construct() {
 		global $conn, $Language;
+		global $UserTable, $UserTableConn;
 		$GLOBALS["Page"] = &$this;
 		$this->TokenTimeout = ew_SessionTimeoutTime();
 
@@ -234,6 +236,9 @@ class ctb_fee_edit extends ctb_fee {
 		// Table object (tb_invoice)
 		if (!isset($GLOBALS['tb_invoice'])) $GLOBALS['tb_invoice'] = new ctb_invoice();
 
+		// Table object (tb_user)
+		if (!isset($GLOBALS['tb_user'])) $GLOBALS['tb_user'] = new ctb_user();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'edit', TRUE);
@@ -247,6 +252,12 @@ class ctb_fee_edit extends ctb_fee {
 
 		// Open connection
 		if (!isset($conn)) $conn = ew_Connect($this->DBID);
+
+		// User table object (tb_user)
+		if (!isset($UserTable)) {
+			$UserTable = new ctb_user();
+			$UserTableConn = Conn($UserTable->DBID);
+		}
 	}
 
 	//
@@ -254,6 +265,21 @@ class ctb_fee_edit extends ctb_fee {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Security
+		$Security = new cAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
+		if (!$Security->CanEdit()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			if ($Security->CanList())
+				$this->Page_Terminate(ew_GetUrl("tb_feelist.php"));
+			else
+				$this->Page_Terminate(ew_GetUrl("login.php"));
+		}
 
 		// Create form object
 		$objForm = new cFormObj();

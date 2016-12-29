@@ -6,6 +6,7 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "tb_kuitansiinfo.php" ?>
+<?php include_once "tb_userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -255,6 +256,7 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 	//
 	function __construct() {
 		global $conn, $Language;
+		global $UserTable, $UserTableConn;
 		$GLOBALS["Page"] = &$this;
 		$this->TokenTimeout = ew_SessionTimeoutTime();
 
@@ -285,6 +287,9 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 		$this->MultiDeleteUrl = "tb_kuitansidelete.php";
 		$this->MultiUpdateUrl = "tb_kuitansiupdate.php";
 
+		// Table object (tb_user)
+		if (!isset($GLOBALS['tb_user'])) $GLOBALS['tb_user'] = new ctb_user();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'list', TRUE);
@@ -298,6 +303,12 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 
 		// Open connection
 		if (!isset($conn)) $conn = ew_Connect($this->DBID);
+
+		// User table object (tb_user)
+		if (!isset($UserTable)) {
+			$UserTable = new ctb_user();
+			$UserTableConn = Conn($UserTable->DBID);
+		}
 
 		// List options
 		$this->ListOptions = new cListOptions();
@@ -333,6 +344,18 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Security
+		$Security = new cAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
+		if (!$Security->CanList()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			$this->Page_Terminate(ew_GetUrl("index.php"));
+		}
 
 		// Get export parameters
 		$custom = "";
@@ -629,6 +652,8 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 
 		// Build filter
 		$sFilter = "";
+		if (!$Security->CanList())
+			$sFilter = "(0=1)"; // Filter all records
 		ew_AddFilter($sFilter, $this->DbDetailFilter);
 		ew_AddFilter($sFilter, $this->SearchWhere);
 
@@ -859,6 +884,7 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 	function BasicSearchWhere($Default = FALSE) {
 		global $Security;
 		$sSearchStr = "";
+		if (!$Security->CanSearch()) return "";
 		$sSearchKeyword = ($Default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
 		$sSearchType = ($Default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 		if ($sSearchKeyword <> "") {
@@ -1092,7 +1118,7 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 		$item = &$option->Add("add");
 		$addcaption = ew_HtmlTitle($Language->Phrase("AddLink"));
 		$item->Body = "<a class=\"ewAddEdit ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "");
+		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
 		$option = $options["action"];
 
 		// Set up options default
@@ -1264,6 +1290,11 @@ class ctb_kuitansi_list extends ctb_kuitansi {
 		// Hide search options
 		if ($this->Export <> "" || $this->CurrentAction <> "")
 			$this->SearchOptions->HideAllOptions();
+		global $Security;
+		if (!$Security->CanSearch()) {
+			$this->SearchOptions->HideAllOptions();
+			$this->FilterOptions->HideAllOptions();
+		}
 	}
 
 	function SetupListOptionsExt() {
@@ -2004,6 +2035,8 @@ var CurrentSearchForm = ftb_kuitansilistsrch = new ew_Form("ftb_kuitansilistsrch
 
 	// Set no record found message
 	if ($tb_kuitansi->CurrentAction == "" && $tb_kuitansi_list->TotalRecs == 0) {
+		if (!$Security->CanList())
+			$tb_kuitansi_list->setWarningMessage(ew_DeniedMsg());
 		if ($tb_kuitansi_list->SearchWhere == "0=101")
 			$tb_kuitansi_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
@@ -2011,6 +2044,7 @@ var CurrentSearchForm = ftb_kuitansilistsrch = new ew_Form("ftb_kuitansilistsrch
 	}
 $tb_kuitansi_list->RenderOtherOptions();
 ?>
+<?php if ($Security->CanSearch()) { ?>
 <?php if ($tb_kuitansi->Export == "" && $tb_kuitansi->CurrentAction == "") { ?>
 <form name="ftb_kuitansilistsrch" id="ftb_kuitansilistsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
 <?php $SearchPanelClass = ($tb_kuitansi_list->SearchWhere <> "") ? " in" : " in"; ?>
@@ -2037,6 +2071,7 @@ $tb_kuitansi_list->RenderOtherOptions();
 	</div>
 </div>
 </form>
+<?php } ?>
 <?php } ?>
 <?php $tb_kuitansi_list->ShowPageHeader(); ?>
 <?php

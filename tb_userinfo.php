@@ -1,18 +1,16 @@
 <?php
 
 // Global variable for table object
-$tb_customer = NULL;
+$tb_user = NULL;
 
 //
-// Table class for tb_customer
+// Table class for tb_user
 //
-class ctb_customer extends cTable {
-	var $id;
-	var $nama;
-	var $alamat;
-	var $kota;
-	var $kodepos;
-	var $no_npwp;
+class ctb_user extends cTable {
+	var $user_id;
+	var $username;
+	var $password;
+	var $userlevel;
 
 	//
 	// Table class constructor
@@ -22,12 +20,12 @@ class ctb_customer extends cTable {
 
 		// Language object
 		if (!isset($Language)) $Language = new cLanguage();
-		$this->TableVar = 'tb_customer';
-		$this->TableName = 'tb_customer';
+		$this->TableVar = 'tb_user';
+		$this->TableName = 'tb_user';
 		$this->TableType = 'TABLE';
 
 		// Update Table
-		$this->UpdateTable = "`tb_customer`";
+		$this->UpdateTable = "`tb_user`";
 		$this->DBID = 'DB';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -41,39 +39,33 @@ class ctb_customer extends cTable {
 		$this->ShowMultipleDetails = FALSE; // Show multiple details
 		$this->GridAddRowCount = 5;
 		$this->AllowAddDeleteRow = ew_AllowAddDeleteRow(); // Allow add/delete row
-		$this->UserIDAllowSecurity = 104; // User ID Allow
+		$this->UserIDAllowSecurity = 0; // User ID Allow
 		$this->BasicSearch = new cBasicSearch($this->TableVar);
 
-		// id
-		$this->id = new cField('tb_customer', 'tb_customer', 'x_id', 'id', '`id`', '`id`', 3, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
-		$this->id->Sortable = TRUE; // Allow sort
-		$this->id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['id'] = &$this->id;
+		// user_id
+		$this->user_id = new cField('tb_user', 'tb_user', 'x_user_id', 'user_id', '`user_id`', '`user_id`', 3, -1, FALSE, '`user_id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
+		$this->user_id->Sortable = TRUE; // Allow sort
+		$this->user_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['user_id'] = &$this->user_id;
 
-		// nama
-		$this->nama = new cField('tb_customer', 'tb_customer', 'x_nama', 'nama', '`nama`', '`nama`', 200, -1, FALSE, '`nama`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->nama->Sortable = TRUE; // Allow sort
-		$this->fields['nama'] = &$this->nama;
+		// username
+		$this->username = new cField('tb_user', 'tb_user', 'x_username', 'username', '`username`', '`username`', 200, -1, FALSE, '`username`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->username->Sortable = TRUE; // Allow sort
+		$this->fields['username'] = &$this->username;
 
-		// alamat
-		$this->alamat = new cField('tb_customer', 'tb_customer', 'x_alamat', 'alamat', '`alamat`', '`alamat`', 200, -1, FALSE, '`alamat`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->alamat->Sortable = TRUE; // Allow sort
-		$this->fields['alamat'] = &$this->alamat;
+		// password
+		$this->password = new cField('tb_user', 'tb_user', 'x_password', 'password', '`password`', '`password`', 200, -1, FALSE, '`password`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->password->Sortable = TRUE; // Allow sort
+		$this->fields['password'] = &$this->password;
 
-		// kota
-		$this->kota = new cField('tb_customer', 'tb_customer', 'x_kota', 'kota', '`kota`', '`kota`', 200, -1, FALSE, '`kota`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->kota->Sortable = TRUE; // Allow sort
-		$this->fields['kota'] = &$this->kota;
-
-		// kodepos
-		$this->kodepos = new cField('tb_customer', 'tb_customer', 'x_kodepos', 'kodepos', '`kodepos`', '`kodepos`', 200, -1, FALSE, '`kodepos`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->kodepos->Sortable = TRUE; // Allow sort
-		$this->fields['kodepos'] = &$this->kodepos;
-
-		// no_npwp
-		$this->no_npwp = new cField('tb_customer', 'tb_customer', 'x_no_npwp', 'no_npwp', '`no_npwp`', '`no_npwp`', 200, -1, FALSE, '`no_npwp`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->no_npwp->Sortable = TRUE; // Allow sort
-		$this->fields['no_npwp'] = &$this->no_npwp;
+		// userlevel
+		$this->userlevel = new cField('tb_user', 'tb_user', 'x_userlevel', 'userlevel', '`userlevel`', '`userlevel`', 3, -1, FALSE, '`userlevel`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'SELECT');
+		$this->userlevel->Sortable = TRUE; // Allow sort
+		$this->userlevel->UsePleaseSelect = TRUE; // Use PleaseSelect by default
+		$this->userlevel->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
+		$this->userlevel->OptionCount = 3;
+		$this->userlevel->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['userlevel'] = &$this->userlevel;
 	}
 
 	// Set Field Visibility
@@ -103,7 +95,7 @@ class ctb_customer extends cTable {
 	var $_SqlFrom = "";
 
 	function getSqlFrom() { // From
-		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`tb_customer`";
+		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`tb_user`";
 	}
 
 	function SqlFrom() { // For backward compatibility
@@ -309,6 +301,8 @@ class ctb_customer extends cTable {
 		foreach ($rs as $name => $value) {
 			if (!isset($this->fields[$name]) || $this->fields[$name]->FldIsCustom)
 				continue;
+			if (EW_ENCRYPTED_PASSWORD && $name == 'password')
+				$value = (EW_CASE_SENSITIVE_PASSWORD) ? ew_EncryptPassword($value) : ew_EncryptPassword(strtolower($value));
 			$names .= $this->fields[$name]->FldExpression . ",";
 			$values .= ew_QuotedValue($value, $this->fields[$name]->FldDataType, $this->DBID) . ",";
 		}
@@ -331,6 +325,9 @@ class ctb_customer extends cTable {
 		foreach ($rs as $name => $value) {
 			if (!isset($this->fields[$name]) || $this->fields[$name]->FldIsCustom)
 				continue;
+			if (EW_ENCRYPTED_PASSWORD && $name == 'password') {
+				$value = (EW_CASE_SENSITIVE_PASSWORD) ? ew_EncryptPassword($value) : ew_EncryptPassword(strtolower($value));
+			}
 			$sql .= $this->fields[$name]->FldExpression . "=";
 			$sql .= ew_QuotedValue($value, $this->fields[$name]->FldDataType, $this->DBID) . ",";
 		}
@@ -356,8 +353,8 @@ class ctb_customer extends cTable {
 		if (is_array($where))
 			$where = $this->ArrayToFilter($where);
 		if ($rs) {
-			if (array_key_exists('id', $rs))
-				ew_AddFilter($where, ew_QuotedName('id', $this->DBID) . '=' . ew_QuotedValue($rs['id'], $this->id->FldDataType, $this->DBID));
+			if (array_key_exists('user_id', $rs))
+				ew_AddFilter($where, ew_QuotedName('user_id', $this->DBID) . '=' . ew_QuotedValue($rs['user_id'], $this->user_id->FldDataType, $this->DBID));
 		}
 		$filter = ($curfilter) ? $this->CurrentFilter : "";
 		ew_AddFilter($filter, $where);
@@ -376,15 +373,15 @@ class ctb_customer extends cTable {
 
 	// Key filter WHERE clause
 	function SqlKeyFilter() {
-		return "`id` = @id@";
+		return "`user_id` = @user_id@";
 	}
 
 	// Key filter
 	function KeyFilter() {
 		$sKeyFilter = $this->SqlKeyFilter();
-		if (!is_numeric($this->id->CurrentValue))
+		if (!is_numeric($this->user_id->CurrentValue))
 			$sKeyFilter = "0=1"; // Invalid key
-		$sKeyFilter = str_replace("@id@", ew_AdjustSql($this->id->CurrentValue, $this->DBID), $sKeyFilter); // Replace key value
+		$sKeyFilter = str_replace("@user_id@", ew_AdjustSql($this->user_id->CurrentValue, $this->DBID), $sKeyFilter); // Replace key value
 		return $sKeyFilter;
 	}
 
@@ -398,7 +395,7 @@ class ctb_customer extends cTable {
 		if (@$_SESSION[$name] <> "") {
 			return $_SESSION[$name];
 		} else {
-			return "tb_customerlist.php";
+			return "tb_userlist.php";
 		}
 	}
 
@@ -408,30 +405,30 @@ class ctb_customer extends cTable {
 
 	// List URL
 	function GetListUrl() {
-		return "tb_customerlist.php";
+		return "tb_userlist.php";
 	}
 
 	// View URL
 	function GetViewUrl($parm = "") {
 		if ($parm <> "")
-			$url = $this->KeyUrl("tb_customerview.php", $this->UrlParm($parm));
+			$url = $this->KeyUrl("tb_userview.php", $this->UrlParm($parm));
 		else
-			$url = $this->KeyUrl("tb_customerview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+			$url = $this->KeyUrl("tb_userview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
 		return $this->AddMasterUrl($url);
 	}
 
 	// Add URL
 	function GetAddUrl($parm = "") {
 		if ($parm <> "")
-			$url = "tb_customeradd.php?" . $this->UrlParm($parm);
+			$url = "tb_useradd.php?" . $this->UrlParm($parm);
 		else
-			$url = "tb_customeradd.php";
+			$url = "tb_useradd.php";
 		return $this->AddMasterUrl($url);
 	}
 
 	// Edit URL
 	function GetEditUrl($parm = "") {
-		$url = $this->KeyUrl("tb_customeredit.php", $this->UrlParm($parm));
+		$url = $this->KeyUrl("tb_useredit.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -443,7 +440,7 @@ class ctb_customer extends cTable {
 
 	// Copy URL
 	function GetCopyUrl($parm = "") {
-		$url = $this->KeyUrl("tb_customeradd.php", $this->UrlParm($parm));
+		$url = $this->KeyUrl("tb_useradd.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -455,7 +452,7 @@ class ctb_customer extends cTable {
 
 	// Delete URL
 	function GetDeleteUrl() {
-		return $this->KeyUrl("tb_customerdelete.php", $this->UrlParm());
+		return $this->KeyUrl("tb_userdelete.php", $this->UrlParm());
 	}
 
 	// Add master url
@@ -465,7 +462,7 @@ class ctb_customer extends cTable {
 
 	function KeyToJson() {
 		$json = "";
-		$json .= "id:" . ew_VarToJson($this->id->CurrentValue, "number", "'");
+		$json .= "user_id:" . ew_VarToJson($this->user_id->CurrentValue, "number", "'");
 		return "{" . $json . "}";
 	}
 
@@ -473,8 +470,8 @@ class ctb_customer extends cTable {
 	function KeyUrl($url, $parm = "") {
 		$sUrl = $url . "?";
 		if ($parm <> "") $sUrl .= $parm . "&";
-		if (!is_null($this->id->CurrentValue)) {
-			$sUrl .= "id=" . urlencode($this->id->CurrentValue);
+		if (!is_null($this->user_id->CurrentValue)) {
+			$sUrl .= "user_id=" . urlencode($this->user_id->CurrentValue);
 		} else {
 			return "javascript:ew_Alert(ewLanguage.Phrase('InvalidRecord'));";
 		}
@@ -507,10 +504,10 @@ class ctb_customer extends cTable {
 			$cnt = count($arKeys);
 		} elseif (!empty($_GET) || !empty($_POST)) {
 			$isPost = ew_IsHttpPost();
-			if ($isPost && isset($_POST["id"]))
-				$arKeys[] = ew_StripSlashes($_POST["id"]);
-			elseif (isset($_GET["id"]))
-				$arKeys[] = ew_StripSlashes($_GET["id"]);
+			if ($isPost && isset($_POST["user_id"]))
+				$arKeys[] = ew_StripSlashes($_POST["user_id"]);
+			elseif (isset($_GET["user_id"]))
+				$arKeys[] = ew_StripSlashes($_GET["user_id"]);
 			else
 				$arKeys = NULL; // Do not setup
 
@@ -535,7 +532,7 @@ class ctb_customer extends cTable {
 		$sKeyFilter = "";
 		foreach ($arKeys as $key) {
 			if ($sKeyFilter <> "") $sKeyFilter .= " OR ";
-			$this->id->CurrentValue = $key;
+			$this->user_id->CurrentValue = $key;
 			$sKeyFilter .= "(" . $this->KeyFilter() . ")";
 		}
 		return $sKeyFilter;
@@ -556,12 +553,10 @@ class ctb_customer extends cTable {
 
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
-		$this->id->setDbValue($rs->fields('id'));
-		$this->nama->setDbValue($rs->fields('nama'));
-		$this->alamat->setDbValue($rs->fields('alamat'));
-		$this->kota->setDbValue($rs->fields('kota'));
-		$this->kodepos->setDbValue($rs->fields('kodepos'));
-		$this->no_npwp->setDbValue($rs->fields('no_npwp'));
+		$this->user_id->setDbValue($rs->fields('user_id'));
+		$this->username->setDbValue($rs->fields('username'));
+		$this->password->setDbValue($rs->fields('password'));
+		$this->userlevel->setDbValue($rs->fields('userlevel'));
 	}
 
 	// Render list row values
@@ -572,66 +567,54 @@ class ctb_customer extends cTable {
 		$this->Row_Rendering();
 
    // Common render codes
-		// id
-		// nama
-		// alamat
-		// kota
-		// kodepos
-		// no_npwp
-		// id
+		// user_id
+		// username
+		// password
+		// userlevel
+		// user_id
 
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
+		$this->user_id->ViewValue = $this->user_id->CurrentValue;
+		$this->user_id->ViewCustomAttributes = "";
 
-		// nama
-		$this->nama->ViewValue = $this->nama->CurrentValue;
-		$this->nama->ViewCustomAttributes = "";
+		// username
+		$this->username->ViewValue = $this->username->CurrentValue;
+		$this->username->ViewCustomAttributes = "";
 
-		// alamat
-		$this->alamat->ViewValue = $this->alamat->CurrentValue;
-		$this->alamat->ViewCustomAttributes = "";
+		// password
+		$this->password->ViewValue = $this->password->CurrentValue;
+		$this->password->ViewCustomAttributes = "";
 
-		// kota
-		$this->kota->ViewValue = $this->kota->CurrentValue;
-		$this->kota->ViewCustomAttributes = "";
+		// userlevel
+		if ($Security->CanAdmin()) { // System admin
+		if (strval($this->userlevel->CurrentValue) <> "") {
+			$this->userlevel->ViewValue = $this->userlevel->OptionCaption($this->userlevel->CurrentValue);
+		} else {
+			$this->userlevel->ViewValue = NULL;
+		}
+		} else {
+			$this->userlevel->ViewValue = $Language->Phrase("PasswordMask");
+		}
+		$this->userlevel->ViewCustomAttributes = "";
 
-		// kodepos
-		$this->kodepos->ViewValue = $this->kodepos->CurrentValue;
-		$this->kodepos->ViewCustomAttributes = "";
+		// user_id
+		$this->user_id->LinkCustomAttributes = "";
+		$this->user_id->HrefValue = "";
+		$this->user_id->TooltipValue = "";
 
-		// no_npwp
-		$this->no_npwp->ViewValue = $this->no_npwp->CurrentValue;
-		$this->no_npwp->ViewCustomAttributes = "";
+		// username
+		$this->username->LinkCustomAttributes = "";
+		$this->username->HrefValue = "";
+		$this->username->TooltipValue = "";
 
-		// id
-		$this->id->LinkCustomAttributes = "";
-		$this->id->HrefValue = "";
-		$this->id->TooltipValue = "";
+		// password
+		$this->password->LinkCustomAttributes = "";
+		$this->password->HrefValue = "";
+		$this->password->TooltipValue = "";
 
-		// nama
-		$this->nama->LinkCustomAttributes = "";
-		$this->nama->HrefValue = "";
-		$this->nama->TooltipValue = "";
-
-		// alamat
-		$this->alamat->LinkCustomAttributes = "";
-		$this->alamat->HrefValue = "";
-		$this->alamat->TooltipValue = "";
-
-		// kota
-		$this->kota->LinkCustomAttributes = "";
-		$this->kota->HrefValue = "";
-		$this->kota->TooltipValue = "";
-
-		// kodepos
-		$this->kodepos->LinkCustomAttributes = "";
-		$this->kodepos->HrefValue = "";
-		$this->kodepos->TooltipValue = "";
-
-		// no_npwp
-		$this->no_npwp->LinkCustomAttributes = "";
-		$this->no_npwp->HrefValue = "";
-		$this->no_npwp->TooltipValue = "";
+		// userlevel
+		$this->userlevel->LinkCustomAttributes = "";
+		$this->userlevel->HrefValue = "";
+		$this->userlevel->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -644,41 +627,32 @@ class ctb_customer extends cTable {
 		// Call Row Rendering event
 		$this->Row_Rendering();
 
-		// id
-		$this->id->EditAttrs["class"] = "form-control";
-		$this->id->EditCustomAttributes = "";
-		$this->id->EditValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
+		// user_id
+		$this->user_id->EditAttrs["class"] = "form-control";
+		$this->user_id->EditCustomAttributes = "";
+		$this->user_id->EditValue = $this->user_id->CurrentValue;
+		$this->user_id->ViewCustomAttributes = "";
 
-		// nama
-		$this->nama->EditAttrs["class"] = "form-control";
-		$this->nama->EditCustomAttributes = "";
-		$this->nama->EditValue = $this->nama->CurrentValue;
-		$this->nama->PlaceHolder = ew_RemoveHtml($this->nama->FldCaption());
+		// username
+		$this->username->EditAttrs["class"] = "form-control";
+		$this->username->EditCustomAttributes = "";
+		$this->username->EditValue = $this->username->CurrentValue;
+		$this->username->PlaceHolder = ew_RemoveHtml($this->username->FldCaption());
 
-		// alamat
-		$this->alamat->EditAttrs["class"] = "form-control";
-		$this->alamat->EditCustomAttributes = "";
-		$this->alamat->EditValue = $this->alamat->CurrentValue;
-		$this->alamat->PlaceHolder = ew_RemoveHtml($this->alamat->FldCaption());
+		// password
+		$this->password->EditAttrs["class"] = "form-control ewPasswordStrength";
+		$this->password->EditCustomAttributes = "";
+		$this->password->EditValue = $this->password->CurrentValue;
+		$this->password->PlaceHolder = ew_RemoveHtml($this->password->FldCaption());
 
-		// kota
-		$this->kota->EditAttrs["class"] = "form-control";
-		$this->kota->EditCustomAttributes = "";
-		$this->kota->EditValue = $this->kota->CurrentValue;
-		$this->kota->PlaceHolder = ew_RemoveHtml($this->kota->FldCaption());
-
-		// kodepos
-		$this->kodepos->EditAttrs["class"] = "form-control";
-		$this->kodepos->EditCustomAttributes = "";
-		$this->kodepos->EditValue = $this->kodepos->CurrentValue;
-		$this->kodepos->PlaceHolder = ew_RemoveHtml($this->kodepos->FldCaption());
-
-		// no_npwp
-		$this->no_npwp->EditAttrs["class"] = "form-control";
-		$this->no_npwp->EditCustomAttributes = "";
-		$this->no_npwp->EditValue = $this->no_npwp->CurrentValue;
-		$this->no_npwp->PlaceHolder = ew_RemoveHtml($this->no_npwp->FldCaption());
+		// userlevel
+		$this->userlevel->EditAttrs["class"] = "form-control";
+		$this->userlevel->EditCustomAttributes = "";
+		if (!$Security->CanAdmin()) { // System admin
+			$this->userlevel->EditValue = $Language->Phrase("PasswordMask");
+		} else {
+		$this->userlevel->EditValue = $this->userlevel->Options(TRUE);
+		}
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -707,19 +681,13 @@ class ctb_customer extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
-					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
-					if ($this->nama->Exportable) $Doc->ExportCaption($this->nama);
-					if ($this->alamat->Exportable) $Doc->ExportCaption($this->alamat);
-					if ($this->kota->Exportable) $Doc->ExportCaption($this->kota);
-					if ($this->kodepos->Exportable) $Doc->ExportCaption($this->kodepos);
-					if ($this->no_npwp->Exportable) $Doc->ExportCaption($this->no_npwp);
+					if ($this->username->Exportable) $Doc->ExportCaption($this->username);
+					if ($this->password->Exportable) $Doc->ExportCaption($this->password);
+					if ($this->userlevel->Exportable) $Doc->ExportCaption($this->userlevel);
 				} else {
-					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
-					if ($this->nama->Exportable) $Doc->ExportCaption($this->nama);
-					if ($this->alamat->Exportable) $Doc->ExportCaption($this->alamat);
-					if ($this->kota->Exportable) $Doc->ExportCaption($this->kota);
-					if ($this->kodepos->Exportable) $Doc->ExportCaption($this->kodepos);
-					if ($this->no_npwp->Exportable) $Doc->ExportCaption($this->no_npwp);
+					if ($this->username->Exportable) $Doc->ExportCaption($this->username);
+					if ($this->password->Exportable) $Doc->ExportCaption($this->password);
+					if ($this->userlevel->Exportable) $Doc->ExportCaption($this->userlevel);
 				}
 				$Doc->EndExportRow();
 			}
@@ -751,19 +719,13 @@ class ctb_customer extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
-						if ($this->id->Exportable) $Doc->ExportField($this->id);
-						if ($this->nama->Exportable) $Doc->ExportField($this->nama);
-						if ($this->alamat->Exportable) $Doc->ExportField($this->alamat);
-						if ($this->kota->Exportable) $Doc->ExportField($this->kota);
-						if ($this->kodepos->Exportable) $Doc->ExportField($this->kodepos);
-						if ($this->no_npwp->Exportable) $Doc->ExportField($this->no_npwp);
+						if ($this->username->Exportable) $Doc->ExportField($this->username);
+						if ($this->password->Exportable) $Doc->ExportField($this->password);
+						if ($this->userlevel->Exportable) $Doc->ExportField($this->userlevel);
 					} else {
-						if ($this->id->Exportable) $Doc->ExportField($this->id);
-						if ($this->nama->Exportable) $Doc->ExportField($this->nama);
-						if ($this->alamat->Exportable) $Doc->ExportField($this->alamat);
-						if ($this->kota->Exportable) $Doc->ExportField($this->kota);
-						if ($this->kodepos->Exportable) $Doc->ExportField($this->kodepos);
-						if ($this->no_npwp->Exportable) $Doc->ExportField($this->no_npwp);
+						if ($this->username->Exportable) $Doc->ExportField($this->username);
+						if ($this->password->Exportable) $Doc->ExportField($this->password);
+						if ($this->userlevel->Exportable) $Doc->ExportField($this->userlevel);
 					}
 					$Doc->EndExportRow();
 				}

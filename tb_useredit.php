@@ -5,7 +5,6 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "tb_baranginfo.php" ?>
 <?php include_once "tb_userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
@@ -14,21 +13,21 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$tb_barang_add = NULL; // Initialize page object first
+$tb_user_edit = NULL; // Initialize page object first
 
-class ctb_barang_add extends ctb_barang {
+class ctb_user_edit extends ctb_user {
 
 	// Page ID
-	var $PageID = 'add';
+	var $PageID = 'edit';
 
 	// Project ID
 	var $ProjectID = "{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}";
 
 	// Table name
-	var $TableName = 'tb_barang';
+	var $TableName = 'tb_user';
 
 	// Page object name
-	var $PageObjName = 'tb_barang_add';
+	var $PageObjName = 'tb_user_edit';
 
 	// Page name
 	function PageName() {
@@ -226,22 +225,19 @@ class ctb_barang_add extends ctb_barang {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (tb_barang)
-		if (!isset($GLOBALS["tb_barang"]) || get_class($GLOBALS["tb_barang"]) == "ctb_barang") {
-			$GLOBALS["tb_barang"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["tb_barang"];
-		}
-
 		// Table object (tb_user)
-		if (!isset($GLOBALS['tb_user'])) $GLOBALS['tb_user'] = new ctb_user();
+		if (!isset($GLOBALS["tb_user"]) || get_class($GLOBALS["tb_user"]) == "ctb_user") {
+			$GLOBALS["tb_user"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["tb_user"];
+		}
 
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
-			define("EW_PAGE_ID", 'add', TRUE);
+			define("EW_PAGE_ID", 'edit', TRUE);
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'tb_barang', TRUE);
+			define("EW_TABLE_NAME", 'tb_user', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -268,11 +264,11 @@ class ctb_barang_add extends ctb_barang {
 		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
 		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
 		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
-		if (!$Security->CanAdd()) {
+		if (!$Security->CanEdit()) {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
 			if ($Security->CanList())
-				$this->Page_Terminate(ew_GetUrl("tb_baranglist.php"));
+				$this->Page_Terminate(ew_GetUrl("tb_userlist.php"));
 			else
 				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
@@ -280,7 +276,9 @@ class ctb_barang_add extends ctb_barang {
 		// Create form object
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->nama->SetVisibility();
+		$this->username->SetVisibility();
+		$this->password->SetVisibility();
+		$this->userlevel->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -326,13 +324,13 @@ class ctb_barang_add extends ctb_barang {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $tb_barang;
+		global $EW_EXPORT, $tb_user;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($tb_barang);
+				$doc = new $class($tb_user);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -363,14 +361,10 @@ class ctb_barang_add extends ctb_barang {
 		}
 		exit();
 	}
-	var $FormClassName = "form-horizontal ewForm ewAddForm";
+	var $FormClassName = "form-horizontal ewForm ewEditForm";
 	var $IsModal = FALSE;
-	var $DbMasterFilter = "";
-	var $DbDetailFilter = "";
-	var $StartRec;
-	var $Priv = 0;
-	var $OldRecordset;
-	var $CopyRecord;
+	var $DbMasterFilter;
+	var $DbDetailFilter;
 
 	// 
 	// Page main
@@ -384,78 +378,100 @@ class ctb_barang_add extends ctb_barang {
 		if ($this->IsModal)
 			$gbSkipHeaderFooter = TRUE;
 
-		// Process form if post back
-		if (@$_POST["a_add"] <> "") {
-			$this->CurrentAction = $_POST["a_add"]; // Get form action
-			$this->CopyRecord = $this->LoadOldRecord(); // Load old recordset
-			$this->LoadFormValues(); // Load form values
-		} else { // Not post back
+		// Load key from QueryString
+		if (@$_GET["user_id"] <> "") {
+			$this->user_id->setQueryStringValue($_GET["user_id"]);
+		}
 
-			// Load key values from QueryString
-			$this->CopyRecord = TRUE;
-			if (@$_GET["barang_id"] != "") {
-				$this->barang_id->setQueryStringValue($_GET["barang_id"]);
-				$this->setKey("barang_id", $this->barang_id->CurrentValue); // Set up key
-			} else {
-				$this->setKey("barang_id", ""); // Clear key
-				$this->CopyRecord = FALSE;
+		// Process form if post back
+		if (@$_POST["a_edit"] <> "") {
+			$this->CurrentAction = $_POST["a_edit"]; // Get action code
+			$this->LoadFormValues(); // Get form values
+		} else {
+			$this->CurrentAction = "I"; // Default action is display
+		}
+
+		// Check if valid key
+		if ($this->user_id->CurrentValue == "") {
+			$this->Page_Terminate("tb_userlist.php"); // Invalid key, return to list
+		}
+
+		// Validate form if post back
+		if (@$_POST["a_edit"] <> "") {
+			if (!$this->ValidateForm()) {
+				$this->CurrentAction = ""; // Form error, reset action
+				$this->setFailureMessage($gsFormError);
+				$this->EventCancelled = TRUE; // Event cancelled
+				$this->RestoreFormValues();
 			}
-			if ($this->CopyRecord) {
-				$this->CurrentAction = "C"; // Copy record
-			} else {
-				$this->CurrentAction = "I"; // Display blank record
-			}
+		}
+		switch ($this->CurrentAction) {
+			case "I": // Get a record to display
+				if (!$this->LoadRow()) { // Load record based on key
+					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
+					$this->Page_Terminate("tb_userlist.php"); // No matching record, return to list
+				}
+				break;
+			Case "U": // Update
+				$sReturnUrl = $this->getReturnUrl();
+				if (ew_GetPageName($sReturnUrl) == "tb_userlist.php")
+					$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to list page with correct master key if necessary
+				$this->SendEmail = TRUE; // Send email on update success
+				if ($this->EditRow()) { // Update record based on key
+					if ($this->getSuccessMessage() == "")
+						$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Update success
+					$this->Page_Terminate($sReturnUrl); // Return to caller
+				} elseif ($this->getFailureMessage() == $Language->Phrase("NoRecord")) {
+					$this->Page_Terminate($sReturnUrl); // Return to caller
+				} else {
+					$this->EventCancelled = TRUE; // Event cancelled
+					$this->RestoreFormValues(); // Restore form values if update failed
+				}
 		}
 
 		// Set up Breadcrumb
 		$this->SetupBreadcrumb();
 
-		// Validate form if post back
-		if (@$_POST["a_add"] <> "") {
-			if (!$this->ValidateForm()) {
-				$this->CurrentAction = "I"; // Form error, reset action
-				$this->EventCancelled = TRUE; // Event cancelled
-				$this->RestoreFormValues(); // Restore form values
-				$this->setFailureMessage($gsFormError);
-			}
-		} else {
-			if ($this->CurrentAction == "I") // Load default values for blank record
-				$this->LoadDefaultValues();
-		}
-
-		// Perform action based on action code
-		switch ($this->CurrentAction) {
-			case "I": // Blank record, no action required
-				break;
-			case "C": // Copy an existing record
-				if (!$this->LoadRow()) { // Load record based on key
-					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
-					$this->Page_Terminate("tb_baranglist.php"); // No matching record, return to list
-				}
-				break;
-			case "A": // Add new record
-				$this->SendEmail = TRUE; // Send email on add success
-				if ($this->AddRow($this->OldRecordset)) { // Add successful
-					if ($this->getSuccessMessage() == "")
-						$this->setSuccessMessage($Language->Phrase("AddSuccess")); // Set up success message
-					$sReturnUrl = $this->getReturnUrl();
-					if (ew_GetPageName($sReturnUrl) == "tb_baranglist.php")
-						$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to list page with correct master key if necessary
-					elseif (ew_GetPageName($sReturnUrl) == "tb_barangview.php")
-						$sReturnUrl = $this->GetViewUrl(); // View page, return to view page with keyurl directly
-					$this->Page_Terminate($sReturnUrl); // Clean up and return
-				} else {
-					$this->EventCancelled = TRUE; // Event cancelled
-					$this->RestoreFormValues(); // Add failed, restore form values
-				}
-		}
-
-		// Render row based on row type
-		$this->RowType = EW_ROWTYPE_ADD; // Render add type
-
-		// Render row
+		// Render the record
+		$this->RowType = EW_ROWTYPE_EDIT; // Render as Edit
 		$this->ResetAttrs();
 		$this->RenderRow();
+	}
+
+	// Set up starting record parameters
+	function SetUpStartRec() {
+		if ($this->DisplayRecs == 0)
+			return;
+		if ($this->IsPageRequest()) { // Validate request
+			if (@$_GET[EW_TABLE_START_REC] <> "") { // Check for "start" parameter
+				$this->StartRec = $_GET[EW_TABLE_START_REC];
+				$this->setStartRecordNumber($this->StartRec);
+			} elseif (@$_GET[EW_TABLE_PAGE_NO] <> "") {
+				$PageNo = $_GET[EW_TABLE_PAGE_NO];
+				if (is_numeric($PageNo)) {
+					$this->StartRec = ($PageNo-1)*$this->DisplayRecs+1;
+					if ($this->StartRec <= 0) {
+						$this->StartRec = 1;
+					} elseif ($this->StartRec >= intval(($this->TotalRecs-1)/$this->DisplayRecs)*$this->DisplayRecs+1) {
+						$this->StartRec = intval(($this->TotalRecs-1)/$this->DisplayRecs)*$this->DisplayRecs+1;
+					}
+					$this->setStartRecordNumber($this->StartRec);
+				}
+			}
+		}
+		$this->StartRec = $this->getStartRecordNumber();
+
+		// Check if correct start record counter
+		if (!is_numeric($this->StartRec) || $this->StartRec == "") { // Avoid invalid start record counter
+			$this->StartRec = 1; // Reset start record counter
+			$this->setStartRecordNumber($this->StartRec);
+		} elseif (intval($this->StartRec) > intval($this->TotalRecs)) { // Avoid starting record > total records
+			$this->StartRec = intval(($this->TotalRecs-1)/$this->DisplayRecs)*$this->DisplayRecs+1; // Point to last page first record
+			$this->setStartRecordNumber($this->StartRec);
+		} elseif (($this->StartRec-1) % $this->DisplayRecs <> 0) {
+			$this->StartRec = intval(($this->StartRec-1)/$this->DisplayRecs)*$this->DisplayRecs+1; // Point to page boundary
+			$this->setStartRecordNumber($this->StartRec);
+		}
 	}
 
 	// Get upload files
@@ -465,27 +481,32 @@ class ctb_barang_add extends ctb_barang {
 		// Get upload data
 	}
 
-	// Load default values
-	function LoadDefaultValues() {
-		$this->nama->CurrentValue = NULL;
-		$this->nama->OldValue = $this->nama->CurrentValue;
-	}
-
 	// Load form values
 	function LoadFormValues() {
 
 		// Load from form
 		global $objForm;
-		if (!$this->nama->FldIsDetailKey) {
-			$this->nama->setFormValue($objForm->GetValue("x_nama"));
+		if (!$this->username->FldIsDetailKey) {
+			$this->username->setFormValue($objForm->GetValue("x_username"));
 		}
+		if (!$this->password->FldIsDetailKey) {
+			$this->password->setFormValue($objForm->GetValue("x_password"));
+		}
+		if (!$this->userlevel->FldIsDetailKey) {
+			$this->userlevel->setFormValue($objForm->GetValue("x_userlevel"));
+		}
+		if (!$this->user_id->FldIsDetailKey)
+			$this->user_id->setFormValue($objForm->GetValue("x_user_id"));
 	}
 
 	// Restore form values
 	function RestoreFormValues() {
 		global $objForm;
-		$this->LoadOldRecord();
-		$this->nama->CurrentValue = $this->nama->FormValue;
+		$this->LoadRow();
+		$this->user_id->CurrentValue = $this->user_id->FormValue;
+		$this->username->CurrentValue = $this->username->FormValue;
+		$this->password->CurrentValue = $this->password->FormValue;
+		$this->userlevel->CurrentValue = $this->userlevel->FormValue;
 	}
 
 	// Load row based on key values
@@ -517,39 +538,20 @@ class ctb_barang_add extends ctb_barang {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->barang_id->setDbValue($rs->fields('barang_id'));
-		$this->nama->setDbValue($rs->fields('nama'));
+		$this->user_id->setDbValue($rs->fields('user_id'));
+		$this->username->setDbValue($rs->fields('username'));
+		$this->password->setDbValue($rs->fields('password'));
+		$this->userlevel->setDbValue($rs->fields('userlevel'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->barang_id->DbValue = $row['barang_id'];
-		$this->nama->DbValue = $row['nama'];
-	}
-
-	// Load old record
-	function LoadOldRecord() {
-
-		// Load key values from Session
-		$bValidKey = TRUE;
-		if (strval($this->getKey("barang_id")) <> "")
-			$this->barang_id->CurrentValue = $this->getKey("barang_id"); // barang_id
-		else
-			$bValidKey = FALSE;
-
-		// Load old recordset
-		if ($bValidKey) {
-			$this->CurrentFilter = $this->KeyFilter();
-			$sSql = $this->SQL();
-			$conn = &$this->Connection();
-			$this->OldRecordset = ew_LoadRecordset($sSql, $conn);
-			$this->LoadRowValues($this->OldRecordset); // Load row values
-		} else {
-			$this->OldRecordset = NULL;
-		}
-		return $bValidKey;
+		$this->user_id->DbValue = $row['user_id'];
+		$this->username->DbValue = $row['username'];
+		$this->password->DbValue = $row['password'];
+		$this->userlevel->DbValue = $row['userlevel'];
 	}
 
 	// Render row values based on field settings
@@ -562,36 +564,83 @@ class ctb_barang_add extends ctb_barang {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// barang_id
-		// nama
+		// user_id
+		// username
+		// password
+		// userlevel
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// barang_id
-		$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
-		$this->barang_id->ViewCustomAttributes = "";
+		// username
+		$this->username->ViewValue = $this->username->CurrentValue;
+		$this->username->ViewCustomAttributes = "";
 
-		// nama
-		$this->nama->ViewValue = $this->nama->CurrentValue;
-		$this->nama->ViewCustomAttributes = "";
+		// password
+		$this->password->ViewValue = $this->password->CurrentValue;
+		$this->password->ViewCustomAttributes = "";
 
-			// nama
-			$this->nama->LinkCustomAttributes = "";
-			$this->nama->HrefValue = "";
-			$this->nama->TooltipValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
+		// userlevel
+		if ($Security->CanAdmin()) { // System admin
+		if (strval($this->userlevel->CurrentValue) <> "") {
+			$this->userlevel->ViewValue = $this->userlevel->OptionCaption($this->userlevel->CurrentValue);
+		} else {
+			$this->userlevel->ViewValue = NULL;
+		}
+		} else {
+			$this->userlevel->ViewValue = $Language->Phrase("PasswordMask");
+		}
+		$this->userlevel->ViewCustomAttributes = "";
 
-			// nama
-			$this->nama->EditAttrs["class"] = "form-control";
-			$this->nama->EditCustomAttributes = "";
-			$this->nama->EditValue = ew_HtmlEncode($this->nama->CurrentValue);
-			$this->nama->PlaceHolder = ew_RemoveHtml($this->nama->FldCaption());
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
 
-			// Add refer script
-			// nama
+			// password
+			$this->password->LinkCustomAttributes = "";
+			$this->password->HrefValue = "";
+			$this->password->TooltipValue = "";
 
-			$this->nama->LinkCustomAttributes = "";
-			$this->nama->HrefValue = "";
+			// userlevel
+			$this->userlevel->LinkCustomAttributes = "";
+			$this->userlevel->HrefValue = "";
+			$this->userlevel->TooltipValue = "";
+		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
+
+			// username
+			$this->username->EditAttrs["class"] = "form-control";
+			$this->username->EditCustomAttributes = "";
+			$this->username->EditValue = ew_HtmlEncode($this->username->CurrentValue);
+			$this->username->PlaceHolder = ew_RemoveHtml($this->username->FldCaption());
+
+			// password
+			$this->password->EditAttrs["class"] = "form-control ewPasswordStrength";
+			$this->password->EditCustomAttributes = "";
+			$this->password->EditValue = ew_HtmlEncode($this->password->CurrentValue);
+			$this->password->PlaceHolder = ew_RemoveHtml($this->password->FldCaption());
+
+			// userlevel
+			$this->userlevel->EditAttrs["class"] = "form-control";
+			$this->userlevel->EditCustomAttributes = "";
+			if (!$Security->CanAdmin()) { // System admin
+				$this->userlevel->EditValue = $Language->Phrase("PasswordMask");
+			} else {
+			$this->userlevel->EditValue = $this->userlevel->Options(TRUE);
+			}
+
+			// Edit refer script
+			// username
+
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+
+			// password
+			$this->password->LinkCustomAttributes = "";
+			$this->password->HrefValue = "";
+
+			// userlevel
+			$this->userlevel->LinkCustomAttributes = "";
+			$this->userlevel->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -614,9 +663,6 @@ class ctb_barang_add extends ctb_barang {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
-		if (!$this->nama->FldIsDetailKey && !is_null($this->nama->FormValue) && $this->nama->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->nama->FldCaption(), $this->nama->ReqErrMsg));
-		}
 
 		// Return validate result
 		$ValidateForm = ($gsFormError == "");
@@ -630,52 +676,70 @@ class ctb_barang_add extends ctb_barang {
 		return $ValidateForm;
 	}
 
-	// Add record
-	function AddRow($rsold = NULL) {
-		global $Language, $Security;
+	// Update record based on key values
+	function EditRow() {
+		global $Security, $Language;
+		$sFilter = $this->KeyFilter();
+		$sFilter = $this->ApplyUserIDFilters($sFilter);
 		$conn = &$this->Connection();
-
-		// Load db values from rsold
-		if ($rsold) {
-			$this->LoadDbValues($rsold);
-		}
-		$rsnew = array();
-
-		// nama
-		$this->nama->SetDbValueDef($rsnew, $this->nama->CurrentValue, "", FALSE);
-
-		// Call Row Inserting event
-		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
-		$bInsertRow = $this->Row_Inserting($rs, $rsnew);
-		if ($bInsertRow) {
-			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-			$AddRow = $this->Insert($rsnew);
-			$conn->raiseErrorFn = '';
-			if ($AddRow) {
-
-				// Get insert id if necessary
-				$this->barang_id->setDbValue($conn->Insert_ID());
-				$rsnew['barang_id'] = $this->barang_id->DbValue;
-			}
+		$this->CurrentFilter = $sFilter;
+		$sSql = $this->SQL();
+		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+		$rs = $conn->Execute($sSql);
+		$conn->raiseErrorFn = '';
+		if ($rs === FALSE)
+			return FALSE;
+		if ($rs->EOF) {
+			$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
+			$EditRow = FALSE; // Update Failed
 		} else {
-			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
 
-				// Use the message, do nothing
-			} elseif ($this->CancelMessage <> "") {
-				$this->setFailureMessage($this->CancelMessage);
-				$this->CancelMessage = "";
-			} else {
-				$this->setFailureMessage($Language->Phrase("InsertCancelled"));
+			// Save old values
+			$rsold = &$rs->fields;
+			$this->LoadDbValues($rsold);
+			$rsnew = array();
+
+			// username
+			$this->username->SetDbValueDef($rsnew, $this->username->CurrentValue, NULL, $this->username->ReadOnly);
+
+			// password
+			$this->password->SetDbValueDef($rsnew, $this->password->CurrentValue, NULL, $this->password->ReadOnly || (EW_ENCRYPTED_PASSWORD && $rs->fields('password') == $this->password->CurrentValue));
+
+			// userlevel
+			if ($Security->CanAdmin()) { // System admin
+			$this->userlevel->SetDbValueDef($rsnew, $this->userlevel->CurrentValue, NULL, $this->userlevel->ReadOnly);
 			}
-			$AddRow = FALSE;
-		}
-		if ($AddRow) {
 
-			// Call Row Inserted event
-			$rs = ($rsold == NULL) ? NULL : $rsold->fields;
-			$this->Row_Inserted($rs, $rsnew);
+			// Call Row Updating event
+			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
+			if ($bUpdateRow) {
+				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+				if (count($rsnew) > 0)
+					$EditRow = $this->Update($rsnew, "", $rsold);
+				else
+					$EditRow = TRUE; // No field to update
+				$conn->raiseErrorFn = '';
+				if ($EditRow) {
+				}
+			} else {
+				if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
+
+					// Use the message, do nothing
+				} elseif ($this->CancelMessage <> "") {
+					$this->setFailureMessage($this->CancelMessage);
+					$this->CancelMessage = "";
+				} else {
+					$this->setFailureMessage($Language->Phrase("UpdateCancelled"));
+				}
+				$EditRow = FALSE;
+			}
 		}
-		return $AddRow;
+
+		// Call Row_Updated event
+		if ($EditRow)
+			$this->Row_Updated($rsold, $rsnew);
+		$rs->Close();
+		return $EditRow;
 	}
 
 	// Set up Breadcrumb
@@ -683,9 +747,9 @@ class ctb_barang_add extends ctb_barang {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("tb_baranglist.php"), "", $this->TableVar, TRUE);
-		$PageId = ($this->CurrentAction == "C") ? "Copy" : "Add";
-		$Breadcrumb->Add("add", $PageId, $url);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("tb_userlist.php"), "", $this->TableVar, TRUE);
+		$PageId = "edit";
+		$Breadcrumb->Add("edit", $PageId, $url);
 	}
 
 	// Setup lookup filters of a field
@@ -776,29 +840,29 @@ class ctb_barang_add extends ctb_barang {
 <?php
 
 // Create page object
-if (!isset($tb_barang_add)) $tb_barang_add = new ctb_barang_add();
+if (!isset($tb_user_edit)) $tb_user_edit = new ctb_user_edit();
 
 // Page init
-$tb_barang_add->Page_Init();
+$tb_user_edit->Page_Init();
 
 // Page main
-$tb_barang_add->Page_Main();
+$tb_user_edit->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$tb_barang_add->Page_Render();
+$tb_user_edit->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
-var CurrentPageID = EW_PAGE_ID = "add";
-var CurrentForm = ftb_barangadd = new ew_Form("ftb_barangadd", "add");
+var CurrentPageID = EW_PAGE_ID = "edit";
+var CurrentForm = ftb_useredit = new ew_Form("ftb_useredit", "edit");
 
 // Validate form
-ftb_barangadd.Validate = function() {
+ftb_useredit.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -812,9 +876,9 @@ ftb_barangadd.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
-			elm = this.GetElements("x" + infix + "_nama");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $tb_barang->nama->FldCaption(), $tb_barang->nama->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_password");
+			if (elm && $(elm).hasClass("ewPasswordStrength") && !$(elm).data("validated"))
+				return this.OnError(elm, ewLanguage.Phrase("PasswordTooSimple"));
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -833,7 +897,7 @@ ftb_barangadd.Validate = function() {
 }
 
 // Form_CustomValidate event
-ftb_barangadd.Form_CustomValidate = 
+ftb_useredit.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -842,65 +906,108 @@ ftb_barangadd.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ftb_barangadd.ValidateRequired = true;
+ftb_useredit.ValidateRequired = true;
 <?php } else { ?>
-ftb_barangadd.ValidateRequired = false; 
+ftb_useredit.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+ftb_useredit.Lists["x_userlevel"] = {"LinkField":"","Ajax":null,"AutoFill":false,"DisplayFields":["","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":""};
+ftb_useredit.Lists["x_userlevel"].Options = <?php echo json_encode($tb_user->userlevel->Options()) ?>;
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php if (!$tb_barang_add->IsModal) { ?>
+<?php if (!$tb_user_edit->IsModal) { ?>
 <div class="ewToolbar">
 <?php $Breadcrumb->Render(); ?>
 <?php echo $Language->SelectionForm(); ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<?php $tb_barang_add->ShowPageHeader(); ?>
+<?php $tb_user_edit->ShowPageHeader(); ?>
 <?php
-$tb_barang_add->ShowMessage();
+$tb_user_edit->ShowMessage();
 ?>
-<form name="ftb_barangadd" id="ftb_barangadd" class="<?php echo $tb_barang_add->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($tb_barang_add->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_barang_add->Token ?>">
+<form name="ftb_useredit" id="ftb_useredit" class="<?php echo $tb_user_edit->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($tb_user_edit->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_user_edit->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="tb_barang">
-<input type="hidden" name="a_add" id="a_add" value="A">
-<?php if ($tb_barang_add->IsModal) { ?>
+<input type="hidden" name="t" value="tb_user">
+<input type="hidden" name="a_edit" id="a_edit" value="U">
+<?php if ($tb_user_edit->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
+<!-- Fields to prevent google autofill -->
+<input class="hidden" type="text" name="<?php echo ew_Encrypt(ew_Random()) ?>">
+<input class="hidden" type="password" name="<?php echo ew_Encrypt(ew_Random()) ?>">
 <div>
-<?php if ($tb_barang->nama->Visible) { // nama ?>
-	<div id="r_nama" class="form-group">
-		<label id="elh_tb_barang_nama" for="x_nama" class="col-sm-2 control-label ewLabel"><?php echo $tb_barang->nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="col-sm-10"><div<?php echo $tb_barang->nama->CellAttributes() ?>>
-<span id="el_tb_barang_nama">
-<input type="text" data-table="tb_barang" data-field="x_nama" name="x_nama" id="x_nama" placeholder="<?php echo ew_HtmlEncode($tb_barang->nama->getPlaceHolder()) ?>" value="<?php echo $tb_barang->nama->EditValue ?>"<?php echo $tb_barang->nama->EditAttributes() ?>>
+<?php if ($tb_user->username->Visible) { // username ?>
+	<div id="r_username" class="form-group">
+		<label id="elh_tb_user_username" for="x_username" class="col-sm-2 control-label ewLabel"><?php echo $tb_user->username->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $tb_user->username->CellAttributes() ?>>
+<span id="el_tb_user_username">
+<input type="text" data-table="tb_user" data-field="x_username" name="x_username" id="x_username" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($tb_user->username->getPlaceHolder()) ?>" value="<?php echo $tb_user->username->EditValue ?>"<?php echo $tb_user->username->EditAttributes() ?>>
 </span>
-<?php echo $tb_barang->nama->CustomMsg ?></div></div>
+<?php echo $tb_user->username->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($tb_user->password->Visible) { // password ?>
+	<div id="r_password" class="form-group">
+		<label id="elh_tb_user_password" for="x_password" class="col-sm-2 control-label ewLabel"><?php echo $tb_user->password->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $tb_user->password->CellAttributes() ?>>
+<span id="el_tb_user_password">
+<div class="input-group" id="ig_password">
+<input type="text" data-password-strength="pst_password" data-password-generated="pgt_password" data-table="tb_user" data-field="x_password" name="x_password" id="x_password" value="<?php echo $tb_user->password->EditValue ?>" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($tb_user->password->getPlaceHolder()) ?>"<?php echo $tb_user->password->EditAttributes() ?>>
+<span class="input-group-btn">
+	<button type="button" class="btn btn-default ewPasswordGenerator" title="<?php echo ew_HtmlTitle($Language->Phrase("GeneratePassword")) ?>" data-password-field="x_password" data-password-confirm="c_password" data-password-strength="pst_password" data-password-generated="pgt_password"><?php echo $Language->Phrase("GeneratePassword") ?></button>
+</span>
+</div>
+<span class="help-block" id="pgt_password" style="display: none;"></span>
+<div class="progress ewPasswordStrengthBar" id="pst_password" style="display: none;">
+	<div class="progress-bar" role="progressbar"></div>
+</div>
+</span>
+<?php echo $tb_user->password->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($tb_user->userlevel->Visible) { // userlevel ?>
+	<div id="r_userlevel" class="form-group">
+		<label id="elh_tb_user_userlevel" for="x_userlevel" class="col-sm-2 control-label ewLabel"><?php echo $tb_user->userlevel->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $tb_user->userlevel->CellAttributes() ?>>
+<?php if (!$Security->IsAdmin() && $Security->IsLoggedIn()) { // Non system admin ?>
+<span id="el_tb_user_userlevel">
+<p class="form-control-static"><?php echo $tb_user->userlevel->EditValue ?></p>
+</span>
+<?php } else { ?>
+<span id="el_tb_user_userlevel">
+<select data-table="tb_user" data-field="x_userlevel" data-value-separator="<?php echo $tb_user->userlevel->DisplayValueSeparatorAttribute() ?>" id="x_userlevel" name="x_userlevel"<?php echo $tb_user->userlevel->EditAttributes() ?>>
+<?php echo $tb_user->userlevel->SelectOptionListHtml("x_userlevel") ?>
+</select>
+</span>
+<?php } ?>
+<?php echo $tb_user->userlevel->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div>
-<?php if (!$tb_barang_add->IsModal) { ?>
+<input type="hidden" data-table="tb_user" data-field="x_user_id" name="x_user_id" id="x_user_id" value="<?php echo ew_HtmlEncode($tb_user->user_id->CurrentValue) ?>">
+<?php if (!$tb_user_edit->IsModal) { ?>
 <div class="form-group">
 	<div class="col-sm-offset-2 col-sm-10">
-<button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("AddBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $tb_barang_add->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+<button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("SaveBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $tb_user_edit->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
 	</div>
 </div>
 <?php } ?>
 </form>
 <script type="text/javascript">
-ftb_barangadd.Init();
+ftb_useredit.Init();
 </script>
 <?php
-$tb_barang_add->ShowPageFooter();
+$tb_user_edit->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -912,5 +1019,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$tb_barang_add->Page_Terminate();
+$tb_user_edit->Page_Terminate();
 ?>
