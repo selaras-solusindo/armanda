@@ -299,6 +299,7 @@ class ctb_invoice_add extends ctb_invoice {
 		$this->ppn->SetVisibility();
 		$this->terbayar->SetVisibility();
 		$this->pasal23->SetVisibility();
+		$this->no_kuitansi->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -528,6 +529,8 @@ class ctb_invoice_add extends ctb_invoice {
 		$this->terbayar->CurrentValue = NULL;
 		$this->terbayar->OldValue = $this->terbayar->CurrentValue;
 		$this->pasal23->CurrentValue = 0;
+		$this->no_kuitansi->CurrentValue = NULL;
+		$this->no_kuitansi->OldValue = $this->no_kuitansi->CurrentValue;
 	}
 
 	// Load form values
@@ -573,6 +576,9 @@ class ctb_invoice_add extends ctb_invoice {
 		if (!$this->pasal23->FldIsDetailKey) {
 			$this->pasal23->setFormValue($objForm->GetValue("x_pasal23"));
 		}
+		if (!$this->no_kuitansi->FldIsDetailKey) {
+			$this->no_kuitansi->setFormValue($objForm->GetValue("x_no_kuitansi"));
+		}
 	}
 
 	// Restore form values
@@ -593,6 +599,7 @@ class ctb_invoice_add extends ctb_invoice {
 		$this->ppn->CurrentValue = $this->ppn->FormValue;
 		$this->terbayar->CurrentValue = $this->terbayar->FormValue;
 		$this->pasal23->CurrentValue = $this->pasal23->FormValue;
+		$this->no_kuitansi->CurrentValue = $this->no_kuitansi->FormValue;
 	}
 
 	// Load row based on key values
@@ -640,6 +647,7 @@ class ctb_invoice_add extends ctb_invoice {
 		$this->terbilang->setDbValue($rs->fields('terbilang'));
 		$this->terbayar->setDbValue($rs->fields('terbayar'));
 		$this->pasal23->setDbValue($rs->fields('pasal23'));
+		$this->no_kuitansi->setDbValue($rs->fields('no_kuitansi'));
 	}
 
 	// Load DbValue from recordset
@@ -662,6 +670,7 @@ class ctb_invoice_add extends ctb_invoice {
 		$this->terbilang->DbValue = $row['terbilang'];
 		$this->terbayar->DbValue = $row['terbayar'];
 		$this->pasal23->DbValue = $row['pasal23'];
+		$this->no_kuitansi->DbValue = $row['no_kuitansi'];
 	}
 
 	// Load old record
@@ -713,6 +722,7 @@ class ctb_invoice_add extends ctb_invoice {
 		// terbilang
 		// terbayar
 		// pasal23
+		// no_kuitansi
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -809,6 +819,10 @@ class ctb_invoice_add extends ctb_invoice {
 		}
 		$this->pasal23->ViewCustomAttributes = "";
 
+		// no_kuitansi
+		$this->no_kuitansi->ViewValue = $this->no_kuitansi->CurrentValue;
+		$this->no_kuitansi->ViewCustomAttributes = "";
+
 			// customer_id
 			$this->customer_id->LinkCustomAttributes = "";
 			$this->customer_id->HrefValue = "";
@@ -868,6 +882,11 @@ class ctb_invoice_add extends ctb_invoice {
 			$this->pasal23->LinkCustomAttributes = "";
 			$this->pasal23->HrefValue = "";
 			$this->pasal23->TooltipValue = "";
+
+			// no_kuitansi
+			$this->no_kuitansi->LinkCustomAttributes = "";
+			$this->no_kuitansi->HrefValue = "";
+			$this->no_kuitansi->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
 			// customer_id
@@ -951,6 +970,12 @@ class ctb_invoice_add extends ctb_invoice {
 			$this->pasal23->EditCustomAttributes = "";
 			$this->pasal23->EditValue = $this->pasal23->Options(FALSE);
 
+			// no_kuitansi
+			$this->no_kuitansi->EditAttrs["class"] = "form-control";
+			$this->no_kuitansi->EditCustomAttributes = "";
+			$this->no_kuitansi->EditValue = ew_HtmlEncode($this->no_kuitansi->CurrentValue);
+			$this->no_kuitansi->PlaceHolder = ew_RemoveHtml($this->no_kuitansi->FldCaption());
+
 			// Add refer script
 			// customer_id
 
@@ -1000,6 +1025,10 @@ class ctb_invoice_add extends ctb_invoice {
 			// pasal23
 			$this->pasal23->LinkCustomAttributes = "";
 			$this->pasal23->HrefValue = "";
+
+			// no_kuitansi
+			$this->no_kuitansi->LinkCustomAttributes = "";
+			$this->no_kuitansi->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -1110,6 +1139,9 @@ class ctb_invoice_add extends ctb_invoice {
 
 		// pasal23
 		$this->pasal23->SetDbValueDef($rsnew, $this->pasal23->CurrentValue, NULL, strval($this->pasal23->CurrentValue) == "");
+
+		// no_kuitansi
+		$this->no_kuitansi->SetDbValueDef($rsnew, $this->no_kuitansi->CurrentValue, NULL, FALSE);
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -1222,7 +1254,7 @@ class ctb_invoice_add extends ctb_invoice {
 			$sSqlWrk = "SELECT `id` AS `LinkFld`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_customer`";
 			$sWhereWrk = "";
 			$this->customer_id->LookupFilters = array();
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => "`id` = {filter_value}", "t0" => "3", "fn0" => "");
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` = {filter_value}', "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1610,6 +1642,16 @@ ew_CreateCalendar("ftb_invoiceadd", "x_tgl_pelaksanaan", 7);
 </div></div>
 </span>
 <?php echo $tb_invoice->pasal23->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($tb_invoice->no_kuitansi->Visible) { // no_kuitansi ?>
+	<div id="r_no_kuitansi" class="form-group">
+		<label id="elh_tb_invoice_no_kuitansi" for="x_no_kuitansi" class="col-sm-2 control-label ewLabel"><?php echo $tb_invoice->no_kuitansi->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $tb_invoice->no_kuitansi->CellAttributes() ?>>
+<span id="el_tb_invoice_no_kuitansi">
+<input type="text" data-table="tb_invoice" data-field="x_no_kuitansi" name="x_no_kuitansi" id="x_no_kuitansi" size="30" maxlength="25" placeholder="<?php echo ew_HtmlEncode($tb_invoice->no_kuitansi->getPlaceHolder()) ?>" value="<?php echo $tb_invoice->no_kuitansi->EditValue ?>"<?php echo $tb_invoice->no_kuitansi->EditAttributes() ?>>
+</span>
+<?php echo $tb_invoice->no_kuitansi->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div>

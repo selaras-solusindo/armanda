@@ -503,7 +503,7 @@ class ctb_kuitansi_delete extends ctb_kuitansi {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->invoice_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `no_invoice` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_invoice`";
 		$sWhereWrk = "";
-		$this->invoice_id->LookupFilters = array("dx1" => "`no_invoice`");
+		$this->invoice_id->LookupFilters = array("dx1" => '`no_invoice`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->invoice_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;

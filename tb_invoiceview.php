@@ -400,6 +400,7 @@ class ctb_invoice_view extends ctb_invoice {
 		$this->terbilang->SetVisibility();
 		$this->terbayar->SetVisibility();
 		$this->pasal23->SetVisibility();
+		$this->no_kuitansi->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -498,10 +499,6 @@ class ctb_invoice_view extends ctb_invoice {
 		$bLoadCurrentRecord = FALSE;
 		$sReturnUrl = "";
 		$bMatchRecord = FALSE;
-
-		// Set up Breadcrumb
-		if ($this->Export == "")
-			$this->SetupBreadcrumb();
 		if ($this->IsPageRequest()) { // Validate request
 			if (@$_GET["id"] <> "") {
 				$this->id->setQueryStringValue($_GET["id"]);
@@ -535,6 +532,10 @@ class ctb_invoice_view extends ctb_invoice {
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
+
+		// Set up Breadcrumb
+		if ($this->Export == "")
+			$this->SetupBreadcrumb();
 
 		// Render row
 		$this->RowType = EW_ROWTYPE_VIEW;
@@ -780,6 +781,7 @@ class ctb_invoice_view extends ctb_invoice {
 		$this->terbilang->setDbValue($rs->fields('terbilang'));
 		$this->terbayar->setDbValue($rs->fields('terbayar'));
 		$this->pasal23->setDbValue($rs->fields('pasal23'));
+		$this->no_kuitansi->setDbValue($rs->fields('no_kuitansi'));
 	}
 
 	// Load DbValue from recordset
@@ -802,6 +804,7 @@ class ctb_invoice_view extends ctb_invoice {
 		$this->terbilang->DbValue = $row['terbilang'];
 		$this->terbayar->DbValue = $row['terbayar'];
 		$this->pasal23->DbValue = $row['pasal23'];
+		$this->no_kuitansi->DbValue = $row['no_kuitansi'];
 	}
 
 	// Render row values based on field settings
@@ -844,6 +847,7 @@ class ctb_invoice_view extends ctb_invoice {
 		// terbilang
 		// terbayar
 		// pasal23
+		// no_kuitansi
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -940,6 +944,10 @@ class ctb_invoice_view extends ctb_invoice {
 		}
 		$this->pasal23->ViewCustomAttributes = "";
 
+		// no_kuitansi
+		$this->no_kuitansi->ViewValue = $this->no_kuitansi->CurrentValue;
+		$this->no_kuitansi->ViewCustomAttributes = "";
+
 			// customer_id
 			$this->customer_id->LinkCustomAttributes = "";
 			$this->customer_id->HrefValue = "";
@@ -1014,6 +1022,11 @@ class ctb_invoice_view extends ctb_invoice {
 			$this->pasal23->LinkCustomAttributes = "";
 			$this->pasal23->HrefValue = "";
 			$this->pasal23->TooltipValue = "";
+
+			// no_kuitansi
+			$this->no_kuitansi->LinkCustomAttributes = "";
+			$this->no_kuitansi->HrefValue = "";
+			$this->no_kuitansi->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1684,6 +1697,17 @@ $tb_invoice_view->ShowMessage();
 <span id="el_tb_invoice_pasal23">
 <span<?php echo $tb_invoice->pasal23->ViewAttributes() ?>>
 <?php echo $tb_invoice->pasal23->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($tb_invoice->no_kuitansi->Visible) { // no_kuitansi ?>
+	<tr id="r_no_kuitansi">
+		<td><span id="elh_tb_invoice_no_kuitansi"><?php echo $tb_invoice->no_kuitansi->FldCaption() ?></span></td>
+		<td data-name="no_kuitansi"<?php echo $tb_invoice->no_kuitansi->CellAttributes() ?>>
+<span id="el_tb_invoice_no_kuitansi">
+<span<?php echo $tb_invoice->no_kuitansi->ViewAttributes() ?>>
+<?php echo $tb_invoice->no_kuitansi->ViewValue ?></span>
 </span>
 </td>
 	</tr>

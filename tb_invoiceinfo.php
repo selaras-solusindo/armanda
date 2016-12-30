@@ -23,6 +23,7 @@ class ctb_invoice extends cTable {
 	var $terbilang;
 	var $terbayar;
 	var $pasal23;
+	var $no_kuitansi;
 
 	//
 	// Table class constructor
@@ -74,7 +75,7 @@ class ctb_invoice extends cTable {
 		$this->fields['no_invoice'] = &$this->no_invoice;
 
 		// tgl_invoice
-		$this->tgl_invoice = new cField('tb_invoice', 'tb_invoice', 'x_tgl_invoice', 'tgl_invoice', '`tgl_invoice`', 'DATE_FORMAT(`tgl_invoice`, \'%Y/%m/%d\')', 133, 7, FALSE, '`tgl_invoice`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->tgl_invoice = new cField('tb_invoice', 'tb_invoice', 'x_tgl_invoice', 'tgl_invoice', '`tgl_invoice`', ew_CastDateFieldForLike('`tgl_invoice`', 7, "DB"), 133, 7, FALSE, '`tgl_invoice`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->tgl_invoice->Sortable = TRUE; // Allow sort
 		$this->tgl_invoice->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
 		$this->fields['tgl_invoice'] = &$this->tgl_invoice;
@@ -95,7 +96,7 @@ class ctb_invoice extends cTable {
 		$this->fields['kegiatan'] = &$this->kegiatan;
 
 		// tgl_pelaksanaan
-		$this->tgl_pelaksanaan = new cField('tb_invoice', 'tb_invoice', 'x_tgl_pelaksanaan', 'tgl_pelaksanaan', '`tgl_pelaksanaan`', 'DATE_FORMAT(`tgl_pelaksanaan`, \'%Y/%m/%d\')', 133, 7, FALSE, '`tgl_pelaksanaan`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->tgl_pelaksanaan = new cField('tb_invoice', 'tb_invoice', 'x_tgl_pelaksanaan', 'tgl_pelaksanaan', '`tgl_pelaksanaan`', ew_CastDateFieldForLike('`tgl_pelaksanaan`', 7, "DB"), 133, 7, FALSE, '`tgl_pelaksanaan`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->tgl_pelaksanaan->Sortable = TRUE; // Allow sort
 		$this->tgl_pelaksanaan->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
 		$this->fields['tgl_pelaksanaan'] = &$this->tgl_pelaksanaan;
@@ -146,6 +147,11 @@ class ctb_invoice extends cTable {
 		$this->pasal23->OptionCount = 2;
 		$this->pasal23->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['pasal23'] = &$this->pasal23;
+
+		// no_kuitansi
+		$this->no_kuitansi = new cField('tb_invoice', 'tb_invoice', 'x_no_kuitansi', 'no_kuitansi', '`no_kuitansi`', '`no_kuitansi`', 200, -1, FALSE, '`no_kuitansi`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->no_kuitansi->Sortable = TRUE; // Allow sort
+		$this->fields['no_kuitansi'] = &$this->no_kuitansi;
 	}
 
 	// Set Field Visibility
@@ -674,6 +680,7 @@ class ctb_invoice extends cTable {
 		$this->terbilang->setDbValue($rs->fields('terbilang'));
 		$this->terbayar->setDbValue($rs->fields('terbayar'));
 		$this->pasal23->setDbValue($rs->fields('pasal23'));
+		$this->no_kuitansi->setDbValue($rs->fields('no_kuitansi'));
 	}
 
 	// Render list row values
@@ -700,6 +707,7 @@ class ctb_invoice extends cTable {
 		// terbilang
 		// terbayar
 		// pasal23
+		// no_kuitansi
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
@@ -798,6 +806,10 @@ class ctb_invoice extends cTable {
 		}
 		$this->pasal23->ViewCustomAttributes = "";
 
+		// no_kuitansi
+		$this->no_kuitansi->ViewValue = $this->no_kuitansi->CurrentValue;
+		$this->no_kuitansi->ViewCustomAttributes = "";
+
 		// id
 		$this->id->LinkCustomAttributes = "";
 		$this->id->HrefValue = "";
@@ -877,6 +889,11 @@ class ctb_invoice extends cTable {
 		$this->pasal23->LinkCustomAttributes = "";
 		$this->pasal23->HrefValue = "";
 		$this->pasal23->TooltipValue = "";
+
+		// no_kuitansi
+		$this->no_kuitansi->LinkCustomAttributes = "";
+		$this->no_kuitansi->HrefValue = "";
+		$this->no_kuitansi->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -981,6 +998,12 @@ class ctb_invoice extends cTable {
 		$this->pasal23->EditCustomAttributes = "";
 		$this->pasal23->EditValue = $this->pasal23->Options(FALSE);
 
+		// no_kuitansi
+		$this->no_kuitansi->EditAttrs["class"] = "form-control";
+		$this->no_kuitansi->EditCustomAttributes = "";
+		$this->no_kuitansi->EditValue = $this->no_kuitansi->CurrentValue;
+		$this->no_kuitansi->PlaceHolder = ew_RemoveHtml($this->no_kuitansi->FldCaption());
+
 		// Call Row Rendered event
 		$this->Row_Rendered();
 	}
@@ -1023,6 +1046,7 @@ class ctb_invoice extends cTable {
 					if ($this->terbilang->Exportable) $Doc->ExportCaption($this->terbilang);
 					if ($this->terbayar->Exportable) $Doc->ExportCaption($this->terbayar);
 					if ($this->pasal23->Exportable) $Doc->ExportCaption($this->pasal23);
+					if ($this->no_kuitansi->Exportable) $Doc->ExportCaption($this->no_kuitansi);
 				} else {
 					if ($this->customer_id->Exportable) $Doc->ExportCaption($this->customer_id);
 					if ($this->no_invoice->Exportable) $Doc->ExportCaption($this->no_invoice);
@@ -1039,6 +1063,7 @@ class ctb_invoice extends cTable {
 					if ($this->terbilang->Exportable) $Doc->ExportCaption($this->terbilang);
 					if ($this->terbayar->Exportable) $Doc->ExportCaption($this->terbayar);
 					if ($this->pasal23->Exportable) $Doc->ExportCaption($this->pasal23);
+					if ($this->no_kuitansi->Exportable) $Doc->ExportCaption($this->no_kuitansi);
 				}
 				$Doc->EndExportRow();
 			}
@@ -1085,6 +1110,7 @@ class ctb_invoice extends cTable {
 						if ($this->terbilang->Exportable) $Doc->ExportField($this->terbilang);
 						if ($this->terbayar->Exportable) $Doc->ExportField($this->terbayar);
 						if ($this->pasal23->Exportable) $Doc->ExportField($this->pasal23);
+						if ($this->no_kuitansi->Exportable) $Doc->ExportField($this->no_kuitansi);
 					} else {
 						if ($this->customer_id->Exportable) $Doc->ExportField($this->customer_id);
 						if ($this->no_invoice->Exportable) $Doc->ExportField($this->no_invoice);
@@ -1101,6 +1127,7 @@ class ctb_invoice extends cTable {
 						if ($this->terbilang->Exportable) $Doc->ExportField($this->terbilang);
 						if ($this->terbayar->Exportable) $Doc->ExportField($this->terbayar);
 						if ($this->pasal23->Exportable) $Doc->ExportField($this->pasal23);
+						if ($this->no_kuitansi->Exportable) $Doc->ExportField($this->no_kuitansi);
 					}
 					$Doc->EndExportRow();
 				}

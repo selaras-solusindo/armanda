@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2016/12/29" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2016/12/30" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -612,17 +612,38 @@
     <menu id="10012">
       <phrase id="menutext" value="Fee" />
     </menu>
-    <menu id="5">
-      <phrase id="menutext" value="Fee" />
-    </menu>
     <menu id="6">
       <phrase id="menutext" value="Invoice" />
     </menu>
-    <menu id="10013">
-      <phrase id="menutext" value="Kwitansi" />
+    <menu id="10069">
+      <phrase id="menutext" value="Cetak" />
     </menu>
     <menu id="10011">
-      <phrase id="menutext" value="Cetak Invoice" />
+      <phrase id="menutext" value="Invoice" />
+    </menu>
+    <menu id="10040">
+      <phrase id="menutext" value="Kwitansi" />
+    </menu>
+    <menu id="10070">
+      <phrase id="menutext" value="Rekap" />
+    </menu>
+    <menu id="10028">
+      <phrase id="menutext" value="Invoice (ALL)" />
+    </menu>
+    <menu id="10029">
+      <phrase id="menutext" value="Invoice (PPN)" />
+    </menu>
+    <menu id="10031">
+      <phrase id="menutext" value="Hutang" />
+    </menu>
+    <menu id="10034">
+      <phrase id="menutext" value="User" />
+    </menu>
+    <menu id="5">
+      <phrase id="menutext" value="Fee" />
+    </menu>
+    <menu id="10013">
+      <phrase id="menutext" value="Kwitansi" />
     </menu>
     <menu id="10015">
       <phrase id="menutext" value="Cetak Kwitansi" />
@@ -633,17 +654,8 @@
     <menu id="10027">
       <phrase id="menutext" value="view 4" />
     </menu>
-    <menu id="10028">
-      <phrase id="menutext" value="Rekap Invoice (All)" />
-    </menu>
-    <menu id="10029">
-      <phrase id="menutext" value="Rekap Invoice (PPN)" />
-    </menu>
     <menu id="10030">
       <phrase id="menutext" value="Rekap Invoice (PPN)" />
-    </menu>
-    <menu id="10031">
-      <phrase id="menutext" value="Rekap Hutang" />
     </menu>
     <menu id="10001">
       <phrase id="menutext" value="option values" />
@@ -677,9 +689,6 @@
     </menu>
     <menu id="10033">
       <phrase id="menutext" value="view 3" />
-    </menu>
-    <menu id="10034">
-      <phrase id="menutext" value="User" />
     </menu>
     <table id="option_values">
       <phrase id="tblcaption" value="option values" />
@@ -888,6 +897,9 @@
         <phrase id="fldtagcaption1" value="Tidak" />
         <phrase id="fldtagvalue2" value="1" />
         <phrase id="fldtagcaption2" value="Ya" />
+      </field>
+      <field id="no_kuitansi">
+        <phrase id="fldcaption" value="No. Kwitansi" />
       </field>
     </table>
     <table id="cetak2_php">
@@ -1185,6 +1197,9 @@
       <field id="no_kuitansi">
         <phrase id="fldcaption" value="No. Kwitansi" />
       </field>
+    </table>
+    <table id="kuitansi_01_php">
+      <phrase id="tblcaption" value="Cetak Kwitansi #2" />
     </table>
   </project>
 </ew-language>

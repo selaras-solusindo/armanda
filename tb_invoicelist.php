@@ -427,6 +427,7 @@ class ctb_invoice_list extends ctb_invoice {
 		$this->terbilang->SetVisibility();
 		$this->terbayar->SetVisibility();
 		$this->pasal23->SetVisibility();
+		$this->no_kuitansi->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -776,6 +777,7 @@ class ctb_invoice_list extends ctb_invoice {
 		$sFilterList = ew_Concat($sFilterList, $this->terbilang->AdvancedSearch->ToJSON(), ","); // Field terbilang
 		$sFilterList = ew_Concat($sFilterList, $this->terbayar->AdvancedSearch->ToJSON(), ","); // Field terbayar
 		$sFilterList = ew_Concat($sFilterList, $this->pasal23->AdvancedSearch->ToJSON(), ","); // Field pasal23
+		$sFilterList = ew_Concat($sFilterList, $this->no_kuitansi->AdvancedSearch->ToJSON(), ","); // Field no_kuitansi
 		if ($this->BasicSearch->Keyword <> "") {
 			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
 			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
@@ -796,9 +798,16 @@ class ctb_invoice_list extends ctb_invoice {
 	// Process filter list
 	function ProcessFilterList() {
 		global $UserProfile;
-		if (@$_POST["cmd"] == "savefilters") {
+		if (@$_POST["ajax"] == "savefilters") { // Save filter request (Ajax)
 			$filters = ew_StripSlashes(@$_POST["filters"]);
 			$UserProfile->SetSearchFilters(CurrentUserName(), "ftb_invoicelistsrch", $filters);
+
+			// Clean output buffer
+			if (!EW_DEBUG_ENABLED && ob_get_length())
+				ob_end_clean();
+			echo ew_ArrayToJson(array(array("success" => TRUE))); // Success
+			$this->Page_Terminate();
+			exit();
 		} elseif (@$_POST["cmd"] == "resetfilter") {
 			$this->RestoreFilterList();
 		}
@@ -940,6 +949,14 @@ class ctb_invoice_list extends ctb_invoice {
 		$this->pasal23->AdvancedSearch->SearchValue2 = @$filter["y_pasal23"];
 		$this->pasal23->AdvancedSearch->SearchOperator2 = @$filter["w_pasal23"];
 		$this->pasal23->AdvancedSearch->Save();
+
+		// Field no_kuitansi
+		$this->no_kuitansi->AdvancedSearch->SearchValue = @$filter["x_no_kuitansi"];
+		$this->no_kuitansi->AdvancedSearch->SearchOperator = @$filter["z_no_kuitansi"];
+		$this->no_kuitansi->AdvancedSearch->SearchCondition = @$filter["v_no_kuitansi"];
+		$this->no_kuitansi->AdvancedSearch->SearchValue2 = @$filter["y_no_kuitansi"];
+		$this->no_kuitansi->AdvancedSearch->SearchOperator2 = @$filter["w_no_kuitansi"];
+		$this->no_kuitansi->AdvancedSearch->Save();
 		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
 		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
 	}
@@ -954,11 +971,12 @@ class ctb_invoice_list extends ctb_invoice {
 		$this->BuildBasicSearchSQL($sWhere, $this->no_sertifikat, $arKeywords, $type);
 		$this->BuildBasicSearchSQL($sWhere, $this->keterangan, $arKeywords, $type);
 		$this->BuildBasicSearchSQL($sWhere, $this->terbilang, $arKeywords, $type);
+		$this->BuildBasicSearchSQL($sWhere, $this->no_kuitansi, $arKeywords, $type);
 		return $sWhere;
 	}
 
 	// Build basic search SQL
-	function BuildBasicSearchSql(&$Where, &$Fld, $arKeywords, $type) {
+	function BuildBasicSearchSQL(&$Where, &$Fld, $arKeywords, $type) {
 		$sDefCond = ($type == "OR") ? "OR" : "AND";
 		$arSQL = array(); // Array for SQL parts
 		$arCond = array(); // Array for search conditions
@@ -983,7 +1001,7 @@ class ctb_invoice_list extends ctb_invoice {
 						$sWrk = $Fld->FldExpression . " IS NULL";
 					} elseif ($Keyword == EW_NOT_NULL_VALUE) {
 						$sWrk = $Fld->FldExpression . " IS NOT NULL";
-					} elseif ($Fld->FldIsVirtual && $Fld->FldVirtualSearch) {
+					} elseif ($Fld->FldIsVirtual) {
 						$sWrk = $Fld->FldVirtualExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
 					} elseif ($Fld->FldDataType != EW_DATATYPE_NUMBER || is_numeric($Keyword)) {
 						$sWrk = $Fld->FldBasicSearchExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
@@ -1133,6 +1151,7 @@ class ctb_invoice_list extends ctb_invoice {
 			$this->UpdateSort($this->terbilang); // terbilang
 			$this->UpdateSort($this->terbayar); // terbayar
 			$this->UpdateSort($this->pasal23); // pasal23
+			$this->UpdateSort($this->no_kuitansi); // no_kuitansi
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -1180,6 +1199,7 @@ class ctb_invoice_list extends ctb_invoice {
 				$this->terbilang->setSort("");
 				$this->terbayar->setSort("");
 				$this->pasal23->setSort("");
+				$this->no_kuitansi->setSort("");
 			}
 
 			// Reset start position
@@ -1759,6 +1779,7 @@ class ctb_invoice_list extends ctb_invoice {
 		$this->terbilang->setDbValue($rs->fields('terbilang'));
 		$this->terbayar->setDbValue($rs->fields('terbayar'));
 		$this->pasal23->setDbValue($rs->fields('pasal23'));
+		$this->no_kuitansi->setDbValue($rs->fields('no_kuitansi'));
 	}
 
 	// Load DbValue from recordset
@@ -1781,6 +1802,7 @@ class ctb_invoice_list extends ctb_invoice {
 		$this->terbilang->DbValue = $row['terbilang'];
 		$this->terbayar->DbValue = $row['terbayar'];
 		$this->pasal23->DbValue = $row['pasal23'];
+		$this->no_kuitansi->DbValue = $row['no_kuitansi'];
 	}
 
 	// Load old record
@@ -1846,6 +1868,7 @@ class ctb_invoice_list extends ctb_invoice {
 		// terbilang
 		// terbayar
 		// pasal23
+		// no_kuitansi
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1942,6 +1965,10 @@ class ctb_invoice_list extends ctb_invoice {
 		}
 		$this->pasal23->ViewCustomAttributes = "";
 
+		// no_kuitansi
+		$this->no_kuitansi->ViewValue = $this->no_kuitansi->CurrentValue;
+		$this->no_kuitansi->ViewCustomAttributes = "";
+
 			// customer_id
 			$this->customer_id->LinkCustomAttributes = "";
 			$this->customer_id->HrefValue = "";
@@ -2016,6 +2043,11 @@ class ctb_invoice_list extends ctb_invoice {
 			$this->pasal23->LinkCustomAttributes = "";
 			$this->pasal23->HrefValue = "";
 			$this->pasal23->TooltipValue = "";
+
+			// no_kuitansi
+			$this->no_kuitansi->LinkCustomAttributes = "";
+			$this->no_kuitansi->HrefValue = "";
+			$this->no_kuitansi->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -2753,6 +2785,15 @@ $tb_invoice_list->ListOptions->Render("header", "left");
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
+<?php if ($tb_invoice->no_kuitansi->Visible) { // no_kuitansi ?>
+	<?php if ($tb_invoice->SortUrl($tb_invoice->no_kuitansi) == "") { ?>
+		<th data-name="no_kuitansi"><div id="elh_tb_invoice_no_kuitansi" class="tb_invoice_no_kuitansi"><div class="ewTableHeaderCaption"><?php echo $tb_invoice->no_kuitansi->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="no_kuitansi"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_invoice->SortUrl($tb_invoice->no_kuitansi) ?>',1);"><div id="elh_tb_invoice_no_kuitansi" class="tb_invoice_no_kuitansi">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_invoice->no_kuitansi->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($tb_invoice->no_kuitansi->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_invoice->no_kuitansi->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
 <?php
 
 // Render list options (header, right)
@@ -2935,6 +2976,14 @@ $tb_invoice_list->ListOptions->Render("body", "left", $tb_invoice_list->RowCnt);
 <span id="el<?php echo $tb_invoice_list->RowCnt ?>_tb_invoice_pasal23" class="tb_invoice_pasal23">
 <span<?php echo $tb_invoice->pasal23->ViewAttributes() ?>>
 <?php echo $tb_invoice->pasal23->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($tb_invoice->no_kuitansi->Visible) { // no_kuitansi ?>
+		<td data-name="no_kuitansi"<?php echo $tb_invoice->no_kuitansi->CellAttributes() ?>>
+<span id="el<?php echo $tb_invoice_list->RowCnt ?>_tb_invoice_no_kuitansi" class="tb_invoice_no_kuitansi">
+<span<?php echo $tb_invoice->no_kuitansi->ViewAttributes() ?>>
+<?php echo $tb_invoice->no_kuitansi->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>

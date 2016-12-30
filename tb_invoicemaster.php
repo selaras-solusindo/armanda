@@ -15,6 +15,7 @@
 // terbilang
 // terbayar
 // pasal23
+// no_kuitansi
 
 ?>
 <?php if ($tb_invoice->Visible) { ?>
@@ -183,6 +184,17 @@
 <span id="el_tb_invoice_pasal23">
 <span<?php echo $tb_invoice->pasal23->ViewAttributes() ?>>
 <?php echo $tb_invoice->pasal23->ListViewValue() ?></span>
+</span>
+</td>
+		</tr>
+<?php } ?>
+<?php if ($tb_invoice->no_kuitansi->Visible) { // no_kuitansi ?>
+		<tr id="r_no_kuitansi">
+			<td><?php echo $tb_invoice->no_kuitansi->FldCaption() ?></td>
+			<td<?php echo $tb_invoice->no_kuitansi->CellAttributes() ?>>
+<span id="el_tb_invoice_no_kuitansi">
+<span<?php echo $tb_invoice->no_kuitansi->ViewAttributes() ?>>
+<?php echo $tb_invoice->no_kuitansi->ListViewValue() ?></span>
 </span>
 </td>
 		</tr>

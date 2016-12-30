@@ -9,16 +9,16 @@ mysql_select_db($database_conn) or die ("Database tidak ditemukan");
 	<head>
 	</head>
 	<body>
-		<form method="post" action="kuitansi2.php">
+		<form method="post" action="kuitansi_02.php">
 			Pilih No. Kwitansi :
-			<select name="no_kuitansi">
+			<select name="invoice_id">
 				<option value="0">No. Kwitansi</option>
 				<?php
-				$msql = "select * from tb_kuitansi";
+				$msql = "select * from tb_invoice where no_kuitansi <> ''";
 				$mquery = mysql_query($msql);
 				while($row = mysql_fetch_array($mquery)) {
 					?>
-				<option value="<?php echo $row["kuitansi_id"]?>"><?php echo $row["no_kuitansi"]?></option>
+				<option value="<?php echo $row["id"]?>"><?php echo $row["no_kuitansi"]?></option>
 					<?php
 				}
 				?>
@@ -27,5 +27,4 @@ mysql_select_db($database_conn) or die ("Database tidak ditemukan");
 		</form>
 	</body>
 </html>
-
 

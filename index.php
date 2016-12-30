@@ -276,12 +276,12 @@ class cdefault {
 			$this->Page_Terminate("cetak2.php");
 		if ($Security->AllowList(CurrentProjectID() . 'tb_barang'))
 			$this->Page_Terminate("tb_baranglist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'tb_kuitansi'))
-			$this->Page_Terminate("tb_kuitansilist.php");
 		if ($Security->AllowList(CurrentProjectID() . 'kuitansi.php'))
 			$this->Page_Terminate("kuitansi.php");
 		if ($Security->AllowList(CurrentProjectID() . 'tb_user'))
 			$this->Page_Terminate("tb_userlist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'kuitansi_01.php'))
+			$this->Page_Terminate("kuitansi_01.php");
 		if ($Security->IsLoggedIn()) {
 			$this->setFailureMessage(ew_DeniedMsg() . "<br><br><a href=\"logout.php\">" . $Language->Phrase("BackToLogin") . "</a>");
 		} else {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ew-language date="2016/12/29" version="9.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2016/12/30" version="9.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
 	<locale>
 		<phrase id="locale" value=""/><!-- *** system locale for this language -->
 		<phrase id="use_system_locale" value="1"/><!-- *** change to "0" to disable system locale and use the following settings *** -->
@@ -411,6 +411,8 @@
 </field>
 <field id="pasal23"><phrase id="fldcaption" value="pasal 23"/>
 </field>
+<field id="no_kuitansi"><phrase id="fldcaption" value="no kuitansi"/>
+</field>
 </table>
 <table id="tb_kuitansi"><phrase id="tblcaption" value="tb kuitansi"/>
 <field id="kuitansi_id"><phrase id="fldcaption" value="kuitansi id"/>
@@ -534,7 +536,7 @@
 <field id="no_kuitansi"><phrase id="fldcaption" value="no kuitansi"/>
 </field>
 </table>
-<table id="report1"><phrase id="tblcaption" value="Report 1"/>
+<table id="report1"><phrase id="tblcaption" value="Invoice (ALL)"/>
 <field id="nama"><phrase id="fldcaption" value="Customer"/>
 </field>
 <field id="no_kuitansi"><phrase id="fldcaption" value="No. KW"/>
@@ -580,7 +582,7 @@
 <field id="tgl_pelaksanaan"><phrase id="fldcaption" value="Tgl. Kegiatan"/>
 </field>
 </table>
-<table id="report2"><phrase id="tblcaption" value="Report 2"/>
+<table id="report2"><phrase id="tblcaption" value="Hutang"/>
 <field id="nama"><phrase id="fldcaption" value="Customer"/>
 </field>
 <field id="tgl_pelaksanaan"><phrase id="fldcaption" value="Tgl. Kegiatan"/>
@@ -662,7 +664,7 @@
 <field id="terbilang"><phrase id="fldcaption" value="terbilang"/>
 </field>
 </table>
-<table id="report4"><phrase id="tblcaption" value="Report 4"/>
+<table id="report4"><phrase id="tblcaption" value="Invoice (PPN)"/>
 <field id="tgl_invoice"><phrase id="fldcaption" value="Tgl. INV"/>
 </field>
 <field id="nama"><phrase id="fldcaption" value="Customer"/>

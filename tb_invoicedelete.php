@@ -298,6 +298,7 @@ class ctb_invoice_delete extends ctb_invoice {
 		$this->terbilang->SetVisibility();
 		$this->terbayar->SetVisibility();
 		$this->pasal23->SetVisibility();
+		$this->no_kuitansi->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -488,6 +489,7 @@ class ctb_invoice_delete extends ctb_invoice {
 		$this->terbilang->setDbValue($rs->fields('terbilang'));
 		$this->terbayar->setDbValue($rs->fields('terbayar'));
 		$this->pasal23->setDbValue($rs->fields('pasal23'));
+		$this->no_kuitansi->setDbValue($rs->fields('no_kuitansi'));
 	}
 
 	// Load DbValue from recordset
@@ -510,6 +512,7 @@ class ctb_invoice_delete extends ctb_invoice {
 		$this->terbilang->DbValue = $row['terbilang'];
 		$this->terbayar->DbValue = $row['terbayar'];
 		$this->pasal23->DbValue = $row['pasal23'];
+		$this->no_kuitansi->DbValue = $row['no_kuitansi'];
 	}
 
 	// Render row values based on field settings
@@ -546,6 +549,7 @@ class ctb_invoice_delete extends ctb_invoice {
 		// terbilang
 		// terbayar
 		// pasal23
+		// no_kuitansi
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -642,6 +646,10 @@ class ctb_invoice_delete extends ctb_invoice {
 		}
 		$this->pasal23->ViewCustomAttributes = "";
 
+		// no_kuitansi
+		$this->no_kuitansi->ViewValue = $this->no_kuitansi->CurrentValue;
+		$this->no_kuitansi->ViewCustomAttributes = "";
+
 			// customer_id
 			$this->customer_id->LinkCustomAttributes = "";
 			$this->customer_id->HrefValue = "";
@@ -716,6 +724,11 @@ class ctb_invoice_delete extends ctb_invoice {
 			$this->pasal23->LinkCustomAttributes = "";
 			$this->pasal23->HrefValue = "";
 			$this->pasal23->TooltipValue = "";
+
+			// no_kuitansi
+			$this->no_kuitansi->LinkCustomAttributes = "";
+			$this->no_kuitansi->HrefValue = "";
+			$this->no_kuitansi->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1065,6 +1078,9 @@ $tb_invoice_delete->ShowMessage();
 <?php if ($tb_invoice->pasal23->Visible) { // pasal23 ?>
 		<th><span id="elh_tb_invoice_pasal23" class="tb_invoice_pasal23"><?php echo $tb_invoice->pasal23->FldCaption() ?></span></th>
 <?php } ?>
+<?php if ($tb_invoice->no_kuitansi->Visible) { // no_kuitansi ?>
+		<th><span id="elh_tb_invoice_no_kuitansi" class="tb_invoice_no_kuitansi"><?php echo $tb_invoice->no_kuitansi->FldCaption() ?></span></th>
+<?php } ?>
 	</tr>
 	</thead>
 	<tbody>
@@ -1203,6 +1219,14 @@ while (!$tb_invoice_delete->Recordset->EOF) {
 <span id="el<?php echo $tb_invoice_delete->RowCnt ?>_tb_invoice_pasal23" class="tb_invoice_pasal23">
 <span<?php echo $tb_invoice->pasal23->ViewAttributes() ?>>
 <?php echo $tb_invoice->pasal23->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($tb_invoice->no_kuitansi->Visible) { // no_kuitansi ?>
+		<td<?php echo $tb_invoice->no_kuitansi->CellAttributes() ?>>
+<span id="el<?php echo $tb_invoice_delete->RowCnt ?>_tb_invoice_no_kuitansi" class="tb_invoice_no_kuitansi">
+<span<?php echo $tb_invoice->no_kuitansi->ViewAttributes() ?>>
+<?php echo $tb_invoice->no_kuitansi->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
