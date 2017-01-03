@@ -65,8 +65,8 @@ if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
 //$pdf->SetFont('times', 'BI', 20);
 
 // add a page
-$pdf->AddPage("L", "A5");
-//$pdf->AddPage();
+//$pdf->AddPage("L", "A5");
+$pdf->AddPage();
 
 //echo "no_invoice " . $_POST["no_invoice"];
 
