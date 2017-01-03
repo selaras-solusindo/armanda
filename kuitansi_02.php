@@ -149,7 +149,7 @@ $html .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 $html .= '</table>';
 $html .= '<table border="0">';
 $tgl_invoice = strtotime($row["tgl_invoice"]);
-$html .= '<tr><td width="435">&nbsp;</td><td>Surabaya, '.date("d", $tgl_invoice).' '.$anamabln_[date("m", $tgl_invoice)].' '.date("Y", $tgl_invoice).'</td></tr>';
+$html .= '<tr><td width="435">&nbsp;</td><td>Surabaya, '.date("d", $tgl_invoice).' '.$anamabln_[intval(date("m", $tgl_invoice))].' '.date("Y", $tgl_invoice).'</td></tr>';
 $html .= '</table>';
 $html .= '<table border="0">';
 $html .= '<tr><td width="155" align="right">Rp.</td><td> '.number_format($total_ppn).'</td></tr>';

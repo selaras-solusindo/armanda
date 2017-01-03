@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ew-language date="2016/12/30" version="9.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/1/3" version="9.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
 	<locale>
 		<phrase id="locale" value=""/><!-- *** system locale for this language -->
 		<phrase id="use_system_locale" value="1"/><!-- *** change to "0" to disable system locale and use the following settings *** -->
@@ -235,7 +235,7 @@
 		<phrase id="nextyear" value="Next year"/>
 		<phrase id="thisyear" value="This year"/>
 	</global>
-	<project><phrase id="footertext" value="&amp;copy;2016 e.World Technology Ltd. All rights reserved."/>
+	<project><phrase id="footertext" value="&amp;copy;2017 e.World Technology Ltd. All rights reserved."/>
 <menu id="18"><phrase id="menutext" value="tb user"/>
 </menu>
 <menu id="15"><phrase id="menutext" value="view 5"/>
