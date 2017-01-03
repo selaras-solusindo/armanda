@@ -280,7 +280,6 @@ class ctb_user_delete extends ctb_user {
 		}
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 		$this->username->SetVisibility();
-		$this->password->SetVisibility();
 		$this->userlevel->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
@@ -493,10 +492,6 @@ class ctb_user_delete extends ctb_user {
 		$this->username->ViewValue = $this->username->CurrentValue;
 		$this->username->ViewCustomAttributes = "";
 
-		// password
-		$this->password->ViewValue = $this->password->CurrentValue;
-		$this->password->ViewCustomAttributes = "";
-
 		// userlevel
 		if ($Security->CanAdmin()) { // System admin
 		if (strval($this->userlevel->CurrentValue) <> "") {
@@ -513,11 +508,6 @@ class ctb_user_delete extends ctb_user {
 			$this->username->LinkCustomAttributes = "";
 			$this->username->HrefValue = "";
 			$this->username->TooltipValue = "";
-
-			// password
-			$this->password->LinkCustomAttributes = "";
-			$this->password->HrefValue = "";
-			$this->password->TooltipValue = "";
 
 			// userlevel
 			$this->userlevel->LinkCustomAttributes = "";
@@ -829,9 +819,6 @@ $tb_user_delete->ShowMessage();
 <?php if ($tb_user->username->Visible) { // username ?>
 		<th><span id="elh_tb_user_username" class="tb_user_username"><?php echo $tb_user->username->FldCaption() ?></span></th>
 <?php } ?>
-<?php if ($tb_user->password->Visible) { // password ?>
-		<th><span id="elh_tb_user_password" class="tb_user_password"><?php echo $tb_user->password->FldCaption() ?></span></th>
-<?php } ?>
 <?php if ($tb_user->userlevel->Visible) { // userlevel ?>
 		<th><span id="elh_tb_user_userlevel" class="tb_user_userlevel"><?php echo $tb_user->userlevel->FldCaption() ?></span></th>
 <?php } ?>
@@ -861,14 +848,6 @@ while (!$tb_user_delete->Recordset->EOF) {
 <span id="el<?php echo $tb_user_delete->RowCnt ?>_tb_user_username" class="tb_user_username">
 <span<?php echo $tb_user->username->ViewAttributes() ?>>
 <?php echo $tb_user->username->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($tb_user->password->Visible) { // password ?>
-		<td<?php echo $tb_user->password->CellAttributes() ?>>
-<span id="el<?php echo $tb_user_delete->RowCnt ?>_tb_user_password" class="tb_user_password">
-<span<?php echo $tb_user->password->ViewAttributes() ?>>
-<?php echo $tb_user->password->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

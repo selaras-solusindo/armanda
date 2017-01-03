@@ -408,7 +408,6 @@ class ctb_user_list extends ctb_user {
 		// Setup export options
 		$this->SetupExportOptions();
 		$this->username->SetVisibility();
-		$this->password->SetVisibility();
 		$this->userlevel->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
@@ -822,7 +821,6 @@ class ctb_user_list extends ctb_user {
 	function BasicSearchSQL($arKeywords, $type) {
 		$sWhere = "";
 		$this->BuildBasicSearchSQL($sWhere, $this->username, $arKeywords, $type);
-		$this->BuildBasicSearchSQL($sWhere, $this->password, $arKeywords, $type);
 		return $sWhere;
 	}
 
@@ -988,7 +986,6 @@ class ctb_user_list extends ctb_user {
 			$this->CurrentOrder = ew_StripSlashes(@$_GET["order"]);
 			$this->CurrentOrderType = @$_GET["ordertype"];
 			$this->UpdateSort($this->username); // username
-			$this->UpdateSort($this->password); // password
 			$this->UpdateSort($this->userlevel); // userlevel
 			$this->setStartRecordNumber(1); // Reset start position
 		}
@@ -1023,7 +1020,6 @@ class ctb_user_list extends ctb_user {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
 				$this->username->setSort("");
-				$this->password->setSort("");
 				$this->userlevel->setSort("");
 			}
 
@@ -1566,10 +1562,6 @@ class ctb_user_list extends ctb_user {
 		$this->username->ViewValue = $this->username->CurrentValue;
 		$this->username->ViewCustomAttributes = "";
 
-		// password
-		$this->password->ViewValue = $this->password->CurrentValue;
-		$this->password->ViewCustomAttributes = "";
-
 		// userlevel
 		if ($Security->CanAdmin()) { // System admin
 		if (strval($this->userlevel->CurrentValue) <> "") {
@@ -1588,13 +1580,6 @@ class ctb_user_list extends ctb_user {
 			$this->username->TooltipValue = "";
 			if ($this->Export == "")
 				$this->username->ViewValue = ew_Highlight($this->HighlightName(), $this->username->ViewValue, $this->BasicSearch->getKeyword(), $this->BasicSearch->getType(), "", "");
-
-			// password
-			$this->password->LinkCustomAttributes = "";
-			$this->password->HrefValue = "";
-			$this->password->TooltipValue = "";
-			if ($this->Export == "")
-				$this->password->ViewValue = ew_Highlight($this->HighlightName(), $this->password->ViewValue, $this->BasicSearch->getKeyword(), $this->BasicSearch->getType(), "", "");
 
 			// userlevel
 			$this->userlevel->LinkCustomAttributes = "";
@@ -2208,15 +2193,6 @@ $tb_user_list->ListOptions->Render("header", "left");
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
-<?php if ($tb_user->password->Visible) { // password ?>
-	<?php if ($tb_user->SortUrl($tb_user->password) == "") { ?>
-		<th data-name="password"><div id="elh_tb_user_password" class="tb_user_password"><div class="ewTableHeaderCaption"><?php echo $tb_user->password->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="password"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_user->SortUrl($tb_user->password) ?>',1);"><div id="elh_tb_user_password" class="tb_user_password">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_user->password->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($tb_user->password->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_user->password->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
 <?php if ($tb_user->userlevel->Visible) { // userlevel ?>
 	<?php if ($tb_user->SortUrl($tb_user->userlevel) == "") { ?>
 		<th data-name="userlevel"><div id="elh_tb_user_userlevel" class="tb_user_userlevel"><div class="ewTableHeaderCaption"><?php echo $tb_user->userlevel->FldCaption() ?></div></div></th>
@@ -2298,14 +2274,6 @@ $tb_user_list->ListOptions->Render("body", "left", $tb_user_list->RowCnt);
 <?php echo $tb_user->username->ListViewValue() ?></span>
 </span>
 <a id="<?php echo $tb_user_list->PageObjName . "_row_" . $tb_user_list->RowCnt ?>"></a></td>
-	<?php } ?>
-	<?php if ($tb_user->password->Visible) { // password ?>
-		<td data-name="password"<?php echo $tb_user->password->CellAttributes() ?>>
-<span id="el<?php echo $tb_user_list->RowCnt ?>_tb_user_password" class="tb_user_password">
-<span<?php echo $tb_user->password->ViewAttributes() ?>>
-<?php echo $tb_user->password->ListViewValue() ?></span>
-</span>
-</td>
 	<?php } ?>
 	<?php if ($tb_user->userlevel->Visible) { // userlevel ?>
 		<td data-name="userlevel"<?php echo $tb_user->userlevel->CellAttributes() ?>>

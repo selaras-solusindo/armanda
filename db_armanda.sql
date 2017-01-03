@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 30, 2016 at 02:35 PM
+-- Generation Time: Jan 03, 2017 at 10:53 AM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.1
 
@@ -140,7 +140,7 @@ INSERT INTO `tb_barang` (`barang_id`, `nama`) VALUES
 CREATE TABLE IF NOT EXISTS `tb_customer` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nama` varchar(50) NOT NULL,
-  `alamat` varchar(100) NOT NULL,
+  `alamat` text NOT NULL,
   `kota` varchar(50) NOT NULL,
   `kodepos` varchar(10) NOT NULL,
   `no_npwp` varchar(50) NOT NULL,

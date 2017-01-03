@@ -381,7 +381,6 @@ class ctb_user_view extends ctb_user {
 		// Setup export options
 		$this->SetupExportOptions();
 		$this->username->SetVisibility();
-		$this->password->SetVisibility();
 		$this->userlevel->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
@@ -712,10 +711,6 @@ class ctb_user_view extends ctb_user {
 		$this->username->ViewValue = $this->username->CurrentValue;
 		$this->username->ViewCustomAttributes = "";
 
-		// password
-		$this->password->ViewValue = $this->password->CurrentValue;
-		$this->password->ViewCustomAttributes = "";
-
 		// userlevel
 		if ($Security->CanAdmin()) { // System admin
 		if (strval($this->userlevel->CurrentValue) <> "") {
@@ -732,11 +727,6 @@ class ctb_user_view extends ctb_user {
 			$this->username->LinkCustomAttributes = "";
 			$this->username->HrefValue = "";
 			$this->username->TooltipValue = "";
-
-			// password
-			$this->password->LinkCustomAttributes = "";
-			$this->password->HrefValue = "";
-			$this->password->TooltipValue = "";
 
 			// userlevel
 			$this->userlevel->LinkCustomAttributes = "";
@@ -1208,17 +1198,6 @@ $tb_user_view->ShowMessage();
 <span id="el_tb_user_username">
 <span<?php echo $tb_user->username->ViewAttributes() ?>>
 <?php echo $tb_user->username->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($tb_user->password->Visible) { // password ?>
-	<tr id="r_password">
-		<td><span id="elh_tb_user_password"><?php echo $tb_user->password->FldCaption() ?></span></td>
-		<td data-name="password"<?php echo $tb_user->password->CellAttributes() ?>>
-<span id="el_tb_user_password">
-<span<?php echo $tb_user->password->ViewAttributes() ?>>
-<?php echo $tb_user->password->ViewValue ?></span>
 </span>
 </td>
 	</tr>

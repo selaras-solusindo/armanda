@@ -56,7 +56,7 @@ class ctb_customer extends cTable {
 		$this->fields['nama'] = &$this->nama;
 
 		// alamat
-		$this->alamat = new cField('tb_customer', 'tb_customer', 'x_alamat', 'alamat', '`alamat`', '`alamat`', 200, -1, FALSE, '`alamat`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->alamat = new cField('tb_customer', 'tb_customer', 'x_alamat', 'alamat', '`alamat`', '`alamat`', 201, -1, FALSE, '`alamat`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXTAREA');
 		$this->alamat->Sortable = TRUE; // Allow sort
 		$this->fields['alamat'] = &$this->alamat;
 

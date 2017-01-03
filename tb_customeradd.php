@@ -1087,7 +1087,7 @@ $tb_customer_add->ShowMessage();
 		<label id="elh_tb_customer_alamat" for="x_alamat" class="col-sm-2 control-label ewLabel"><?php echo $tb_customer->alamat->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
 		<div class="col-sm-10"><div<?php echo $tb_customer->alamat->CellAttributes() ?>>
 <span id="el_tb_customer_alamat">
-<input type="text" data-table="tb_customer" data-field="x_alamat" name="x_alamat" id="x_alamat" size="30" maxlength="100" placeholder="<?php echo ew_HtmlEncode($tb_customer->alamat->getPlaceHolder()) ?>" value="<?php echo $tb_customer->alamat->EditValue ?>"<?php echo $tb_customer->alamat->EditAttributes() ?>>
+<textarea data-table="tb_customer" data-field="x_alamat" name="x_alamat" id="x_alamat" cols="35" rows="4" placeholder="<?php echo ew_HtmlEncode($tb_customer->alamat->getPlaceHolder()) ?>"<?php echo $tb_customer->alamat->EditAttributes() ?>><?php echo $tb_customer->alamat->EditValue ?></textarea>
 </span>
 <?php echo $tb_customer->alamat->CustomMsg ?></div></div>
 	</div>

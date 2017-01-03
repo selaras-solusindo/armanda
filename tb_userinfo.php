@@ -682,11 +682,9 @@ class ctb_user extends cTable {
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
 					if ($this->username->Exportable) $Doc->ExportCaption($this->username);
-					if ($this->password->Exportable) $Doc->ExportCaption($this->password);
 					if ($this->userlevel->Exportable) $Doc->ExportCaption($this->userlevel);
 				} else {
 					if ($this->username->Exportable) $Doc->ExportCaption($this->username);
-					if ($this->password->Exportable) $Doc->ExportCaption($this->password);
 					if ($this->userlevel->Exportable) $Doc->ExportCaption($this->userlevel);
 				}
 				$Doc->EndExportRow();
@@ -720,11 +718,9 @@ class ctb_user extends cTable {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
 						if ($this->username->Exportable) $Doc->ExportField($this->username);
-						if ($this->password->Exportable) $Doc->ExportField($this->password);
 						if ($this->userlevel->Exportable) $Doc->ExportField($this->userlevel);
 					} else {
 						if ($this->username->Exportable) $Doc->ExportField($this->username);
-						if ($this->password->Exportable) $Doc->ExportField($this->password);
 						if ($this->userlevel->Exportable) $Doc->ExportField($this->userlevel);
 					}
 					$Doc->EndExportRow();
