@@ -1,0 +1,3 @@
+date/time	script	user	action	table	field	key value	old value	new value
+2017/01/03 23:05:56	/armanda/tb_invoiceedit.php	admin2	U	tb_invoice	no_sertifikat	3	9	9x
+2017/01/03 23:05:56	/armanda/tb_invoiceedit.php	admin2	U	tb_invoice	no_kuitansi	3		

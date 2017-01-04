@@ -1,3 +1,13 @@
+update database
+1. buka browser, akses ke http://localhost/phpmyadmin
+2. username : root, password : admin, klik GO
+3. klik db_armanda di sisi kiri
+4. klik pada "view1"
+5. klik drop (tulisan warna merah) pada sisi kanan, klik OK
+6. klik icon SQL di sisi kanan
+7. copy-kan perintah di bawah ini di textbox yang ada di bawah SQL tadi,
+
+create view view1 as
 SELECT tb_customer.nama AS nama,
   tb_customer.alamat AS alamat,
   tb_customer.kota AS kota,
@@ -28,3 +38,5 @@ FROM ((tb_customer
   RIGHT JOIN tb_invoice ON tb_invoice.customer_id = tb_customer.id)
   LEFT JOIN tb_fee ON tb_invoice.id = tb_fee.invoice_id)
   LEFT JOIN tb_barang ON tb_fee.barang_id = tb_barang.barang_id
+
+8. klik GO (ada di bawah kanan)

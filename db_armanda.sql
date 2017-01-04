@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jan 03, 2017 at 10:53 AM
+-- Generation Time: Jan 04, 2017 at 08:10 AM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.1
 
@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS `tb_fee` (
   `jumlah` float(10,2) DEFAULT NULL,
   `keterangan` text,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=17 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
 
 --
 -- Dumping data for table `tb_fee`
@@ -188,7 +188,8 @@ INSERT INTO `tb_fee` (`id`, `invoice_id`, `barang_id`, `harga`, `qty`, `satuan`,
 (13, 4, 0, 12000, 5, NULL, 60000.00, NULL),
 (14, 5, 1, 10500, 3, NULL, 31500.00, NULL),
 (15, 5, 1, NULL, NULL, NULL, 0.00, NULL),
-(16, 6, 1, 60, 60, NULL, 3600.00, NULL);
+(16, 6, 1, 60, 60, NULL, 3600.00, NULL),
+(17, 7, 1, 8000, 5, NULL, 40000.00, NULL);
 
 -- --------------------------------------------------------
 
@@ -213,21 +214,22 @@ CREATE TABLE IF NOT EXISTS `tb_invoice` (
   `terbilang` text,
   `terbayar` tinyint(1) DEFAULT NULL,
   `pasal23` tinyint(1) DEFAULT '0',
-  `no_kuitansi` varchar(25) DEFAULT NULL,
+  `no_kuitansi` varchar(25) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
 
 --
 -- Dumping data for table `tb_invoice`
 --
 
 INSERT INTO `tb_invoice` (`id`, `customer_id`, `no_invoice`, `tgl_invoice`, `no_order`, `no_referensi`, `kegiatan`, `tgl_pelaksanaan`, `no_sertifikat`, `keterangan`, `total`, `ppn`, `total_ppn`, `terbilang`, `terbayar`, `pasal23`, `no_kuitansi`) VALUES
-(1, 1, '11', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 'xx1'),
-(2, 1, 'q123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 555000.00, 10, 610500.00, ' enam ratus sepuluh ribu lima ratus ', 0, 0, NULL),
-(3, 1, '007', '2016-12-20', '7', '8', 'tes', '2016-12-21', '9', '-', 56000.00, 10, 61600.00, ' enam puluh satu ribu enam ratus ', 0, 0, NULL),
-(4, 2, 'mjs123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 60000.00, 10, 66000.00, ' enam puluh enam ribu ', 0, 0, NULL),
-(5, 2, '1313', '2016-12-23', NULL, NULL, NULL, NULL, NULL, NULL, 31500.00, NULL, 31500.00, ' tiga puluh satu ribu lima ratus ', 0, 1, 'xx2'),
-(6, 2, 'tyty', '2017-01-02', NULL, NULL, NULL, NULL, NULL, NULL, 3600.00, NULL, 3600.00, ' tiga ribu enam ratus ', 1, 1, NULL);
+(1, 1, '11', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, ''),
+(2, 1, 'q123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 555000.00, 10, 610500.00, ' enam ratus sepuluh ribu lima ratus ', 0, 0, ''),
+(3, 1, '007', '2016-12-20', '7', '8', 'tes', '2016-12-21', '9x', '-', 56000.00, 10, 61600.00, ' enam puluh satu ribu enam ratus ', 0, 0, ''),
+(4, 2, 'mjs123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 60000.00, 10, 66000.00, ' enam puluh enam ribu ', 0, 0, ''),
+(5, 2, '1313', '2016-12-23', NULL, NULL, NULL, NULL, NULL, NULL, 31500.00, NULL, 31500.00, ' tiga puluh satu ribu lima ratus ', 0, 1, ''),
+(6, 2, 'tyty', '2017-01-02', NULL, NULL, NULL, NULL, NULL, NULL, 3600.00, NULL, 3600.00, ' tiga ribu enam ratus ', 1, 1, ''),
+(7, 1, 'kjhkjh', '2017-01-01', NULL, NULL, NULL, NULL, NULL, NULL, 40000.00, NULL, 40000.00, ' empat puluh  ribu ', NULL, 0, '');
 
 -- --------------------------------------------------------
 
@@ -240,14 +242,14 @@ CREATE TABLE IF NOT EXISTS `tb_kuitansi` (
   `invoice_id` int(11) NOT NULL,
   `no_kuitansi` varchar(25) NOT NULL,
   PRIMARY KEY (`kuitansi_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
 
 --
 -- Dumping data for table `tb_kuitansi`
 --
 
 INSERT INTO `tb_kuitansi` (`kuitansi_id`, `invoice_id`, `no_kuitansi`) VALUES
-(2, 5, 'NK131313');
+(6, 5, 'a3');
 
 -- --------------------------------------------------------
 
@@ -276,16 +278,25 @@ INSERT INTO `tb_user` (`user_id`, `username`, `password`, `userlevel`) VALUES
 -- Table structure for table `view1`
 --
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `db_armanda`.`view1` AS select `db_armanda`.`tb_customer`.`nama` AS `nama`,`db_armanda`.`tb_customer`.`alamat` AS `alamat`,`db_armanda`.`tb_customer`.`kota` AS `kota`,`db_armanda`.`tb_customer`.`kodepos` AS `kodepos`,`db_armanda`.`tb_customer`.`no_npwp` AS `no_npwp`,`db_armanda`.`tb_invoice`.`id` AS `id`,`db_armanda`.`tb_invoice`.`customer_id` AS `customer_id`,`db_armanda`.`tb_invoice`.`no_invoice` AS `no_invoice`,`db_armanda`.`tb_invoice`.`tgl_invoice` AS `tgl_invoice`,`db_armanda`.`tb_invoice`.`no_order` AS `no_order`,`db_armanda`.`tb_invoice`.`no_referensi` AS `no_referensi`,`db_armanda`.`tb_invoice`.`kegiatan` AS `kegiatan`,`db_armanda`.`tb_invoice`.`tgl_pelaksanaan` AS `tgl_pelaksanaan`,`db_armanda`.`tb_invoice`.`no_sertifikat` AS `no_sertifikat`,`db_armanda`.`tb_invoice`.`keterangan` AS `keterangan`,`db_armanda`.`tb_invoice`.`total` AS `total`,`db_armanda`.`tb_invoice`.`ppn` AS `ppn`,`db_armanda`.`tb_invoice`.`total_ppn` AS `total_ppn`,`db_armanda`.`tb_invoice`.`terbilang` AS `terbilang`,`db_armanda`.`tb_fee`.`harga` AS `harga`,`db_armanda`.`tb_fee`.`qty` AS `qty`,`db_armanda`.`tb_fee`.`satuan` AS `satuan`,`db_armanda`.`tb_fee`.`jumlah` AS `jumlah`,`db_armanda`.`tb_fee`.`keterangan` AS `keterangan1`,`db_armanda`.`tb_barang`.`nama` AS `nama1`,`db_armanda`.`tb_invoice`.`pasal23` AS `pasal23` from (((`db_armanda`.`tb_customer` join `db_armanda`.`tb_invoice` on((`db_armanda`.`tb_invoice`.`customer_id` = `db_armanda`.`tb_customer`.`id`))) join `db_armanda`.`tb_fee` on((`db_armanda`.`tb_invoice`.`id` = `db_armanda`.`tb_fee`.`invoice_id`))) join `db_armanda`.`tb_barang` on((`db_armanda`.`tb_fee`.`barang_id` = `db_armanda`.`tb_barang`.`barang_id`)));
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `db_armanda`.`view1` AS select `db_armanda`.`tb_customer`.`nama` AS `nama`,`db_armanda`.`tb_customer`.`alamat` AS `alamat`,`db_armanda`.`tb_customer`.`kota` AS `kota`,`db_armanda`.`tb_customer`.`kodepos` AS `kodepos`,`db_armanda`.`tb_customer`.`no_npwp` AS `no_npwp`,`db_armanda`.`tb_invoice`.`id` AS `id`,`db_armanda`.`tb_invoice`.`customer_id` AS `customer_id`,`db_armanda`.`tb_invoice`.`no_invoice` AS `no_invoice`,`db_armanda`.`tb_invoice`.`tgl_invoice` AS `tgl_invoice`,`db_armanda`.`tb_invoice`.`no_order` AS `no_order`,`db_armanda`.`tb_invoice`.`no_referensi` AS `no_referensi`,`db_armanda`.`tb_invoice`.`kegiatan` AS `kegiatan`,`db_armanda`.`tb_invoice`.`tgl_pelaksanaan` AS `tgl_pelaksanaan`,`db_armanda`.`tb_invoice`.`no_sertifikat` AS `no_sertifikat`,`db_armanda`.`tb_invoice`.`keterangan` AS `keterangan`,`db_armanda`.`tb_invoice`.`total` AS `total`,`db_armanda`.`tb_invoice`.`ppn` AS `ppn`,`db_armanda`.`tb_invoice`.`total_ppn` AS `total_ppn`,`db_armanda`.`tb_invoice`.`terbilang` AS `terbilang`,`db_armanda`.`tb_fee`.`harga` AS `harga`,`db_armanda`.`tb_fee`.`qty` AS `qty`,`db_armanda`.`tb_fee`.`satuan` AS `satuan`,`db_armanda`.`tb_fee`.`jumlah` AS `jumlah`,`db_armanda`.`tb_fee`.`keterangan` AS `keterangan1`,`db_armanda`.`tb_barang`.`nama` AS `nama1`,`db_armanda`.`tb_invoice`.`pasal23` AS `pasal23` from (((`db_armanda`.`tb_invoice` left join `db_armanda`.`tb_customer` on((`db_armanda`.`tb_invoice`.`customer_id` = `db_armanda`.`tb_customer`.`id`))) left join `db_armanda`.`tb_fee` on((`db_armanda`.`tb_invoice`.`id` = `db_armanda`.`tb_fee`.`invoice_id`))) left join `db_armanda`.`tb_barang` on((`db_armanda`.`tb_fee`.`barang_id` = `db_armanda`.`tb_barang`.`barang_id`)));
 
 --
 -- Dumping data for table `view1`
 --
 
 INSERT INTO `view1` (`nama`, `alamat`, `kota`, `kodepos`, `no_npwp`, `id`, `customer_id`, `no_invoice`, `tgl_invoice`, `no_order`, `no_referensi`, `kegiatan`, `tgl_pelaksanaan`, `no_sertifikat`, `keterangan`, `total`, `ppn`, `total_ppn`, `terbilang`, `harga`, `qty`, `satuan`, `jumlah`, `keterangan1`, `nama1`, `pasal23`) VALUES
+('PT. Angkasa Buana Cipta', 'Jl. Tenggilis Mejoyo Blok U No. 36', 'Surabaya', '60262', '02.525.076.2-641.000', 1, 1, '11', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 70000, 7, 'unit', 0.00, '-', NULL, 0),
+('PT. Angkasa Buana Cipta', 'Jl. Tenggilis Mejoyo Blok U No. 36', 'Surabaya', '60262', '02.525.076.2-641.000', 1, 1, '11', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 80000, 4, 'unit', 0.00, '-', NULL, 0),
+('PT. Angkasa Buana Cipta', 'Jl. Tenggilis Mejoyo Blok U No. 36', 'Surabaya', '60262', '02.525.076.2-641.000', 2, 1, 'q123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 555000.00, 10, 610500.00, ' enam ratus sepuluh ribu lima ratus ', 20000, 10, 'unit', 200000.00, '-', NULL, 0),
+('PT. Angkasa Buana Cipta', 'Jl. Tenggilis Mejoyo Blok U No. 36', 'Surabaya', '60262', '02.525.076.2-641.000', 2, 1, 'q123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 555000.00, 10, 610500.00, ' enam ratus sepuluh ribu lima ratus ', 10000, 10, 'u', 100000.00, NULL, NULL, 0),
+('PT. Angkasa Buana Cipta', 'Jl. Tenggilis Mejoyo Blok U No. 36', 'Surabaya', '60262', '02.525.076.2-641.000', 2, 1, 'q123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 555000.00, 10, 610500.00, ' enam ratus sepuluh ribu lima ratus ', 35000, 3, NULL, 105000.00, NULL, NULL, 0),
+('PT. Angkasa Buana Cipta', 'Jl. Tenggilis Mejoyo Blok U No. 36', 'Surabaya', '60262', '02.525.076.2-641.000', 2, 1, 'q123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 555000.00, 10, 610500.00, ' enam ratus sepuluh ribu lima ratus ', 15000, 10, NULL, 150000.00, NULL, NULL, 0),
+('PT. Angkasa Buana Cipta', 'Jl. Tenggilis Mejoyo Blok U No. 36', 'Surabaya', '60262', '02.525.076.2-641.000', 3, 1, '007', '2016-12-20', '7', '8', 'tes', '2016-12-21', '9x', '-', 56000.00, 10, 61600.00, ' enam puluh satu ribu enam ratus ', 8000, 7, NULL, 56000.00, NULL, NULL, 0),
+('MJS, PT', 'Manyar', 'Sby', '88888', '8080888', 4, 2, 'mjs123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 60000.00, 10, 66000.00, ' enam puluh enam ribu ', 12000, 5, NULL, 60000.00, NULL, NULL, 0),
 ('MJS, PT', 'Manyar', 'Sby', '88888', '8080888', 5, 2, '1313', '2016-12-23', NULL, NULL, NULL, NULL, NULL, NULL, 31500.00, NULL, 31500.00, ' tiga puluh satu ribu lima ratus ', 10500, 3, NULL, 31500.00, NULL, 'Barang 1', 1),
 ('MJS, PT', 'Manyar', 'Sby', '88888', '8080888', 5, 2, '1313', '2016-12-23', NULL, NULL, NULL, NULL, NULL, NULL, 31500.00, NULL, 31500.00, ' tiga puluh satu ribu lima ratus ', NULL, NULL, NULL, 0.00, NULL, 'Barang 1', 1),
-('MJS, PT', 'Manyar', 'Sby', '88888', '8080888', 6, 2, 'tyty', '2017-01-02', NULL, NULL, NULL, NULL, NULL, NULL, 3600.00, NULL, 3600.00, ' tiga ribu enam ratus ', 60, 60, NULL, 3600.00, NULL, 'Barang 1', 1);
+('MJS, PT', 'Manyar', 'Sby', '88888', '8080888', 6, 2, 'tyty', '2017-01-02', NULL, NULL, NULL, NULL, NULL, NULL, 3600.00, NULL, 3600.00, ' tiga ribu enam ratus ', 60, 60, NULL, 3600.00, NULL, 'Barang 1', 1),
+('PT. Angkasa Buana Cipta', 'Jl. Tenggilis Mejoyo Blok U No. 36', 'Surabaya', '60262', '02.525.076.2-641.000', 7, 1, 'kjhkjh', '2017-01-01', NULL, NULL, NULL, NULL, NULL, NULL, 40000.00, NULL, 40000.00, ' empat puluh  ribu ', 8000, 5, NULL, 40000.00, NULL, 'Barang 1', 0);
 
 -- --------------------------------------------------------
 
@@ -300,7 +311,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 
 INSERT INTO `view2` (`kuitansi_id`, `invoice_id`, `no_kuitansi`, `nama`, `total_ppn1`, `terbilang1`, `keterangan1`, `no_invoice`, `tgl_invoice`, `no_sertifikat`, `pasal23`, `total`) VALUES
-(2, 5, 'NK131313', 'MJS, PT', 31500.00, ' tiga puluh satu ribu lima ratus ', NULL, '1313', '2016-12-23', NULL, 1, 31500.00);
+(6, 5, 'a3', 'MJS, PT', 31500.00, ' tiga puluh satu ribu lima ratus ', NULL, '1313', '2016-12-23', NULL, 1, 31500.00);
 
 -- --------------------------------------------------------
 
@@ -317,9 +328,10 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 INSERT INTO `view3` (`id`, `customer_id`, `no_invoice`, `tgl_invoice`, `no_order`, `no_referensi`, `kegiatan`, `tgl_pelaksanaan`, `no_sertifikat`, `keterangan`, `total`, `ppn`, `total_ppn`, `terbilang`, `nama`, `no_kuitansi`) VALUES
 (1, 1, '11', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PT. Angkasa Buana Cipta', NULL),
 (2, 1, 'q123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 555000.00, 10, 610500.00, ' enam ratus sepuluh ribu lima ratus ', 'PT. Angkasa Buana Cipta', NULL),
-(3, 1, '007', '2016-12-20', '7', '8', 'tes', '2016-12-21', '9', '-', 56000.00, 10, 61600.00, ' enam puluh satu ribu enam ratus ', 'PT. Angkasa Buana Cipta', NULL),
+(3, 1, '007', '2016-12-20', '7', '8', 'tes', '2016-12-21', '9x', '-', 56000.00, 10, 61600.00, ' enam puluh satu ribu enam ratus ', 'PT. Angkasa Buana Cipta', NULL),
+(7, 1, 'kjhkjh', '2017-01-01', NULL, NULL, NULL, NULL, NULL, NULL, 40000.00, NULL, 40000.00, ' empat puluh  ribu ', 'PT. Angkasa Buana Cipta', NULL),
 (4, 2, 'mjs123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 60000.00, 10, 66000.00, ' enam puluh enam ribu ', 'MJS, PT', NULL),
-(5, 2, '1313', '2016-12-23', NULL, NULL, NULL, NULL, NULL, NULL, 31500.00, NULL, 31500.00, ' tiga puluh satu ribu lima ratus ', 'MJS, PT', 'NK131313'),
+(5, 2, '1313', '2016-12-23', NULL, NULL, NULL, NULL, NULL, NULL, 31500.00, NULL, 31500.00, ' tiga puluh satu ribu lima ratus ', 'MJS, PT', 'a3'),
 (6, 2, 'tyty', '2017-01-02', NULL, NULL, NULL, NULL, NULL, NULL, 3600.00, NULL, 3600.00, ' tiga ribu enam ratus ', 'MJS, PT', NULL);
 
 -- --------------------------------------------------------
@@ -338,7 +350,7 @@ INSERT INTO `view4` (`nama`, `no_kuitansi`, `no_invoice`, `total_ppn`, `tgl_pela
 ('PT. Angkasa Buana Cipta', NULL, 'q123', 610500.00, NULL),
 ('PT. Angkasa Buana Cipta', NULL, '007', 61600.00, '2016-12-21'),
 ('MJS, PT', NULL, 'mjs123', 66000.00, NULL),
-('MJS, PT', 'NK131313', '1313', 31500.00, NULL);
+('MJS, PT', 'a3', '1313', 31500.00, NULL);
 
 -- --------------------------------------------------------
 
@@ -354,7 +366,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 
 INSERT INTO `view5` (`id`, `customer_id`, `no_invoice`, `tgl_invoice`, `no_order`, `no_referensi`, `kegiatan`, `tgl_pelaksanaan`, `no_sertifikat`, `keterangan`, `total`, `ppn`, `total_ppn`, `terbilang`, `nama`, `no_kuitansi`) VALUES
 (2, 1, 'q123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 555000.00, 10, 610500.00, ' enam ratus sepuluh ribu lima ratus ', 'PT. Angkasa Buana Cipta', NULL),
-(3, 1, '007', '2016-12-20', '7', '8', 'tes', '2016-12-21', '9', '-', 56000.00, 10, 61600.00, ' enam puluh satu ribu enam ratus ', 'PT. Angkasa Buana Cipta', NULL),
+(3, 1, '007', '2016-12-20', '7', '8', 'tes', '2016-12-21', '9x', '-', 56000.00, 10, 61600.00, ' enam puluh satu ribu enam ratus ', 'PT. Angkasa Buana Cipta', NULL),
 (4, 2, 'mjs123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 60000.00, 10, 66000.00, ' enam puluh enam ribu ', 'MJS, PT', NULL);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

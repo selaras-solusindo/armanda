@@ -1,0 +1,24 @@
+date/time	script	user	action	table	field	key value	old value	new value
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	*** Batch insert begin ***	tb_fee				
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_fee	invoice_id	17		7
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_fee	barang_id	17		1
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_fee	harga	17		8000
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_fee	qty	17		5
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_fee	satuan	17		
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_fee	jumlah	17		40000
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_fee	keterangan	17		[MEMO]
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_fee	id	17		17
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	*** Batch insert successful ***	tb_fee				
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_invoice	customer_id	7		1
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_invoice	no_invoice	7		kjhkjh
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_invoice	tgl_invoice	7		2017-01-01
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_invoice	no_order	7		
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_invoice	no_referensi	7		
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_invoice	kegiatan	7		[MEMO]
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_invoice	tgl_pelaksanaan	7		
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_invoice	no_sertifikat	7		
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_invoice	keterangan	7		[MEMO]
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_invoice	ppn	7		
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_invoice	terbayar	7		
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_invoice	pasal23	7		0
+2017/01/01 06:23:09	/armanda/tb_invoiceadd.php	admin2	A	tb_invoice	id	7		7
