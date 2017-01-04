@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/1/3" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/1/4" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -582,7 +582,7 @@
   </global>
   <project>
     <phrase id="footertext" value="CV. Armanda Nusantara" />
-    <menu id="10035">
+    <menu id="10071">
       <phrase id="menutext" value="view 1" />
     </menu>
     <menu id="10036">
@@ -950,91 +950,6 @@
         <phrase id="fldtagcaption3" value="Default" />
       </field>
     </table>
-    <table id="view1">
-      <phrase id="tblcaption" value="view 1" />
-      <field id="nama">
-        <phrase id="fldcaption" value="Nama" />
-      </field>
-      <field id="alamat">
-        <phrase id="fldcaption" value="Alamat" />
-      </field>
-      <field id="kota">
-        <phrase id="fldcaption" value="Kota" />
-      </field>
-      <field id="kodepos">
-        <phrase id="fldcaption" value="Kode Pos" />
-      </field>
-      <field id="no_npwp">
-        <phrase id="fldcaption" value="No. NPWP" />
-      </field>
-      <field id="id">
-        <phrase id="fldcaption" value="ID" />
-      </field>
-      <field id="customer_id">
-        <phrase id="fldcaption" value="Customer" />
-      </field>
-      <field id="no_invoice">
-        <phrase id="fldcaption" value="No. Invoice" />
-      </field>
-      <field id="tgl_invoice">
-        <phrase id="fldcaption" value="Tgl. Invoice" />
-      </field>
-      <field id="no_order">
-        <phrase id="fldcaption" value="No. Order" />
-      </field>
-      <field id="no_referensi">
-        <phrase id="fldcaption" value="No. Seri Faktur Pajak" />
-      </field>
-      <field id="kegiatan">
-        <phrase id="fldcaption" value="Kegiatan" />
-      </field>
-      <field id="tgl_pelaksanaan">
-        <phrase id="fldcaption" value="Tgl. Pelaksanaan" />
-      </field>
-      <field id="no_sertifikat">
-        <phrase id="fldcaption" value="No. Sertifikat" />
-      </field>
-      <field id="keterangan">
-        <phrase id="fldcaption" value="Keterangan" />
-      </field>
-      <field id="total">
-        <phrase id="fldcaption" value="Total" />
-      </field>
-      <field id="ppn">
-        <phrase id="fldcaption" value="PPN" />
-      </field>
-      <field id="total_ppn">
-        <phrase id="fldcaption" value="Total PPN" />
-      </field>
-      <field id="terbilang">
-        <phrase id="fldcaption" value="Terbilang" />
-      </field>
-      <field id="harga">
-        <phrase id="fldcaption" value="Harga" />
-      </field>
-      <field id="qty">
-        <phrase id="fldcaption" value="Qty." />
-      </field>
-      <field id="satuan">
-        <phrase id="fldcaption" value="Satuan" />
-      </field>
-      <field id="jumlah">
-        <phrase id="fldcaption" value="Jumlah" />
-      </field>
-      <field id="keterangan1">
-        <phrase id="fldcaption" value="Keterangan" />
-      </field>
-      <field id="nama1">
-        <phrase id="fldcaption" value="Fee" />
-      </field>
-      <field id="pasal23">
-        <phrase id="fldcaption" value="Pasal 23" />
-        <phrase id="fldtagvalue1" value="0" />
-        <phrase id="fldtagcaption1" value="Tidak" />
-        <phrase id="fldtagvalue2" value="1" />
-        <phrase id="fldtagcaption2" value="Ya" />
-      </field>
-    </table>
     <table id="view2">
       <phrase id="tblcaption" value="view 2" />
       <field id="kuitansi_id">
@@ -1200,6 +1115,91 @@
     </table>
     <table id="kuitansi_01_php">
       <phrase id="tblcaption" value="Cetak Kwitansi #2" />
+    </table>
+    <table id="view1">
+      <phrase id="tblcaption" value="view 1" />
+      <field id="nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+      <field id="alamat">
+        <phrase id="fldcaption" value="Alamat" />
+      </field>
+      <field id="kota">
+        <phrase id="fldcaption" value="Kota" />
+      </field>
+      <field id="kodepos">
+        <phrase id="fldcaption" value="Kode Pos" />
+      </field>
+      <field id="no_npwp">
+        <phrase id="fldcaption" value="No. NPWP" />
+      </field>
+      <field id="id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="customer_id">
+        <phrase id="fldcaption" value="Customer" />
+      </field>
+      <field id="no_invoice">
+        <phrase id="fldcaption" value="No. Invoice" />
+      </field>
+      <field id="tgl_invoice">
+        <phrase id="fldcaption" value="Tgl. Invoice" />
+      </field>
+      <field id="no_order">
+        <phrase id="fldcaption" value="No. Order" />
+      </field>
+      <field id="no_referensi">
+        <phrase id="fldcaption" value="No. Seri Faktur Pajak" />
+      </field>
+      <field id="kegiatan">
+        <phrase id="fldcaption" value="Kegiatan" />
+      </field>
+      <field id="tgl_pelaksanaan">
+        <phrase id="fldcaption" value="Tgl. Pelaksanaan" />
+      </field>
+      <field id="no_sertifikat">
+        <phrase id="fldcaption" value="No. Sertifikat" />
+      </field>
+      <field id="keterangan">
+        <phrase id="fldcaption" value="Keterangan" />
+      </field>
+      <field id="total">
+        <phrase id="fldcaption" value="Total" />
+      </field>
+      <field id="ppn">
+        <phrase id="fldcaption" value="PPN" />
+      </field>
+      <field id="total_ppn">
+        <phrase id="fldcaption" value="Total PPN" />
+      </field>
+      <field id="terbilang">
+        <phrase id="fldcaption" value="Terbilang" />
+      </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="Harga" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="Qty." />
+      </field>
+      <field id="satuan">
+        <phrase id="fldcaption" value="Satuan" />
+      </field>
+      <field id="jumlah">
+        <phrase id="fldcaption" value="Jumlah" />
+      </field>
+      <field id="keterangan1">
+        <phrase id="fldcaption" value="Keterangan" />
+      </field>
+      <field id="nama1">
+        <phrase id="fldcaption" value="Fee" />
+      </field>
+      <field id="pasal23">
+        <phrase id="fldcaption" value="Pasal 23" />
+        <phrase id="fldtagvalue1" value="0" />
+        <phrase id="fldtagcaption1" value="Tidak" />
+        <phrase id="fldtagvalue2" value="1" />
+        <phrase id="fldtagcaption2" value="Ya" />
+      </field>
     </table>
   </project>
 </ew-language>

@@ -3132,7 +3132,6 @@ class crAdvancedSecurity {
 	// Validate user
 	function ValidateUser(&$usr, &$pwd, $autologin, $encrypted = FALSE) {
 		global $ReportLanguage;
-		global $UserTable, $UserTableConn;
 		$ValidateUser = FALSE;
 		$CustomValidateUser = FALSE;
 
@@ -3144,33 +3143,6 @@ class crAdvancedSecurity {
 				$this->setCurrentUserName($usr); // Load user name
 			}
 		}
-
-		// Check other users
-		if (!$ValidateUser) {
-			$sFilter = str_replace("%u", ewr_AdjustSql($usr, EWR_USER_TABLE_DBID), EWR_USER_NAME_FILTER);
-			$sSql = EWR_LOGIN_SELECT_SQL . " WHERE " . $sFilter;
-			if ($rs = $UserTableConn->Execute($sSql)) {
-				if (!$rs->EOF) {
-					$ValidateUser = $CustomValidateUser || ewr_ComparePassword($rs->fields('password'), $pwd, $encrypted);
-					if ($ValidateUser) {
-						$_SESSION[EWR_SESSION_STATUS] = "login";
-						$_SESSION[EWR_SESSION_SYSTEM_ADMIN] = 0; // Non System Administrator
-						$this->setCurrentUserName($rs->fields('username')); // Load user name
-						if (is_null($rs->fields('userlevel'))) {
-							$this->setSessionUserLevelID(0);
-						} else {
-							$this->setSessionUserLevelID(intval($rs->fields('userlevel'))); // Load User Level
-						}
-						$this->SetUpUserLevel();
-
-						// Call User Validated event
-						$row = $rs->fields;
-						$this->User_Validated($row);
-					}
-				}
-				$rs->Close();
-			}
-		}
 		if ($CustomValidateUser)
 			return $CustomValidateUser;
 		if (!$ValidateUser)
@@ -3178,112 +3150,8 @@ class crAdvancedSecurity {
 		return $ValidateUser;
 	}
 
-	// Load user level from config file
-	function LoadUserLevelFromConfigFile(&$arUserLevel, &$arUserLevelPriv, &$arTable, $userpriv = FALSE) {
-
-		// User Level definitions
-		array_splice($arUserLevel, 0);
-		array_splice($arUserLevelPriv, 0);
-		array_splice($arTable, 0);
-
-		// Load user level from config files
-		$doc = new crXMLDocument();
-		$folder = ewr_AppRoot() . EWR_CONFIG_FILE_FOLDER;
-
-		// Load user level settings from main config file
-		$ProjectID = CurrentProjectID();
-		$file = $folder . EWR_PATH_DELIMITER . $ProjectID . ".xml";
-		if (file_exists($file) && $doc->Load($file) && (($projnode = $doc->SelectSingleNode("//configuration/project")) != NULL)) {
-			$userlevel = $doc->GetAttribute($projnode, "userlevel");
-			$usergroup = explode(";", $userlevel);
-			foreach ($usergroup as $group) {
-				@list($id, $name, $priv) = explode(",", $group, 3);
-
-				// Remove quotes
-				if (strlen($name) >= 2 && substr($name,0,1) == "\"" && substr($name,-1) == "\"")
-					$name = substr($name,1,strlen($name)-2);
-				$arUserLevel[] = array($id, $name);
-			}
-
-			// Load from main config file
-			$this->LoadUserLevelFromXml($folder, $doc, $arUserLevelPriv, $arTable, $userpriv);
-		}
-
-		// Warn user if user level not setup
-		if (count($arUserLevel) == 0) {
-			die("Unable to load user level from config file: " . $file);
-		}
-
-		// Load user priv settings from all config files
-		if ($dir_handle = opendir($folder)) {
-			while (FALSE !== ($file = readdir($dir_handle))) {
-				if ($file == "." || $file == ".." || !is_file($folder . EWR_PATH_DELIMITER . $file))
-					continue;
-				$pathinfo = pathinfo($file);
-				if (isset($pathinfo["extension"]) && strtolower($pathinfo["extension"]) == "xml") {
-					if ($file <> $ProjectID . ".xml")
-						$this->LoadUserLevelFromXml($folder, $file, $arUserLevelPriv, $arTable, $userpriv);
-				}
-			}
-		}
-	}
-
-	function LoadUserLevelFromXml($folder, $file, &$arUserLevelPriv, &$arTable, $userpriv) {
-		if (is_string($file)) {
-			$file = $folder . EWR_PATH_DELIMITER . $file;
-			$doc = new crXMLDocument();
-			$doc->Load($file);
-		} else {
-			$doc = $file;
-		}
-		if ($doc instanceof crXMLDocument) {
-
-			// Load project id
-			$projid = "";
-			$projfile = "";
-			if (($projnode = $doc->SelectSingleNode("//configuration/project")) != NULL) {
-				$projid = $doc->GetAttribute($projnode, "id");
-				$projfile = $doc->GetAttribute($projnode, "file");
-			}
-
-			// Load user priv
-			$tablelist = $doc->SelectNodes("//configuration/project/table");
-			foreach ($tablelist as $table) {
-				$tablevar = $doc->GetAttribute($table, "id");
-				$tablename = $doc->GetAttribute($table, "name");
-				$tablecaption = $doc->GetAttribute($table, "caption");
-				$userlevel = $doc->GetAttribute($table, "userlevel");
-				$priv = $doc->GetAttribute($table, "priv");
-				if (!$userpriv || ($userpriv && $priv == "1")) {
-					$usergroup = explode(";", $userlevel);
-					foreach($usergroup as $group) {
-						@list($id, $name, $priv) = explode(",", $group, 3);
-						$arUserLevelPriv[] = array($projid . $tablename, $id, $priv);
-					}
-					$arTable[] = array($tablename, $tablevar, $tablecaption, $priv, $projid, $projfile);
-				}
-			}
-		}
-	}
-
-	// Static User Level security
-	function SetUpUserLevel() {
-
-		// Load user level from config file
-		$arTable = array();
-		$this->LoadUserLevelFromConfigFile($this->UserLevel, $this->UserLevelPriv, $arTable);
-
-		// User Level loaded event
-		$this->UserLevel_Loaded();
-
-		// Save the User Level to Session variable
-		$this->SaveUserLevel();
-	}
-
-	// Get all User Level settings from database
-	function SetUpUserLevelEx() {
-		return FALSE;
-	}
+	// No User Level security
+	function SetUpUserLevel() {}
 
 	// Add user permission
 	function AddUserPermission($UserLevelName, $TableName, $UserPermission) {
@@ -3488,8 +3356,6 @@ class crAdvancedSecurity {
 	// Check if user is administrator
 	function IsAdmin() {
 		$IsAdmin = $this->IsSysAdmin();
-		if (!$IsAdmin)
-			$IsAdmin = $this->CurrentUserLevelID == -1 || in_array(-1, $this->UserLevelID);
 		return $IsAdmin;
 	}
 
@@ -6319,7 +6185,8 @@ function ewr_CloseConn() {
 
 // Database Connecting event
 // MySQL/PostgreSQL
-//function Database_Connecting(&$info) {
+function Database_Connecting(&$info) {
+
 	// Example:
 	//var_dump($info);
 	// Assume the scripts are generated with connection info for local PC
@@ -6330,22 +6197,8 @@ function ewr_CloseConn() {
 	// $info["pass"] = "yyy";
 	// $info["db"] = "production_db";
 	// }
-//}
-function Database_Connecting(&$info) {
 
-	//if (ew_CurrentUserIP() == "127.0.0.1") { // setting koneksi database di komputer localhost
-	if (ewr_CurrentUserIP () == "127.0.0.1"  || ewr_CurrentUserIP () == ":: 1"  || ewr_CurrentHost () == "localhost" ) { // testing on local PC
-		$info["host"] = "localhost";
-		$info["user"] = "root"; // sesuaikan dengan username database di komputer localhost
-		$info["pass"] = "admin"; // sesuaikan dengan password database di komputer localhost
-		$info["db"] = "db_armanda"; // sesuaikan dengan nama database di komputer localhost
-	} else { // setting koneksi database untuk komputer server
-		$info["host"] = "mysql.idhostinger.com";  // sesuaikan dengan ip address atau hostname komputer server
-		$info["user"] = "u814357398_arman"; // sesuaikan dengan username database di komputer server
-		$info["pass"] = "PresarioCQ43"; // sesuaikan deengan password database di komputer server
-		$info["db"] = "u814357398_arman"; // sesuaikan dengan nama database di komputer server
-	}
-}
+} 
 
 // Database Connected event
 function Database_Connected(&$conn) {

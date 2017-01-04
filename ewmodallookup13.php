@@ -59,11 +59,11 @@ class cewmodallookup {
 	//
 	function Page_Main() {
 		global $Language;
+		$Language = new cLanguage();
+		$GLOBALS["Page"] = &$this;
 		$this->PostData = ew_StripSlashes($_POST);
 		if (count($this->PostData) == 0)
 			$this->Page_Error("Missing post data.");
-		$Language = new cLanguage("", @$this->PostData["lang"]);
-		$GLOBALS["Page"] = &$this;
 
 		// Load form data
 		$sql = @$this->PostData["s"];
@@ -115,7 +115,7 @@ class cewmodallookup {
 				$filterwrk = "";
 				$cnt = count($arKeys);
 				for ($i = 0; $i < $cnt; $i++) {
-					$arKeys[$i] = ew_QuotedValue($arKeys[$i], $flddatatype, $this->DBID);
+					$arKeys[$i] = ew_QuotedValue($arKeys[$i], $flddatatype, $dbid);
 					$filterwrk .= (($filterwrk <> "") ? " OR " : "") . str_replace("{filter_value}", $arKeys[$i], $filter);
 				}
 				$filter = $filterwrk;
@@ -312,7 +312,6 @@ class cewmodallookup {
 	// Try to get record count
 	function TryGetRecordCount($sSql) {
 		$cnt = -1;
-		$sSql = preg_replace('/\/\*BeginOrderBy\*\/[\s\S]+\/\*EndOrderBy\*\//', "", $sSql); // Remove ORDER BY clause (MSSQL)
 		$sSql = "SELECT COUNT(*) FROM" . preg_replace('/^SELECT\s([\s\S]+)?\sFROM/i', "", $sSql);
 		$rs = $this->Connection->Execute($sSql);
 		if (!$rs) {
@@ -356,7 +355,7 @@ class cewmodallookup {
 				$ar = array($this->LinkField => $row[0]);
 				for ($i = 1; $i <= $fldcnt; $i++) {
 					$str = ew_ConvertToUtf8(strval($row[$i]));
-					if ($ardt[$i] != "" && intval($ardt[$i]) >= 0) // Format date
+					if ($ardt[$i] != "" && intval($ardt[$i]) > 0) // Format date
 						$str = ew_FormatDateTime($str, $ardt[$i]);
 					$str = str_replace(array("\r", "\n", "\t"), isset($post["keepCRLF"]) ? array("\\r", "\\n", "\\t") : array(" ", " ", " "), $str);
 					$row[$i] = $str;

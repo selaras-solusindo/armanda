@@ -758,16 +758,9 @@ class ctb_user_list extends ctb_user {
 	// Process filter list
 	function ProcessFilterList() {
 		global $UserProfile;
-		if (@$_POST["ajax"] == "savefilters") { // Save filter request (Ajax)
+		if (@$_POST["cmd"] == "savefilters") {
 			$filters = ew_StripSlashes(@$_POST["filters"]);
 			$UserProfile->SetSearchFilters(CurrentUserName(), "ftb_userlistsrch", $filters);
-
-			// Clean output buffer
-			if (!EW_DEBUG_ENABLED && ob_get_length())
-				ob_end_clean();
-			echo ew_ArrayToJson(array(array("success" => TRUE))); // Success
-			$this->Page_Terminate();
-			exit();
 		} elseif (@$_POST["cmd"] == "resetfilter") {
 			$this->RestoreFilterList();
 		}
@@ -825,7 +818,7 @@ class ctb_user_list extends ctb_user {
 	}
 
 	// Build basic search SQL
-	function BuildBasicSearchSQL(&$Where, &$Fld, $arKeywords, $type) {
+	function BuildBasicSearchSql(&$Where, &$Fld, $arKeywords, $type) {
 		$sDefCond = ($type == "OR") ? "OR" : "AND";
 		$arSQL = array(); // Array for SQL parts
 		$arCond = array(); // Array for search conditions
@@ -850,7 +843,7 @@ class ctb_user_list extends ctb_user {
 						$sWrk = $Fld->FldExpression . " IS NULL";
 					} elseif ($Keyword == EW_NOT_NULL_VALUE) {
 						$sWrk = $Fld->FldExpression . " IS NOT NULL";
-					} elseif ($Fld->FldIsVirtual) {
+					} elseif ($Fld->FldIsVirtual && $Fld->FldVirtualSearch) {
 						$sWrk = $Fld->FldVirtualExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
 					} elseif ($Fld->FldDataType != EW_DATATYPE_NUMBER || is_numeric($Keyword)) {
 						$sWrk = $Fld->FldBasicSearchExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);

@@ -495,6 +495,10 @@ class ctb_fee_view extends ctb_fee {
 
 		// Set up master/detail parameters
 		$this->SetUpMasterParms();
+
+		// Set up Breadcrumb
+		if ($this->Export == "")
+			$this->SetupBreadcrumb();
 		if ($this->IsPageRequest()) { // Validate request
 			if (@$_GET["id"] <> "") {
 				$this->id->setQueryStringValue($_GET["id"]);
@@ -528,10 +532,6 @@ class ctb_fee_view extends ctb_fee {
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
-
-		// Set up Breadcrumb
-		if ($this->Export == "")
-			$this->SetupBreadcrumb();
 
 		// Render row
 		$this->RowType = EW_ROWTYPE_VIEW;
@@ -756,7 +756,7 @@ class ctb_fee_view extends ctb_fee {
 			$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 		$sWhereWrk = "";
-		$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+		$this->barang_id->LookupFilters = array("dx1" => "`nama`");
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;

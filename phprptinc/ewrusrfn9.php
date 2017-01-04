@@ -59,4 +59,9 @@ function tgl_indo($tgl) {
 	$tahun = date("Y", $tgl_data);
 	return $tanggal." ".$bulan." ".$tahun;
 }
+
+// Get current host name, e.g. "www.mycompany.com"
+function ewr_CurrentHost() {
+	return ewr_ServerVar("HTTP_HOST");
+}
 ?>

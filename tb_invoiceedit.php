@@ -412,6 +412,9 @@ class ctb_invoice_edit extends ctb_invoice {
 			$this->id->setQueryStringValue($_GET["id"]);
 		}
 
+		// Set up Breadcrumb
+		$this->SetupBreadcrumb();
+
 		// Process form if post back
 		if (@$_POST["a_edit"] <> "") {
 			$this->CurrentAction = $_POST["a_edit"]; // Get action code
@@ -469,9 +472,6 @@ class ctb_invoice_edit extends ctb_invoice {
 					$this->SetUpDetailParms();
 				}
 		}
-
-		// Set up Breadcrumb
-		$this->SetupBreadcrumb();
 
 		// Render the record
 		$this->RowType = EW_ROWTYPE_EDIT; // Render as Edit
@@ -1038,6 +1038,9 @@ class ctb_invoice_edit extends ctb_invoice {
 		if (!ew_CheckInteger($this->ppn->FormValue)) {
 			ew_AddMessage($gsFormError, $this->ppn->FldErrMsg());
 		}
+		if (!$this->no_kuitansi->FldIsDetailKey && !is_null($this->no_kuitansi->FormValue) && $this->no_kuitansi->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->no_kuitansi->FldCaption(), $this->no_kuitansi->ReqErrMsg));
+		}
 
 		// Validate detail grid
 		$DetailTblVar = explode(",", $this->getCurrentDetailTable());
@@ -1122,7 +1125,7 @@ class ctb_invoice_edit extends ctb_invoice {
 			$this->pasal23->SetDbValueDef($rsnew, $this->pasal23->CurrentValue, NULL, $this->pasal23->ReadOnly);
 
 			// no_kuitansi
-			$this->no_kuitansi->SetDbValueDef($rsnew, $this->no_kuitansi->CurrentValue, NULL, $this->no_kuitansi->ReadOnly);
+			$this->no_kuitansi->SetDbValueDef($rsnew, $this->no_kuitansi->CurrentValue, "", $this->no_kuitansi->ReadOnly);
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -1229,7 +1232,7 @@ class ctb_invoice_edit extends ctb_invoice {
 			$sSqlWrk = "SELECT `id` AS `LinkFld`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_customer`";
 			$sWhereWrk = "";
 			$this->customer_id->LookupFilters = array();
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => "`id` = {filter_value}", "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1427,6 +1430,9 @@ ftb_invoiceedit.Validate = function() {
 			elm = this.GetElements("x" + infix + "_ppn");
 			if (elm && !ew_CheckInteger(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($tb_invoice->ppn->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_no_kuitansi");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $tb_invoice->no_kuitansi->FldCaption(), $tb_invoice->no_kuitansi->ReqErrMsg)) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -1634,7 +1640,7 @@ ew_CreateCalendar("ftb_invoiceedit", "x_tgl_pelaksanaan", 7);
 <?php } ?>
 <?php if ($tb_invoice->no_kuitansi->Visible) { // no_kuitansi ?>
 	<div id="r_no_kuitansi" class="form-group">
-		<label id="elh_tb_invoice_no_kuitansi" for="x_no_kuitansi" class="col-sm-2 control-label ewLabel"><?php echo $tb_invoice->no_kuitansi->FldCaption() ?></label>
+		<label id="elh_tb_invoice_no_kuitansi" for="x_no_kuitansi" class="col-sm-2 control-label ewLabel"><?php echo $tb_invoice->no_kuitansi->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
 		<div class="col-sm-10"><div<?php echo $tb_invoice->no_kuitansi->CellAttributes() ?>>
 <span id="el_tb_invoice_no_kuitansi">
 <input type="text" data-table="tb_invoice" data-field="x_no_kuitansi" name="x_no_kuitansi" id="x_no_kuitansi" size="30" maxlength="25" placeholder="<?php echo ew_HtmlEncode($tb_invoice->no_kuitansi->getPlaceHolder()) ?>" value="<?php echo $tb_invoice->no_kuitansi->EditValue ?>"<?php echo $tb_invoice->no_kuitansi->EditAttributes() ?>>
