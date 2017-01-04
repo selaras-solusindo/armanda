@@ -159,7 +159,7 @@ $html .= '<table border="0">';
 $html .= '<tr><td width="385">&nbsp;</td><td align="center">&nbsp;</td></tr>';
 $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
-$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
+//$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 $html .= '<tr><td>&nbsp;</td><td align="center">SEINDRI SUSANTI</td></tr>';
 $html .= '</table>';
 
