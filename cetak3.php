@@ -119,7 +119,7 @@ $anamabln_ = array(
   "Desember"
   );
 
-$msql = "select * from view1 where id = '".$_POST["no_invoice"]."'"; //echo $msql;
+$msql = "select * from cetak_invoice_fee where id = '".$_POST["no_invoice"]."'"; //echo $msql;
 $mquery = mysql_query($msql);
 $row = mysql_fetch_array($mquery);
 $html = '';
@@ -142,8 +142,16 @@ $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 $html .= '<tr><td width="155">No. Order</td><td width="485">: '.$row["no_order"].'</td></tr>';
 $html .= '<tr><td>No. Seri Faktur Pajak</td><td>: '.$row["no_referensi"].'</td></tr>';
 $html .= '<tr><td>Kegiatan</td><td>: '.$row["kegiatan"].'</td></tr>';
-$tgl_pelaksanaan = strtotime($row["tgl_invoice"]);
-$html .= '<tr><td>Tgl. Pelaksanaan</td><td>: '.date("d", $tgl_pelaksanaan).' '.$anamabln_[intval(date("m", $tgl_pelaksanaan))].' '.date("Y", $tgl_pelaksanaan).'</td></tr>';
+//$tgl_pelaksanaan = strtotime($row["tgl_invoice"]);
+//.date("d", $tgl_pelaksanaan).' '.$anamabln_[intval(date("m", $tgl_pelaksanaan))].' '.date("Y", $tgl_pelaksanaan).'</td></tr>'
+$html .= '<tr><td>Tgl. Pelaksanaan</td><td>: <table><tr><td>';
+$msql2 = "select * from cetak_invoice_tgl_pelaksanaan where id = ".$_POST["no_invoice"]."";
+$mquery2 = mysql_query($msql2);
+while($row2 = mysql_fetch_array($mquery2)) {
+	$tgl_pelaksanaan = strtotime($row2["pelaksanaan_tgl"]);
+	$html .= date("d", $tgl_pelaksanaan).' '.$anamabln_[intval(date("m", $tgl_pelaksanaan))].' '.date("Y", $tgl_pelaksanaan).", ";
+}
+$html .= '</td></tr></table></td></tr>';
 $html .= '<tr><td>No. Sertifikat/Laporan</td><td>: '.$row["no_sertifikat"].'</td></tr>';
 $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 $html .= '<tr><td>Fee</td><td>:&nbsp;</td></tr>';

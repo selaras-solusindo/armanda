@@ -54,7 +54,7 @@ class ctb_pelaksanaan extends cTable {
 		$this->fields['invoice_id'] = &$this->invoice_id;
 
 		// pelaksanaan_tgl
-		$this->pelaksanaan_tgl = new cField('tb_pelaksanaan', 'tb_pelaksanaan', 'x_pelaksanaan_tgl', 'pelaksanaan_tgl', '`pelaksanaan_tgl`', ew_CastDateFieldForLike('`pelaksanaan_tgl`', 7, "DB"), 133, 7, FALSE, '`pelaksanaan_tgl`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->pelaksanaan_tgl = new cField('tb_pelaksanaan', 'tb_pelaksanaan', 'x_pelaksanaan_tgl', 'pelaksanaan_tgl', '`pelaksanaan_tgl`', 'DATE_FORMAT(`pelaksanaan_tgl`, \'%Y/%m/%d\')', 133, 7, FALSE, '`pelaksanaan_tgl`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->pelaksanaan_tgl->Sortable = TRUE; // Allow sort
 		$this->pelaksanaan_tgl->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
 		$this->fields['pelaksanaan_tgl'] = &$this->pelaksanaan_tgl;
