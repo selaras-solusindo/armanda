@@ -229,7 +229,8 @@ $html .= '
 				<tr>
 					<td colspan="3"></td>
 					<td colspan="2">Total</td>
-					<td colspan="2" align="right">'.number_format($total).'</td>
+					<td align="center">&nbsp;</td>
+					<td align="right">'.number_format($total).'</td>
 				</tr>
 			</table>
 		</td>
@@ -245,7 +246,8 @@ $html .= '
 					<td colspan="3"></td>
 					<td>PPN</td>
 					<td align="right">'.$ppn.($ppn != 0 ? " %" : "").'</td>
-					<td colspan="2" align="right">'.($ppn != 0 ? number_format($total * $ppn/100) : "").'</td>
+					<td align="center">&nbsp;</td>
+					<td align="right">'.($ppn != 0 ? number_format($total * $ppn/100) : "").'</td>
 				</tr>
 			</table>
 		</td>
@@ -269,11 +271,12 @@ $html .= '
 	<tr>
 		<td>&nbsp;</td>
 		<td>
-			<table border="1">
+			<table border="0">
 				<tr>
 					<td colspan="3"></td>
 					<td colspan="2">Pot. Pasal 23</td>
-					<td colspan="2" align="right">'.number_format($nilai_pasal23).'</td>
+					<td align="center">&nbsp;</td>
+					<td align="right">'.number_format($nilai_pasal23).'</td>
 				</tr>
 			</table>
 		</td>
@@ -283,7 +286,7 @@ $html .= '
 	<tr>
 		<td>&nbsp;</td>
 		<td>
-			<table border="1">
+			<table border="0">
 				<tr>
 					<td colspan="6"></td>
 					<td><hr></td>
@@ -302,7 +305,8 @@ $html .= '
 				<tr>
 					<td colspan="3"></td>
 					<td colspan="2">Grand Total</td>
-					<td colspan="2" align="right">'.number_format($total_ppn).'</td>
+					<td align="center">&nbsp;</td>
+					<td align="right">'.number_format($total_ppn).'</td>
 				</tr>
 			</table>
 		</td>

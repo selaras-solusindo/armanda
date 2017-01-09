@@ -1,0 +1,9 @@
+date/time	script	user	action	table	field	key value	old value	new value
+2017/01/09 06:17:52	/armanda/tb_invoiceedit.php	admin2	*** Batch update begin ***	tb_fee				
+2017/01/09 06:17:52	/armanda/tb_invoiceedit.php	admin2	U	tb_fee	barang_id	1	0	1
+2017/01/09 06:17:52	/armanda/tb_invoiceedit.php	admin2	U	tb_fee	jumlah	1	0.00	490000
+2017/01/09 06:17:52	/armanda/tb_invoiceedit.php	admin2	U	tb_fee	barang_id	2	0	2
+2017/01/09 06:17:52	/armanda/tb_invoiceedit.php	admin2	U	tb_fee	jumlah	2	0.00	320000
+2017/01/09 06:17:52	/armanda/tb_invoiceedit.php	admin2	*** Batch update successful ***	tb_fee				
+2017/01/09 06:17:52	/armanda/tb_invoiceedit.php	admin2	U	tb_invoice	no_invoice	1	11	170001/an/sba-I/2017
+2017/01/09 06:26:27	/armanda/tb_invoiceedit.php	admin2	U	tb_invoice	no_invoice	1	170001/an/sba-I/2017	170001/AN/SBA/I/2017
