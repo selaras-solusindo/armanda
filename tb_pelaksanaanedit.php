@@ -5,6 +5,8 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
+<?php include_once "tb_pelaksanaaninfo.php" ?>
+<?php include_once "tb_invoiceinfo.php" ?>
 <?php include_once "tb_userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
@@ -13,9 +15,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$tb_user_edit = NULL; // Initialize page object first
+$tb_pelaksanaan_edit = NULL; // Initialize page object first
 
-class ctb_user_edit extends ctb_user {
+class ctb_pelaksanaan_edit extends ctb_pelaksanaan {
 
 	// Page ID
 	var $PageID = 'edit';
@@ -24,10 +26,10 @@ class ctb_user_edit extends ctb_user {
 	var $ProjectID = "{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}";
 
 	// Table name
-	var $TableName = 'tb_user';
+	var $TableName = 'tb_pelaksanaan';
 
 	// Page object name
-	var $PageObjName = 'tb_user_edit';
+	var $PageObjName = 'tb_pelaksanaan_edit';
 
 	// Page name
 	function PageName() {
@@ -231,11 +233,17 @@ class ctb_user_edit extends ctb_user {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (tb_user)
-		if (!isset($GLOBALS["tb_user"]) || get_class($GLOBALS["tb_user"]) == "ctb_user") {
-			$GLOBALS["tb_user"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["tb_user"];
+		// Table object (tb_pelaksanaan)
+		if (!isset($GLOBALS["tb_pelaksanaan"]) || get_class($GLOBALS["tb_pelaksanaan"]) == "ctb_pelaksanaan") {
+			$GLOBALS["tb_pelaksanaan"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["tb_pelaksanaan"];
 		}
+
+		// Table object (tb_invoice)
+		if (!isset($GLOBALS['tb_invoice'])) $GLOBALS['tb_invoice'] = new ctb_invoice();
+
+		// Table object (tb_user)
+		if (!isset($GLOBALS['tb_user'])) $GLOBALS['tb_user'] = new ctb_user();
 
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
@@ -243,7 +251,7 @@ class ctb_user_edit extends ctb_user {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'tb_user', TRUE);
+			define("EW_TABLE_NAME", 'tb_pelaksanaan', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -274,7 +282,7 @@ class ctb_user_edit extends ctb_user {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
 			if ($Security->CanList())
-				$this->Page_Terminate(ew_GetUrl("tb_userlist.php"));
+				$this->Page_Terminate(ew_GetUrl("tb_pelaksanaanlist.php"));
 			else
 				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
@@ -282,9 +290,8 @@ class ctb_user_edit extends ctb_user {
 		// Create form object
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->username->SetVisibility();
-		$this->password->SetVisibility();
-		$this->userlevel->SetVisibility();
+		$this->invoice_id->SetVisibility();
+		$this->pelaksanaan_tgl->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -330,13 +337,13 @@ class ctb_user_edit extends ctb_user {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $tb_user;
+		global $EW_EXPORT, $tb_pelaksanaan;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($tb_user);
+				$doc = new $class($tb_pelaksanaan);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -385,9 +392,12 @@ class ctb_user_edit extends ctb_user {
 			$gbSkipHeaderFooter = TRUE;
 
 		// Load key from QueryString
-		if (@$_GET["user_id"] <> "") {
-			$this->user_id->setQueryStringValue($_GET["user_id"]);
+		if (@$_GET["pelaksanaan_id"] <> "") {
+			$this->pelaksanaan_id->setQueryStringValue($_GET["pelaksanaan_id"]);
 		}
+
+		// Set up master detail parameters
+		$this->SetUpMasterParms();
 
 		// Process form if post back
 		if (@$_POST["a_edit"] <> "") {
@@ -398,8 +408,8 @@ class ctb_user_edit extends ctb_user {
 		}
 
 		// Check if valid key
-		if ($this->user_id->CurrentValue == "") {
-			$this->Page_Terminate("tb_userlist.php"); // Invalid key, return to list
+		if ($this->pelaksanaan_id->CurrentValue == "") {
+			$this->Page_Terminate("tb_pelaksanaanlist.php"); // Invalid key, return to list
 		}
 
 		// Validate form if post back
@@ -415,12 +425,12 @@ class ctb_user_edit extends ctb_user {
 			case "I": // Get a record to display
 				if (!$this->LoadRow()) { // Load record based on key
 					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
-					$this->Page_Terminate("tb_userlist.php"); // No matching record, return to list
+					$this->Page_Terminate("tb_pelaksanaanlist.php"); // No matching record, return to list
 				}
 				break;
 			Case "U": // Update
 				$sReturnUrl = $this->getReturnUrl();
-				if (ew_GetPageName($sReturnUrl) == "tb_userlist.php")
+				if (ew_GetPageName($sReturnUrl) == "tb_pelaksanaanlist.php")
 					$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to list page with correct master key if necessary
 				$this->SendEmail = TRUE; // Send email on update success
 				if ($this->EditRow()) { // Update record based on key
@@ -492,27 +502,25 @@ class ctb_user_edit extends ctb_user {
 
 		// Load from form
 		global $objForm;
-		if (!$this->username->FldIsDetailKey) {
-			$this->username->setFormValue($objForm->GetValue("x_username"));
+		if (!$this->invoice_id->FldIsDetailKey) {
+			$this->invoice_id->setFormValue($objForm->GetValue("x_invoice_id"));
 		}
-		if (!$this->password->FldIsDetailKey) {
-			$this->password->setFormValue($objForm->GetValue("x_password"));
+		if (!$this->pelaksanaan_tgl->FldIsDetailKey) {
+			$this->pelaksanaan_tgl->setFormValue($objForm->GetValue("x_pelaksanaan_tgl"));
+			$this->pelaksanaan_tgl->CurrentValue = ew_UnFormatDateTime($this->pelaksanaan_tgl->CurrentValue, 7);
 		}
-		if (!$this->userlevel->FldIsDetailKey) {
-			$this->userlevel->setFormValue($objForm->GetValue("x_userlevel"));
-		}
-		if (!$this->user_id->FldIsDetailKey)
-			$this->user_id->setFormValue($objForm->GetValue("x_user_id"));
+		if (!$this->pelaksanaan_id->FldIsDetailKey)
+			$this->pelaksanaan_id->setFormValue($objForm->GetValue("x_pelaksanaan_id"));
 	}
 
 	// Restore form values
 	function RestoreFormValues() {
 		global $objForm;
 		$this->LoadRow();
-		$this->user_id->CurrentValue = $this->user_id->FormValue;
-		$this->username->CurrentValue = $this->username->FormValue;
-		$this->password->CurrentValue = $this->password->FormValue;
-		$this->userlevel->CurrentValue = $this->userlevel->FormValue;
+		$this->pelaksanaan_id->CurrentValue = $this->pelaksanaan_id->FormValue;
+		$this->invoice_id->CurrentValue = $this->invoice_id->FormValue;
+		$this->pelaksanaan_tgl->CurrentValue = $this->pelaksanaan_tgl->FormValue;
+		$this->pelaksanaan_tgl->CurrentValue = ew_UnFormatDateTime($this->pelaksanaan_tgl->CurrentValue, 7);
 	}
 
 	// Load row based on key values
@@ -544,20 +552,18 @@ class ctb_user_edit extends ctb_user {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->user_id->setDbValue($rs->fields('user_id'));
-		$this->username->setDbValue($rs->fields('username'));
-		$this->password->setDbValue($rs->fields('password'));
-		$this->userlevel->setDbValue($rs->fields('userlevel'));
+		$this->pelaksanaan_id->setDbValue($rs->fields('pelaksanaan_id'));
+		$this->invoice_id->setDbValue($rs->fields('invoice_id'));
+		$this->pelaksanaan_tgl->setDbValue($rs->fields('pelaksanaan_tgl'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->user_id->DbValue = $row['user_id'];
-		$this->username->DbValue = $row['username'];
-		$this->password->DbValue = $row['password'];
-		$this->userlevel->DbValue = $row['userlevel'];
+		$this->pelaksanaan_id->DbValue = $row['pelaksanaan_id'];
+		$this->invoice_id->DbValue = $row['invoice_id'];
+		$this->pelaksanaan_tgl->DbValue = $row['pelaksanaan_tgl'];
 	}
 
 	// Render row values based on field settings
@@ -570,83 +576,63 @@ class ctb_user_edit extends ctb_user {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// user_id
-		// username
-		// password
-		// userlevel
+		// pelaksanaan_id
+		// invoice_id
+		// pelaksanaan_tgl
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// username
-		$this->username->ViewValue = $this->username->CurrentValue;
-		$this->username->ViewCustomAttributes = "";
+		// pelaksanaan_id
+		$this->pelaksanaan_id->ViewValue = $this->pelaksanaan_id->CurrentValue;
+		$this->pelaksanaan_id->ViewCustomAttributes = "";
 
-		// password
-		$this->password->ViewValue = $this->password->CurrentValue;
-		$this->password->ViewCustomAttributes = "";
+		// invoice_id
+		$this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
+		$this->invoice_id->ViewCustomAttributes = "";
 
-		// userlevel
-		if ($Security->CanAdmin()) { // System admin
-		if (strval($this->userlevel->CurrentValue) <> "") {
-			$this->userlevel->ViewValue = $this->userlevel->OptionCaption($this->userlevel->CurrentValue);
-		} else {
-			$this->userlevel->ViewValue = NULL;
-		}
-		} else {
-			$this->userlevel->ViewValue = $Language->Phrase("PasswordMask");
-		}
-		$this->userlevel->ViewCustomAttributes = "";
+		// pelaksanaan_tgl
+		$this->pelaksanaan_tgl->ViewValue = $this->pelaksanaan_tgl->CurrentValue;
+		$this->pelaksanaan_tgl->ViewValue = ew_FormatDateTime($this->pelaksanaan_tgl->ViewValue, 7);
+		$this->pelaksanaan_tgl->ViewCustomAttributes = "";
 
-			// username
-			$this->username->LinkCustomAttributes = "";
-			$this->username->HrefValue = "";
-			$this->username->TooltipValue = "";
+			// invoice_id
+			$this->invoice_id->LinkCustomAttributes = "";
+			$this->invoice_id->HrefValue = "";
+			$this->invoice_id->TooltipValue = "";
 
-			// password
-			$this->password->LinkCustomAttributes = "";
-			$this->password->HrefValue = "";
-			$this->password->TooltipValue = "";
-
-			// userlevel
-			$this->userlevel->LinkCustomAttributes = "";
-			$this->userlevel->HrefValue = "";
-			$this->userlevel->TooltipValue = "";
+			// pelaksanaan_tgl
+			$this->pelaksanaan_tgl->LinkCustomAttributes = "";
+			$this->pelaksanaan_tgl->HrefValue = "";
+			$this->pelaksanaan_tgl->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
-			// username
-			$this->username->EditAttrs["class"] = "form-control";
-			$this->username->EditCustomAttributes = "";
-			$this->username->EditValue = ew_HtmlEncode($this->username->CurrentValue);
-			$this->username->PlaceHolder = ew_RemoveHtml($this->username->FldCaption());
-
-			// password
-			$this->password->EditAttrs["class"] = "form-control ewPasswordStrength";
-			$this->password->EditCustomAttributes = "";
-			$this->password->EditValue = ew_HtmlEncode($this->password->CurrentValue);
-			$this->password->PlaceHolder = ew_RemoveHtml($this->password->FldCaption());
-
-			// userlevel
-			$this->userlevel->EditAttrs["class"] = "form-control";
-			$this->userlevel->EditCustomAttributes = "";
-			if (!$Security->CanAdmin()) { // System admin
-				$this->userlevel->EditValue = $Language->Phrase("PasswordMask");
+			// invoice_id
+			$this->invoice_id->EditAttrs["class"] = "form-control";
+			$this->invoice_id->EditCustomAttributes = "";
+			if ($this->invoice_id->getSessionValue() <> "") {
+				$this->invoice_id->CurrentValue = $this->invoice_id->getSessionValue();
+			$this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
+			$this->invoice_id->ViewCustomAttributes = "";
 			} else {
-			$this->userlevel->EditValue = $this->userlevel->Options(TRUE);
+			$this->invoice_id->EditValue = ew_HtmlEncode($this->invoice_id->CurrentValue);
+			$this->invoice_id->PlaceHolder = ew_RemoveHtml($this->invoice_id->FldCaption());
 			}
 
+			// pelaksanaan_tgl
+			$this->pelaksanaan_tgl->EditAttrs["class"] = "form-control";
+			$this->pelaksanaan_tgl->EditCustomAttributes = "";
+			$this->pelaksanaan_tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->pelaksanaan_tgl->CurrentValue, 7));
+			$this->pelaksanaan_tgl->PlaceHolder = ew_RemoveHtml($this->pelaksanaan_tgl->FldCaption());
+
 			// Edit refer script
-			// username
+			// invoice_id
 
-			$this->username->LinkCustomAttributes = "";
-			$this->username->HrefValue = "";
+			$this->invoice_id->LinkCustomAttributes = "";
+			$this->invoice_id->HrefValue = "";
 
-			// password
-			$this->password->LinkCustomAttributes = "";
-			$this->password->HrefValue = "";
-
-			// userlevel
-			$this->userlevel->LinkCustomAttributes = "";
-			$this->userlevel->HrefValue = "";
+			// pelaksanaan_tgl
+			$this->pelaksanaan_tgl->LinkCustomAttributes = "";
+			$this->pelaksanaan_tgl->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -669,6 +655,18 @@ class ctb_user_edit extends ctb_user {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
+		if (!$this->invoice_id->FldIsDetailKey && !is_null($this->invoice_id->FormValue) && $this->invoice_id->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->invoice_id->FldCaption(), $this->invoice_id->ReqErrMsg));
+		}
+		if (!ew_CheckInteger($this->invoice_id->FormValue)) {
+			ew_AddMessage($gsFormError, $this->invoice_id->FldErrMsg());
+		}
+		if (!$this->pelaksanaan_tgl->FldIsDetailKey && !is_null($this->pelaksanaan_tgl->FormValue) && $this->pelaksanaan_tgl->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->pelaksanaan_tgl->FldCaption(), $this->pelaksanaan_tgl->ReqErrMsg));
+		}
+		if (!ew_CheckEuroDate($this->pelaksanaan_tgl->FormValue)) {
+			ew_AddMessage($gsFormError, $this->pelaksanaan_tgl->FldErrMsg());
+		}
 
 		// Return validate result
 		$ValidateForm = ($gsFormError == "");
@@ -705,15 +703,32 @@ class ctb_user_edit extends ctb_user {
 			$this->LoadDbValues($rsold);
 			$rsnew = array();
 
-			// username
-			$this->username->SetDbValueDef($rsnew, $this->username->CurrentValue, NULL, $this->username->ReadOnly);
+			// invoice_id
+			$this->invoice_id->SetDbValueDef($rsnew, $this->invoice_id->CurrentValue, 0, $this->invoice_id->ReadOnly);
 
-			// password
-			$this->password->SetDbValueDef($rsnew, $this->password->CurrentValue, NULL, $this->password->ReadOnly || (EW_ENCRYPTED_PASSWORD && $rs->fields('password') == $this->password->CurrentValue));
+			// pelaksanaan_tgl
+			$this->pelaksanaan_tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->pelaksanaan_tgl->CurrentValue, 7), ew_CurrentDate(), $this->pelaksanaan_tgl->ReadOnly);
 
-			// userlevel
-			if ($Security->CanAdmin()) { // System admin
-			$this->userlevel->SetDbValueDef($rsnew, $this->userlevel->CurrentValue, NULL, $this->userlevel->ReadOnly);
+			// Check referential integrity for master table 'tb_invoice'
+			$bValidMasterRecord = TRUE;
+			$sMasterFilter = $this->SqlMasterFilter_tb_invoice();
+			$KeyValue = isset($rsnew['invoice_id']) ? $rsnew['invoice_id'] : $rsold['invoice_id'];
+			if (strval($KeyValue) <> "") {
+				$sMasterFilter = str_replace("@id@", ew_AdjustSql($KeyValue), $sMasterFilter);
+			} else {
+				$bValidMasterRecord = FALSE;
+			}
+			if ($bValidMasterRecord) {
+				if (!isset($GLOBALS["tb_invoice"])) $GLOBALS["tb_invoice"] = new ctb_invoice();
+				$rsmaster = $GLOBALS["tb_invoice"]->LoadRs($sMasterFilter);
+				$bValidMasterRecord = ($rsmaster && !$rsmaster->EOF);
+				$rsmaster->Close();
+			}
+			if (!$bValidMasterRecord) {
+				$sRelatedRecordMsg = str_replace("%t", "tb_invoice", $Language->Phrase("RelatedRecordRequired"));
+				$this->setFailureMessage($sRelatedRecordMsg);
+				$rs->Close();
+				return FALSE;
 			}
 
 			// Call Row Updating event
@@ -751,12 +766,73 @@ class ctb_user_edit extends ctb_user {
 		return $EditRow;
 	}
 
+	// Set up master/detail based on QueryString
+	function SetUpMasterParms() {
+		$bValidMaster = FALSE;
+
+		// Get the keys for master table
+		if (isset($_GET[EW_TABLE_SHOW_MASTER])) {
+			$sMasterTblVar = $_GET[EW_TABLE_SHOW_MASTER];
+			if ($sMasterTblVar == "") {
+				$bValidMaster = TRUE;
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+			}
+			if ($sMasterTblVar == "tb_invoice") {
+				$bValidMaster = TRUE;
+				if (@$_GET["fk_id"] <> "") {
+					$GLOBALS["tb_invoice"]->id->setQueryStringValue($_GET["fk_id"]);
+					$this->invoice_id->setQueryStringValue($GLOBALS["tb_invoice"]->id->QueryStringValue);
+					$this->invoice_id->setSessionValue($this->invoice_id->QueryStringValue);
+					if (!is_numeric($GLOBALS["tb_invoice"]->id->QueryStringValue)) $bValidMaster = FALSE;
+				} else {
+					$bValidMaster = FALSE;
+				}
+			}
+		} elseif (isset($_POST[EW_TABLE_SHOW_MASTER])) {
+			$sMasterTblVar = $_POST[EW_TABLE_SHOW_MASTER];
+			if ($sMasterTblVar == "") {
+				$bValidMaster = TRUE;
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+			}
+			if ($sMasterTblVar == "tb_invoice") {
+				$bValidMaster = TRUE;
+				if (@$_POST["fk_id"] <> "") {
+					$GLOBALS["tb_invoice"]->id->setFormValue($_POST["fk_id"]);
+					$this->invoice_id->setFormValue($GLOBALS["tb_invoice"]->id->FormValue);
+					$this->invoice_id->setSessionValue($this->invoice_id->FormValue);
+					if (!is_numeric($GLOBALS["tb_invoice"]->id->FormValue)) $bValidMaster = FALSE;
+				} else {
+					$bValidMaster = FALSE;
+				}
+			}
+		}
+		if ($bValidMaster) {
+
+			// Save current master table
+			$this->setCurrentMasterTable($sMasterTblVar);
+			$this->setSessionWhere($this->GetDetailFilter());
+
+			// Reset start record counter (new master key)
+			$this->StartRec = 1;
+			$this->setStartRecordNumber($this->StartRec);
+
+			// Clear previous master key from Session
+			if ($sMasterTblVar <> "tb_invoice") {
+				if ($this->invoice_id->CurrentValue == "") $this->invoice_id->setSessionValue("");
+			}
+		}
+		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
+		$this->DbDetailFilter = $this->GetDetailFilter(); // Get detail filter
+	}
+
 	// Set up Breadcrumb
 	function SetupBreadcrumb() {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("tb_userlist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("tb_pelaksanaanlist.php"), "", $this->TableVar, TRUE);
 		$PageId = "edit";
 		$Breadcrumb->Add("edit", $PageId, $url);
 	}
@@ -779,7 +855,7 @@ class ctb_user_edit extends ctb_user {
 
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
-		$table = 'tb_user';
+		$table = 'tb_pelaksanaan';
 		$usr = CurrentUserName();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
@@ -788,12 +864,12 @@ class ctb_user_edit extends ctb_user {
 	function WriteAuditTrailOnEdit(&$rsold, &$rsnew) {
 		global $Language;
 		if (!$this->AuditTrailOnEdit) return;
-		$table = 'tb_user';
+		$table = 'tb_pelaksanaan';
 
 		// Get key value
 		$key = "";
 		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rsold['user_id'];
+		$key .= $rsold['pelaksanaan_id'];
 
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
@@ -824,10 +900,6 @@ class ctb_user_edit extends ctb_user {
 					} else {
 						$oldvalue = $rsold[$fldname];
 						$newvalue = $rsnew[$fldname];
-					}
-					if ($fldname == 'password') {
-						$oldvalue = $Language->Phrase("PasswordMask");
-						$newvalue = $Language->Phrase("PasswordMask");
 					}
 					ew_WriteAuditTrail("log", $dt, $id, $usr, "U", $table, $fldname, $key, $oldvalue, $newvalue);
 				}
@@ -907,29 +979,29 @@ class ctb_user_edit extends ctb_user {
 <?php
 
 // Create page object
-if (!isset($tb_user_edit)) $tb_user_edit = new ctb_user_edit();
+if (!isset($tb_pelaksanaan_edit)) $tb_pelaksanaan_edit = new ctb_pelaksanaan_edit();
 
 // Page init
-$tb_user_edit->Page_Init();
+$tb_pelaksanaan_edit->Page_Init();
 
 // Page main
-$tb_user_edit->Page_Main();
+$tb_pelaksanaan_edit->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$tb_user_edit->Page_Render();
+$tb_pelaksanaan_edit->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "edit";
-var CurrentForm = ftb_useredit = new ew_Form("ftb_useredit", "edit");
+var CurrentForm = ftb_pelaksanaanedit = new ew_Form("ftb_pelaksanaanedit", "edit");
 
 // Validate form
-ftb_useredit.Validate = function() {
+ftb_pelaksanaanedit.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -943,9 +1015,18 @@ ftb_useredit.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
-			elm = this.GetElements("x" + infix + "_password");
-			if (elm && $(elm).hasClass("ewPasswordStrength") && !$(elm).data("validated"))
-				return this.OnError(elm, ewLanguage.Phrase("PasswordTooSimple"));
+			elm = this.GetElements("x" + infix + "_invoice_id");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $tb_pelaksanaan->invoice_id->FldCaption(), $tb_pelaksanaan->invoice_id->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_invoice_id");
+			if (elm && !ew_CheckInteger(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($tb_pelaksanaan->invoice_id->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_pelaksanaan_tgl");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $tb_pelaksanaan->pelaksanaan_tgl->FldCaption(), $tb_pelaksanaan->pelaksanaan_tgl->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_pelaksanaan_tgl");
+			if (elm && !ew_CheckEuroDate(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($tb_pelaksanaan->pelaksanaan_tgl->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -964,7 +1045,7 @@ ftb_useredit.Validate = function() {
 }
 
 // Form_CustomValidate event
-ftb_useredit.Form_CustomValidate = 
+ftb_pelaksanaanedit.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -973,108 +1054,93 @@ ftb_useredit.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ftb_useredit.ValidateRequired = true;
+ftb_pelaksanaanedit.ValidateRequired = true;
 <?php } else { ?>
-ftb_useredit.ValidateRequired = false; 
+ftb_pelaksanaanedit.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-ftb_useredit.Lists["x_userlevel"] = {"LinkField":"","Ajax":null,"AutoFill":false,"DisplayFields":["","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":""};
-ftb_useredit.Lists["x_userlevel"].Options = <?php echo json_encode($tb_user->userlevel->Options()) ?>;
-
 // Form object for search
+
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php if (!$tb_user_edit->IsModal) { ?>
+<?php if (!$tb_pelaksanaan_edit->IsModal) { ?>
 <div class="ewToolbar">
 <?php $Breadcrumb->Render(); ?>
 <?php echo $Language->SelectionForm(); ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<?php $tb_user_edit->ShowPageHeader(); ?>
+<?php $tb_pelaksanaan_edit->ShowPageHeader(); ?>
 <?php
-$tb_user_edit->ShowMessage();
+$tb_pelaksanaan_edit->ShowMessage();
 ?>
-<form name="ftb_useredit" id="ftb_useredit" class="<?php echo $tb_user_edit->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($tb_user_edit->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_user_edit->Token ?>">
+<form name="ftb_pelaksanaanedit" id="ftb_pelaksanaanedit" class="<?php echo $tb_pelaksanaan_edit->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($tb_pelaksanaan_edit->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_pelaksanaan_edit->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="tb_user">
+<input type="hidden" name="t" value="tb_pelaksanaan">
 <input type="hidden" name="a_edit" id="a_edit" value="U">
-<?php if ($tb_user_edit->IsModal) { ?>
+<?php if ($tb_pelaksanaan_edit->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<!-- Fields to prevent google autofill -->
-<input class="hidden" type="text" name="<?php echo ew_Encrypt(ew_Random()) ?>">
-<input class="hidden" type="password" name="<?php echo ew_Encrypt(ew_Random()) ?>">
+<?php if ($tb_pelaksanaan->getCurrentMasterTable() == "tb_invoice") { ?>
+<input type="hidden" name="<?php echo EW_TABLE_SHOW_MASTER ?>" value="tb_invoice">
+<input type="hidden" name="fk_id" value="<?php echo $tb_pelaksanaan->invoice_id->getSessionValue() ?>">
+<?php } ?>
 <div>
-<?php if ($tb_user->username->Visible) { // username ?>
-	<div id="r_username" class="form-group">
-		<label id="elh_tb_user_username" for="x_username" class="col-sm-2 control-label ewLabel"><?php echo $tb_user->username->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $tb_user->username->CellAttributes() ?>>
-<span id="el_tb_user_username">
-<input type="text" data-table="tb_user" data-field="x_username" name="x_username" id="x_username" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($tb_user->username->getPlaceHolder()) ?>" value="<?php echo $tb_user->username->EditValue ?>"<?php echo $tb_user->username->EditAttributes() ?>>
+<?php if ($tb_pelaksanaan->invoice_id->Visible) { // invoice_id ?>
+	<div id="r_invoice_id" class="form-group">
+		<label id="elh_tb_pelaksanaan_invoice_id" for="x_invoice_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_pelaksanaan->invoice_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $tb_pelaksanaan->invoice_id->CellAttributes() ?>>
+<?php if ($tb_pelaksanaan->invoice_id->getSessionValue() <> "") { ?>
+<span id="el_tb_pelaksanaan_invoice_id">
+<span<?php echo $tb_pelaksanaan->invoice_id->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $tb_pelaksanaan->invoice_id->ViewValue ?></p></span>
 </span>
-<?php echo $tb_user->username->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
-<?php if ($tb_user->password->Visible) { // password ?>
-	<div id="r_password" class="form-group">
-		<label id="elh_tb_user_password" for="x_password" class="col-sm-2 control-label ewLabel"><?php echo $tb_user->password->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $tb_user->password->CellAttributes() ?>>
-<span id="el_tb_user_password">
-<div class="input-group" id="ig_password">
-<input type="text" data-password-strength="pst_password" data-password-generated="pgt_password" data-table="tb_user" data-field="x_password" name="x_password" id="x_password" value="<?php echo $tb_user->password->EditValue ?>" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($tb_user->password->getPlaceHolder()) ?>"<?php echo $tb_user->password->EditAttributes() ?>>
-<span class="input-group-btn">
-	<button type="button" class="btn btn-default ewPasswordGenerator" title="<?php echo ew_HtmlTitle($Language->Phrase("GeneratePassword")) ?>" data-password-field="x_password" data-password-confirm="c_password" data-password-strength="pst_password" data-password-generated="pgt_password"><?php echo $Language->Phrase("GeneratePassword") ?></button>
-</span>
-</div>
-<span class="help-block" id="pgt_password" style="display: none;"></span>
-<div class="progress ewPasswordStrengthBar" id="pst_password" style="display: none;">
-	<div class="progress-bar" role="progressbar"></div>
-</div>
-</span>
-<?php echo $tb_user->password->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
-<?php if ($tb_user->userlevel->Visible) { // userlevel ?>
-	<div id="r_userlevel" class="form-group">
-		<label id="elh_tb_user_userlevel" for="x_userlevel" class="col-sm-2 control-label ewLabel"><?php echo $tb_user->userlevel->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $tb_user->userlevel->CellAttributes() ?>>
-<?php if (!$Security->IsAdmin() && $Security->IsLoggedIn()) { // Non system admin ?>
-<span id="el_tb_user_userlevel">
-<p class="form-control-static"><?php echo $tb_user->userlevel->EditValue ?></p>
-</span>
+<input type="hidden" id="x_invoice_id" name="x_invoice_id" value="<?php echo ew_HtmlEncode($tb_pelaksanaan->invoice_id->CurrentValue) ?>">
 <?php } else { ?>
-<span id="el_tb_user_userlevel">
-<select data-table="tb_user" data-field="x_userlevel" data-value-separator="<?php echo $tb_user->userlevel->DisplayValueSeparatorAttribute() ?>" id="x_userlevel" name="x_userlevel"<?php echo $tb_user->userlevel->EditAttributes() ?>>
-<?php echo $tb_user->userlevel->SelectOptionListHtml("x_userlevel") ?>
-</select>
+<span id="el_tb_pelaksanaan_invoice_id">
+<input type="text" data-table="tb_pelaksanaan" data-field="x_invoice_id" name="x_invoice_id" id="x_invoice_id" size="30" placeholder="<?php echo ew_HtmlEncode($tb_pelaksanaan->invoice_id->getPlaceHolder()) ?>" value="<?php echo $tb_pelaksanaan->invoice_id->EditValue ?>"<?php echo $tb_pelaksanaan->invoice_id->EditAttributes() ?>>
 </span>
 <?php } ?>
-<?php echo $tb_user->userlevel->CustomMsg ?></div></div>
+<?php echo $tb_pelaksanaan->invoice_id->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($tb_pelaksanaan->pelaksanaan_tgl->Visible) { // pelaksanaan_tgl ?>
+	<div id="r_pelaksanaan_tgl" class="form-group">
+		<label id="elh_tb_pelaksanaan_pelaksanaan_tgl" for="x_pelaksanaan_tgl" class="col-sm-2 control-label ewLabel"><?php echo $tb_pelaksanaan->pelaksanaan_tgl->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $tb_pelaksanaan->pelaksanaan_tgl->CellAttributes() ?>>
+<span id="el_tb_pelaksanaan_pelaksanaan_tgl">
+<input type="text" data-table="tb_pelaksanaan" data-field="x_pelaksanaan_tgl" data-format="7" name="x_pelaksanaan_tgl" id="x_pelaksanaan_tgl" placeholder="<?php echo ew_HtmlEncode($tb_pelaksanaan->pelaksanaan_tgl->getPlaceHolder()) ?>" value="<?php echo $tb_pelaksanaan->pelaksanaan_tgl->EditValue ?>"<?php echo $tb_pelaksanaan->pelaksanaan_tgl->EditAttributes() ?>>
+<?php if (!$tb_pelaksanaan->pelaksanaan_tgl->ReadOnly && !$tb_pelaksanaan->pelaksanaan_tgl->Disabled && !isset($tb_pelaksanaan->pelaksanaan_tgl->EditAttrs["readonly"]) && !isset($tb_pelaksanaan->pelaksanaan_tgl->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateCalendar("ftb_pelaksanaanedit", "x_pelaksanaan_tgl", 7);
+</script>
+<?php } ?>
+</span>
+<?php echo $tb_pelaksanaan->pelaksanaan_tgl->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div>
-<input type="hidden" data-table="tb_user" data-field="x_user_id" name="x_user_id" id="x_user_id" value="<?php echo ew_HtmlEncode($tb_user->user_id->CurrentValue) ?>">
-<?php if (!$tb_user_edit->IsModal) { ?>
+<input type="hidden" data-table="tb_pelaksanaan" data-field="x_pelaksanaan_id" name="x_pelaksanaan_id" id="x_pelaksanaan_id" value="<?php echo ew_HtmlEncode($tb_pelaksanaan->pelaksanaan_id->CurrentValue) ?>">
+<?php if (!$tb_pelaksanaan_edit->IsModal) { ?>
 <div class="form-group">
 	<div class="col-sm-offset-2 col-sm-10">
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("SaveBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $tb_user_edit->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $tb_pelaksanaan_edit->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
 	</div>
 </div>
 <?php } ?>
 </form>
 <script type="text/javascript">
-ftb_useredit.Init();
+ftb_pelaksanaanedit.Init();
 </script>
 <?php
-$tb_user_edit->ShowPageFooter();
+$tb_pelaksanaan_edit->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -1086,5 +1152,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$tb_user_edit->Page_Terminate();
+$tb_pelaksanaan_edit->Page_Terminate();
 ?>

@@ -33,7 +33,9 @@
 <div id="ewTooltip"></div>
 <?php } ?>
 <?php if (@$gsExport == "") { ?>
-<script type="text/javascript" src="<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt13.js"></script>
+<script type="text/javascript">
+jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt13.js");
+</script>
 <script type="text/javascript">
 
 // Write your global startup script here

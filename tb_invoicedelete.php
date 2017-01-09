@@ -289,7 +289,6 @@ class ctb_invoice_delete extends ctb_invoice {
 		$this->no_order->SetVisibility();
 		$this->no_referensi->SetVisibility();
 		$this->kegiatan->SetVisibility();
-		$this->tgl_pelaksanaan->SetVisibility();
 		$this->no_sertifikat->SetVisibility();
 		$this->keterangan->SetVisibility();
 		$this->total->SetVisibility();
@@ -430,7 +429,7 @@ class ctb_invoice_delete extends ctb_invoice {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -475,6 +474,11 @@ class ctb_invoice_delete extends ctb_invoice {
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->customer_id->setDbValue($rs->fields('customer_id'));
+		if (array_key_exists('EV__customer_id', $rs->fields)) {
+			$this->customer_id->VirtualValue = $rs->fields('EV__customer_id'); // Set up virtual field value
+		} else {
+			$this->customer_id->VirtualValue = ""; // Clear value
+		}
 		$this->no_invoice->setDbValue($rs->fields('no_invoice'));
 		$this->tgl_invoice->setDbValue($rs->fields('tgl_invoice'));
 		$this->no_order->setDbValue($rs->fields('no_order'));
@@ -541,6 +545,9 @@ class ctb_invoice_delete extends ctb_invoice {
 		// no_referensi
 		// kegiatan
 		// tgl_pelaksanaan
+
+		$this->tgl_pelaksanaan->CellCssStyle = "white-space: nowrap;";
+
 		// no_sertifikat
 		// keterangan
 		// total
@@ -554,11 +561,14 @@ class ctb_invoice_delete extends ctb_invoice {
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
 		// customer_id
+		if ($this->customer_id->VirtualValue <> "") {
+			$this->customer_id->ViewValue = $this->customer_id->VirtualValue;
+		} else {
 		if (strval($this->customer_id->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->customer_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_customer`";
 		$sWhereWrk = "";
-		$this->customer_id->LookupFilters = array();
+		$this->customer_id->LookupFilters = array("dx1" => '`nama`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -573,6 +583,7 @@ class ctb_invoice_delete extends ctb_invoice {
 			}
 		} else {
 			$this->customer_id->ViewValue = NULL;
+		}
 		}
 		$this->customer_id->ViewCustomAttributes = "";
 
@@ -596,11 +607,6 @@ class ctb_invoice_delete extends ctb_invoice {
 		// kegiatan
 		$this->kegiatan->ViewValue = $this->kegiatan->CurrentValue;
 		$this->kegiatan->ViewCustomAttributes = "";
-
-		// tgl_pelaksanaan
-		$this->tgl_pelaksanaan->ViewValue = $this->tgl_pelaksanaan->CurrentValue;
-		$this->tgl_pelaksanaan->ViewValue = ew_FormatDateTime($this->tgl_pelaksanaan->ViewValue, 7);
-		$this->tgl_pelaksanaan->ViewCustomAttributes = "";
 
 		// no_sertifikat
 		$this->no_sertifikat->ViewValue = $this->no_sertifikat->CurrentValue;
@@ -679,11 +685,6 @@ class ctb_invoice_delete extends ctb_invoice {
 			$this->kegiatan->LinkCustomAttributes = "";
 			$this->kegiatan->HrefValue = "";
 			$this->kegiatan->TooltipValue = "";
-
-			// tgl_pelaksanaan
-			$this->tgl_pelaksanaan->LinkCustomAttributes = "";
-			$this->tgl_pelaksanaan->HrefValue = "";
-			$this->tgl_pelaksanaan->TooltipValue = "";
 
 			// no_sertifikat
 			$this->no_sertifikat->LinkCustomAttributes = "";
@@ -1051,9 +1052,6 @@ $tb_invoice_delete->ShowMessage();
 <?php if ($tb_invoice->kegiatan->Visible) { // kegiatan ?>
 		<th><span id="elh_tb_invoice_kegiatan" class="tb_invoice_kegiatan"><?php echo $tb_invoice->kegiatan->FldCaption() ?></span></th>
 <?php } ?>
-<?php if ($tb_invoice->tgl_pelaksanaan->Visible) { // tgl_pelaksanaan ?>
-		<th><span id="elh_tb_invoice_tgl_pelaksanaan" class="tb_invoice_tgl_pelaksanaan"><?php echo $tb_invoice->tgl_pelaksanaan->FldCaption() ?></span></th>
-<?php } ?>
 <?php if ($tb_invoice->no_sertifikat->Visible) { // no_sertifikat ?>
 		<th><span id="elh_tb_invoice_no_sertifikat" class="tb_invoice_no_sertifikat"><?php echo $tb_invoice->no_sertifikat->FldCaption() ?></span></th>
 <?php } ?>
@@ -1147,14 +1145,6 @@ while (!$tb_invoice_delete->Recordset->EOF) {
 <span id="el<?php echo $tb_invoice_delete->RowCnt ?>_tb_invoice_kegiatan" class="tb_invoice_kegiatan">
 <span<?php echo $tb_invoice->kegiatan->ViewAttributes() ?>>
 <?php echo $tb_invoice->kegiatan->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($tb_invoice->tgl_pelaksanaan->Visible) { // tgl_pelaksanaan ?>
-		<td<?php echo $tb_invoice->tgl_pelaksanaan->CellAttributes() ?>>
-<span id="el<?php echo $tb_invoice_delete->RowCnt ?>_tb_invoice_tgl_pelaksanaan" class="tb_invoice_tgl_pelaksanaan">
-<span<?php echo $tb_invoice->tgl_pelaksanaan->ViewAttributes() ?>>
-<?php echo $tb_invoice->tgl_pelaksanaan->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

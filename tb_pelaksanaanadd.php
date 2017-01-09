@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "tb_feeinfo.php" ?>
+<?php include_once "tb_pelaksanaaninfo.php" ?>
 <?php include_once "tb_invoiceinfo.php" ?>
 <?php include_once "tb_userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
@@ -15,9 +15,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$tb_fee_add = NULL; // Initialize page object first
+$tb_pelaksanaan_add = NULL; // Initialize page object first
 
-class ctb_fee_add extends ctb_fee {
+class ctb_pelaksanaan_add extends ctb_pelaksanaan {
 
 	// Page ID
 	var $PageID = 'add';
@@ -26,10 +26,10 @@ class ctb_fee_add extends ctb_fee {
 	var $ProjectID = "{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}";
 
 	// Table name
-	var $TableName = 'tb_fee';
+	var $TableName = 'tb_pelaksanaan';
 
 	// Page object name
-	var $PageObjName = 'tb_fee_add';
+	var $PageObjName = 'tb_pelaksanaan_add';
 
 	// Page name
 	function PageName() {
@@ -233,10 +233,10 @@ class ctb_fee_add extends ctb_fee {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (tb_fee)
-		if (!isset($GLOBALS["tb_fee"]) || get_class($GLOBALS["tb_fee"]) == "ctb_fee") {
-			$GLOBALS["tb_fee"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["tb_fee"];
+		// Table object (tb_pelaksanaan)
+		if (!isset($GLOBALS["tb_pelaksanaan"]) || get_class($GLOBALS["tb_pelaksanaan"]) == "ctb_pelaksanaan") {
+			$GLOBALS["tb_pelaksanaan"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["tb_pelaksanaan"];
 		}
 
 		// Table object (tb_invoice)
@@ -251,7 +251,7 @@ class ctb_fee_add extends ctb_fee {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'tb_fee', TRUE);
+			define("EW_TABLE_NAME", 'tb_pelaksanaan', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -282,7 +282,7 @@ class ctb_fee_add extends ctb_fee {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
 			if ($Security->CanList())
-				$this->Page_Terminate(ew_GetUrl("tb_feelist.php"));
+				$this->Page_Terminate(ew_GetUrl("tb_pelaksanaanlist.php"));
 			else
 				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
@@ -291,11 +291,7 @@ class ctb_fee_add extends ctb_fee {
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 		$this->invoice_id->SetVisibility();
-		$this->barang_id->SetVisibility();
-		$this->harga->SetVisibility();
-		$this->qty->SetVisibility();
-		$this->satuan->SetVisibility();
-		$this->keterangan->SetVisibility();
+		$this->pelaksanaan_tgl->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -341,13 +337,13 @@ class ctb_fee_add extends ctb_fee {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $tb_fee;
+		global $EW_EXPORT, $tb_pelaksanaan;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($tb_fee);
+				$doc = new $class($tb_pelaksanaan);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -411,11 +407,11 @@ class ctb_fee_add extends ctb_fee {
 
 			// Load key values from QueryString
 			$this->CopyRecord = TRUE;
-			if (@$_GET["id"] != "") {
-				$this->id->setQueryStringValue($_GET["id"]);
-				$this->setKey("id", $this->id->CurrentValue); // Set up key
+			if (@$_GET["pelaksanaan_id"] != "") {
+				$this->pelaksanaan_id->setQueryStringValue($_GET["pelaksanaan_id"]);
+				$this->setKey("pelaksanaan_id", $this->pelaksanaan_id->CurrentValue); // Set up key
 			} else {
-				$this->setKey("id", ""); // Clear key
+				$this->setKey("pelaksanaan_id", ""); // Clear key
 				$this->CopyRecord = FALSE;
 			}
 			if ($this->CopyRecord) {
@@ -448,7 +444,7 @@ class ctb_fee_add extends ctb_fee {
 			case "C": // Copy an existing record
 				if (!$this->LoadRow()) { // Load record based on key
 					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
-					$this->Page_Terminate("tb_feelist.php"); // No matching record, return to list
+					$this->Page_Terminate("tb_pelaksanaanlist.php"); // No matching record, return to list
 				}
 				break;
 			case "A": // Add new record
@@ -457,9 +453,9 @@ class ctb_fee_add extends ctb_fee {
 					if ($this->getSuccessMessage() == "")
 						$this->setSuccessMessage($Language->Phrase("AddSuccess")); // Set up success message
 					$sReturnUrl = $this->getReturnUrl();
-					if (ew_GetPageName($sReturnUrl) == "tb_feelist.php")
+					if (ew_GetPageName($sReturnUrl) == "tb_pelaksanaanlist.php")
 						$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to list page with correct master key if necessary
-					elseif (ew_GetPageName($sReturnUrl) == "tb_feeview.php")
+					elseif (ew_GetPageName($sReturnUrl) == "tb_pelaksanaanview.php")
 						$sReturnUrl = $this->GetViewUrl(); // View page, return to view page with keyurl directly
 					$this->Page_Terminate($sReturnUrl); // Clean up and return
 				} else {
@@ -487,16 +483,8 @@ class ctb_fee_add extends ctb_fee {
 	function LoadDefaultValues() {
 		$this->invoice_id->CurrentValue = NULL;
 		$this->invoice_id->OldValue = $this->invoice_id->CurrentValue;
-		$this->barang_id->CurrentValue = NULL;
-		$this->barang_id->OldValue = $this->barang_id->CurrentValue;
-		$this->harga->CurrentValue = NULL;
-		$this->harga->OldValue = $this->harga->CurrentValue;
-		$this->qty->CurrentValue = NULL;
-		$this->qty->OldValue = $this->qty->CurrentValue;
-		$this->satuan->CurrentValue = NULL;
-		$this->satuan->OldValue = $this->satuan->CurrentValue;
-		$this->keterangan->CurrentValue = NULL;
-		$this->keterangan->OldValue = $this->keterangan->CurrentValue;
+		$this->pelaksanaan_tgl->CurrentValue = NULL;
+		$this->pelaksanaan_tgl->OldValue = $this->pelaksanaan_tgl->CurrentValue;
 	}
 
 	// Load form values
@@ -507,20 +495,9 @@ class ctb_fee_add extends ctb_fee {
 		if (!$this->invoice_id->FldIsDetailKey) {
 			$this->invoice_id->setFormValue($objForm->GetValue("x_invoice_id"));
 		}
-		if (!$this->barang_id->FldIsDetailKey) {
-			$this->barang_id->setFormValue($objForm->GetValue("x_barang_id"));
-		}
-		if (!$this->harga->FldIsDetailKey) {
-			$this->harga->setFormValue($objForm->GetValue("x_harga"));
-		}
-		if (!$this->qty->FldIsDetailKey) {
-			$this->qty->setFormValue($objForm->GetValue("x_qty"));
-		}
-		if (!$this->satuan->FldIsDetailKey) {
-			$this->satuan->setFormValue($objForm->GetValue("x_satuan"));
-		}
-		if (!$this->keterangan->FldIsDetailKey) {
-			$this->keterangan->setFormValue($objForm->GetValue("x_keterangan"));
+		if (!$this->pelaksanaan_tgl->FldIsDetailKey) {
+			$this->pelaksanaan_tgl->setFormValue($objForm->GetValue("x_pelaksanaan_tgl"));
+			$this->pelaksanaan_tgl->CurrentValue = ew_UnFormatDateTime($this->pelaksanaan_tgl->CurrentValue, 7);
 		}
 	}
 
@@ -529,11 +506,8 @@ class ctb_fee_add extends ctb_fee {
 		global $objForm;
 		$this->LoadOldRecord();
 		$this->invoice_id->CurrentValue = $this->invoice_id->FormValue;
-		$this->barang_id->CurrentValue = $this->barang_id->FormValue;
-		$this->harga->CurrentValue = $this->harga->FormValue;
-		$this->qty->CurrentValue = $this->qty->FormValue;
-		$this->satuan->CurrentValue = $this->satuan->FormValue;
-		$this->keterangan->CurrentValue = $this->keterangan->FormValue;
+		$this->pelaksanaan_tgl->CurrentValue = $this->pelaksanaan_tgl->FormValue;
+		$this->pelaksanaan_tgl->CurrentValue = ew_UnFormatDateTime($this->pelaksanaan_tgl->CurrentValue, 7);
 	}
 
 	// Load row based on key values
@@ -565,33 +539,18 @@ class ctb_fee_add extends ctb_fee {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->id->setDbValue($rs->fields('id'));
+		$this->pelaksanaan_id->setDbValue($rs->fields('pelaksanaan_id'));
 		$this->invoice_id->setDbValue($rs->fields('invoice_id'));
-		$this->barang_id->setDbValue($rs->fields('barang_id'));
-		if (array_key_exists('EV__barang_id', $rs->fields)) {
-			$this->barang_id->VirtualValue = $rs->fields('EV__barang_id'); // Set up virtual field value
-		} else {
-			$this->barang_id->VirtualValue = ""; // Clear value
-		}
-		$this->harga->setDbValue($rs->fields('harga'));
-		$this->qty->setDbValue($rs->fields('qty'));
-		$this->satuan->setDbValue($rs->fields('satuan'));
-		$this->jumlah->setDbValue($rs->fields('jumlah'));
-		$this->keterangan->setDbValue($rs->fields('keterangan'));
+		$this->pelaksanaan_tgl->setDbValue($rs->fields('pelaksanaan_tgl'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->id->DbValue = $row['id'];
+		$this->pelaksanaan_id->DbValue = $row['pelaksanaan_id'];
 		$this->invoice_id->DbValue = $row['invoice_id'];
-		$this->barang_id->DbValue = $row['barang_id'];
-		$this->harga->DbValue = $row['harga'];
-		$this->qty->DbValue = $row['qty'];
-		$this->satuan->DbValue = $row['satuan'];
-		$this->jumlah->DbValue = $row['jumlah'];
-		$this->keterangan->DbValue = $row['keterangan'];
+		$this->pelaksanaan_tgl->DbValue = $row['pelaksanaan_tgl'];
 	}
 
 	// Load old record
@@ -599,8 +558,8 @@ class ctb_fee_add extends ctb_fee {
 
 		// Load key values from Session
 		$bValidKey = TRUE;
-		if (strval($this->getKey("id")) <> "")
-			$this->id->CurrentValue = $this->getKey("id"); // id
+		if (strval($this->getKey("pelaksanaan_id")) <> "")
+			$this->pelaksanaan_id->CurrentValue = $this->getKey("pelaksanaan_id"); // pelaksanaan_id
 		else
 			$bValidKey = FALSE;
 
@@ -622,110 +581,39 @@ class ctb_fee_add extends ctb_fee {
 		global $Security, $Language, $gsLanguage;
 
 		// Initialize URLs
-		// Convert decimal values if posted back
-
-		if ($this->harga->FormValue == $this->harga->CurrentValue && is_numeric(ew_StrToFloat($this->harga->CurrentValue)))
-			$this->harga->CurrentValue = ew_StrToFloat($this->harga->CurrentValue);
-
 		// Call Row_Rendering event
+
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// id
+		// pelaksanaan_id
 		// invoice_id
-		// barang_id
-		// harga
-		// qty
-		// satuan
-		// jumlah
-		// keterangan
+		// pelaksanaan_tgl
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
+
+		// pelaksanaan_id
+		$this->pelaksanaan_id->ViewValue = $this->pelaksanaan_id->CurrentValue;
+		$this->pelaksanaan_id->ViewCustomAttributes = "";
 
 		// invoice_id
 		$this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
 		$this->invoice_id->ViewCustomAttributes = "";
 
-		// barang_id
-		if ($this->barang_id->VirtualValue <> "") {
-			$this->barang_id->ViewValue = $this->barang_id->VirtualValue;
-		} else {
-		if (strval($this->barang_id->CurrentValue) <> "") {
-			$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
-		$sWhereWrk = "";
-		$this->barang_id->LookupFilters = array("dx1" => '`nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->barang_id->ViewValue = $this->barang_id->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
-			}
-		} else {
-			$this->barang_id->ViewValue = NULL;
-		}
-		}
-		$this->barang_id->ViewCustomAttributes = "";
-
-		// harga
-		$this->harga->ViewValue = $this->harga->CurrentValue;
-		$this->harga->ViewValue = ew_FormatNumber($this->harga->ViewValue, 2, -2, -2, -1);
-		$this->harga->CellCssStyle .= "text-align: right;";
-		$this->harga->ViewCustomAttributes = "";
-
-		// qty
-		$this->qty->ViewValue = $this->qty->CurrentValue;
-		$this->qty->ViewCustomAttributes = "";
-
-		// satuan
-		$this->satuan->ViewValue = $this->satuan->CurrentValue;
-		$this->satuan->ViewCustomAttributes = "";
-
-		// jumlah
-		$this->jumlah->ViewValue = $this->jumlah->CurrentValue;
-		$this->jumlah->ViewValue = ew_FormatNumber($this->jumlah->ViewValue, 2, -2, -2, -1);
-		$this->jumlah->CellCssStyle .= "text-align: right;";
-		$this->jumlah->ViewCustomAttributes = "";
-
-		// keterangan
-		$this->keterangan->ViewValue = $this->keterangan->CurrentValue;
-		$this->keterangan->ViewCustomAttributes = "";
+		// pelaksanaan_tgl
+		$this->pelaksanaan_tgl->ViewValue = $this->pelaksanaan_tgl->CurrentValue;
+		$this->pelaksanaan_tgl->ViewValue = ew_FormatDateTime($this->pelaksanaan_tgl->ViewValue, 7);
+		$this->pelaksanaan_tgl->ViewCustomAttributes = "";
 
 			// invoice_id
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
 			$this->invoice_id->TooltipValue = "";
 
-			// barang_id
-			$this->barang_id->LinkCustomAttributes = "";
-			$this->barang_id->HrefValue = "";
-			$this->barang_id->TooltipValue = "";
-
-			// harga
-			$this->harga->LinkCustomAttributes = "";
-			$this->harga->HrefValue = "";
-			$this->harga->TooltipValue = "";
-
-			// qty
-			$this->qty->LinkCustomAttributes = "";
-			$this->qty->HrefValue = "";
-			$this->qty->TooltipValue = "";
-
-			// satuan
-			$this->satuan->LinkCustomAttributes = "";
-			$this->satuan->HrefValue = "";
-			$this->satuan->TooltipValue = "";
-
-			// keterangan
-			$this->keterangan->LinkCustomAttributes = "";
-			$this->keterangan->HrefValue = "";
-			$this->keterangan->TooltipValue = "";
+			// pelaksanaan_tgl
+			$this->pelaksanaan_tgl->LinkCustomAttributes = "";
+			$this->pelaksanaan_tgl->HrefValue = "";
+			$this->pelaksanaan_tgl->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
 			// invoice_id
@@ -740,55 +628,11 @@ class ctb_fee_add extends ctb_fee {
 			$this->invoice_id->PlaceHolder = ew_RemoveHtml($this->invoice_id->FldCaption());
 			}
 
-			// barang_id
-			$this->barang_id->EditCustomAttributes = "";
-			if (trim(strval($this->barang_id->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `tb_barang`";
-			$sWhereWrk = "";
-			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$this->barang_id->ViewValue = $this->barang_id->DisplayValue($arwrk);
-			} else {
-				$this->barang_id->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->barang_id->EditValue = $arwrk;
-
-			// harga
-			$this->harga->EditAttrs["class"] = "form-control";
-			$this->harga->EditCustomAttributes = "";
-			$this->harga->EditValue = ew_HtmlEncode($this->harga->CurrentValue);
-			$this->harga->PlaceHolder = ew_RemoveHtml($this->harga->FldCaption());
-			if (strval($this->harga->EditValue) <> "" && is_numeric($this->harga->EditValue)) $this->harga->EditValue = ew_FormatNumber($this->harga->EditValue, -2, -2, -2, -1);
-
-			// qty
-			$this->qty->EditAttrs["class"] = "form-control";
-			$this->qty->EditCustomAttributes = "";
-			$this->qty->EditValue = ew_HtmlEncode($this->qty->CurrentValue);
-			$this->qty->PlaceHolder = ew_RemoveHtml($this->qty->FldCaption());
-
-			// satuan
-			$this->satuan->EditAttrs["class"] = "form-control";
-			$this->satuan->EditCustomAttributes = "";
-			$this->satuan->EditValue = ew_HtmlEncode($this->satuan->CurrentValue);
-			$this->satuan->PlaceHolder = ew_RemoveHtml($this->satuan->FldCaption());
-
-			// keterangan
-			$this->keterangan->EditAttrs["class"] = "form-control";
-			$this->keterangan->EditCustomAttributes = "";
-			$this->keterangan->EditValue = ew_HtmlEncode($this->keterangan->CurrentValue);
-			$this->keterangan->PlaceHolder = ew_RemoveHtml($this->keterangan->FldCaption());
+			// pelaksanaan_tgl
+			$this->pelaksanaan_tgl->EditAttrs["class"] = "form-control";
+			$this->pelaksanaan_tgl->EditCustomAttributes = "";
+			$this->pelaksanaan_tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->pelaksanaan_tgl->CurrentValue, 7));
+			$this->pelaksanaan_tgl->PlaceHolder = ew_RemoveHtml($this->pelaksanaan_tgl->FldCaption());
 
 			// Add refer script
 			// invoice_id
@@ -796,25 +640,9 @@ class ctb_fee_add extends ctb_fee {
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
 
-			// barang_id
-			$this->barang_id->LinkCustomAttributes = "";
-			$this->barang_id->HrefValue = "";
-
-			// harga
-			$this->harga->LinkCustomAttributes = "";
-			$this->harga->HrefValue = "";
-
-			// qty
-			$this->qty->LinkCustomAttributes = "";
-			$this->qty->HrefValue = "";
-
-			// satuan
-			$this->satuan->LinkCustomAttributes = "";
-			$this->satuan->HrefValue = "";
-
-			// keterangan
-			$this->keterangan->LinkCustomAttributes = "";
-			$this->keterangan->HrefValue = "";
+			// pelaksanaan_tgl
+			$this->pelaksanaan_tgl->LinkCustomAttributes = "";
+			$this->pelaksanaan_tgl->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -837,17 +665,17 @@ class ctb_fee_add extends ctb_fee {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
+		if (!$this->invoice_id->FldIsDetailKey && !is_null($this->invoice_id->FormValue) && $this->invoice_id->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->invoice_id->FldCaption(), $this->invoice_id->ReqErrMsg));
+		}
 		if (!ew_CheckInteger($this->invoice_id->FormValue)) {
 			ew_AddMessage($gsFormError, $this->invoice_id->FldErrMsg());
 		}
-		if (!$this->barang_id->FldIsDetailKey && !is_null($this->barang_id->FormValue) && $this->barang_id->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->barang_id->FldCaption(), $this->barang_id->ReqErrMsg));
+		if (!$this->pelaksanaan_tgl->FldIsDetailKey && !is_null($this->pelaksanaan_tgl->FormValue) && $this->pelaksanaan_tgl->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->pelaksanaan_tgl->FldCaption(), $this->pelaksanaan_tgl->ReqErrMsg));
 		}
-		if (!ew_CheckNumber($this->harga->FormValue)) {
-			ew_AddMessage($gsFormError, $this->harga->FldErrMsg());
-		}
-		if (!ew_CheckInteger($this->qty->FormValue)) {
-			ew_AddMessage($gsFormError, $this->qty->FldErrMsg());
+		if (!ew_CheckEuroDate($this->pelaksanaan_tgl->FormValue)) {
+			ew_AddMessage($gsFormError, $this->pelaksanaan_tgl->FldErrMsg());
 		}
 
 		// Return validate result
@@ -894,22 +722,10 @@ class ctb_fee_add extends ctb_fee {
 		$rsnew = array();
 
 		// invoice_id
-		$this->invoice_id->SetDbValueDef($rsnew, $this->invoice_id->CurrentValue, NULL, FALSE);
+		$this->invoice_id->SetDbValueDef($rsnew, $this->invoice_id->CurrentValue, 0, FALSE);
 
-		// barang_id
-		$this->barang_id->SetDbValueDef($rsnew, $this->barang_id->CurrentValue, 0, FALSE);
-
-		// harga
-		$this->harga->SetDbValueDef($rsnew, $this->harga->CurrentValue, NULL, FALSE);
-
-		// qty
-		$this->qty->SetDbValueDef($rsnew, $this->qty->CurrentValue, NULL, FALSE);
-
-		// satuan
-		$this->satuan->SetDbValueDef($rsnew, $this->satuan->CurrentValue, NULL, FALSE);
-
-		// keterangan
-		$this->keterangan->SetDbValueDef($rsnew, $this->keterangan->CurrentValue, NULL, FALSE);
+		// pelaksanaan_tgl
+		$this->pelaksanaan_tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->pelaksanaan_tgl->CurrentValue, 7), ew_CurrentDate(), FALSE);
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -921,8 +737,8 @@ class ctb_fee_add extends ctb_fee {
 			if ($AddRow) {
 
 				// Get insert id if necessary
-				$this->id->setDbValue($conn->Insert_ID());
-				$rsnew['id'] = $this->id->DbValue;
+				$this->pelaksanaan_id->setDbValue($conn->Insert_ID());
+				$rsnew['pelaksanaan_id'] = $this->pelaksanaan_id->DbValue;
 			}
 		} else {
 			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
@@ -1011,7 +827,7 @@ class ctb_fee_add extends ctb_fee {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("tb_feelist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("tb_pelaksanaanlist.php"), "", $this->TableVar, TRUE);
 		$PageId = ($this->CurrentAction == "C") ? "Copy" : "Add";
 		$Breadcrumb->Add("add", $PageId, $url);
 	}
@@ -1021,18 +837,6 @@ class ctb_fee_add extends ctb_fee {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
-		case "x_barang_id":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `barang_id` AS `LinkFld`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
-			$sWhereWrk = "{filter}";
-			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`barang_id` = {filter_value}', "t0" => "3", "fn0" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
 		}
 	}
 
@@ -1046,7 +850,7 @@ class ctb_fee_add extends ctb_fee {
 
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
-		$table = 'tb_fee';
+		$table = 'tb_pelaksanaan';
 		$usr = CurrentUserName();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
@@ -1055,12 +859,12 @@ class ctb_fee_add extends ctb_fee {
 	function WriteAuditTrailOnAdd(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnAdd) return;
-		$table = 'tb_fee';
+		$table = 'tb_pelaksanaan';
 
 		// Get key value
 		$key = "";
 		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rs['id'];
+		$key .= $rs['pelaksanaan_id'];
 
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
@@ -1157,29 +961,29 @@ class ctb_fee_add extends ctb_fee {
 <?php
 
 // Create page object
-if (!isset($tb_fee_add)) $tb_fee_add = new ctb_fee_add();
+if (!isset($tb_pelaksanaan_add)) $tb_pelaksanaan_add = new ctb_pelaksanaan_add();
 
 // Page init
-$tb_fee_add->Page_Init();
+$tb_pelaksanaan_add->Page_Init();
 
 // Page main
-$tb_fee_add->Page_Main();
+$tb_pelaksanaan_add->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$tb_fee_add->Page_Render();
+$tb_pelaksanaan_add->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "add";
-var CurrentForm = ftb_feeadd = new ew_Form("ftb_feeadd", "add");
+var CurrentForm = ftb_pelaksanaanadd = new ew_Form("ftb_pelaksanaanadd", "add");
 
 // Validate form
-ftb_feeadd.Validate = function() {
+ftb_pelaksanaanadd.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -1194,17 +998,17 @@ ftb_feeadd.Validate = function() {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
 			elm = this.GetElements("x" + infix + "_invoice_id");
-			if (elm && !ew_CheckInteger(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($tb_fee->invoice_id->FldErrMsg()) ?>");
-			elm = this.GetElements("x" + infix + "_barang_id");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $tb_fee->barang_id->FldCaption(), $tb_fee->barang_id->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_harga");
-			if (elm && !ew_CheckNumber(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($tb_fee->harga->FldErrMsg()) ?>");
-			elm = this.GetElements("x" + infix + "_qty");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $tb_pelaksanaan->invoice_id->FldCaption(), $tb_pelaksanaan->invoice_id->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_invoice_id");
 			if (elm && !ew_CheckInteger(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($tb_fee->qty->FldErrMsg()) ?>");
+				return this.OnError(elm, "<?php echo ew_JsEncode2($tb_pelaksanaan->invoice_id->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_pelaksanaan_tgl");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $tb_pelaksanaan->pelaksanaan_tgl->FldCaption(), $tb_pelaksanaan->pelaksanaan_tgl->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_pelaksanaan_tgl");
+			if (elm && !ew_CheckEuroDate(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($tb_pelaksanaan->pelaksanaan_tgl->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -1223,7 +1027,7 @@ ftb_feeadd.Validate = function() {
 }
 
 // Form_CustomValidate event
-ftb_feeadd.Form_CustomValidate = 
+ftb_pelaksanaanadd.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -1232,133 +1036,92 @@ ftb_feeadd.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ftb_feeadd.ValidateRequired = true;
+ftb_pelaksanaanadd.ValidateRequired = true;
 <?php } else { ?>
-ftb_feeadd.ValidateRequired = false; 
+ftb_pelaksanaanadd.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-ftb_feeadd.Lists["x_barang_id"] = {"LinkField":"x_barang_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"tb_barang"};
-
 // Form object for search
+
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php if (!$tb_fee_add->IsModal) { ?>
+<?php if (!$tb_pelaksanaan_add->IsModal) { ?>
 <div class="ewToolbar">
 <?php $Breadcrumb->Render(); ?>
 <?php echo $Language->SelectionForm(); ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<?php $tb_fee_add->ShowPageHeader(); ?>
+<?php $tb_pelaksanaan_add->ShowPageHeader(); ?>
 <?php
-$tb_fee_add->ShowMessage();
+$tb_pelaksanaan_add->ShowMessage();
 ?>
-<form name="ftb_feeadd" id="ftb_feeadd" class="<?php echo $tb_fee_add->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($tb_fee_add->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_fee_add->Token ?>">
+<form name="ftb_pelaksanaanadd" id="ftb_pelaksanaanadd" class="<?php echo $tb_pelaksanaan_add->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($tb_pelaksanaan_add->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_pelaksanaan_add->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="tb_fee">
+<input type="hidden" name="t" value="tb_pelaksanaan">
 <input type="hidden" name="a_add" id="a_add" value="A">
-<?php if ($tb_fee_add->IsModal) { ?>
+<?php if ($tb_pelaksanaan_add->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<?php if ($tb_fee->getCurrentMasterTable() == "tb_invoice") { ?>
+<?php if ($tb_pelaksanaan->getCurrentMasterTable() == "tb_invoice") { ?>
 <input type="hidden" name="<?php echo EW_TABLE_SHOW_MASTER ?>" value="tb_invoice">
-<input type="hidden" name="fk_id" value="<?php echo $tb_fee->invoice_id->getSessionValue() ?>">
+<input type="hidden" name="fk_id" value="<?php echo $tb_pelaksanaan->invoice_id->getSessionValue() ?>">
 <?php } ?>
 <div>
-<?php if ($tb_fee->invoice_id->Visible) { // invoice_id ?>
+<?php if ($tb_pelaksanaan->invoice_id->Visible) { // invoice_id ?>
 	<div id="r_invoice_id" class="form-group">
-		<label id="elh_tb_fee_invoice_id" for="x_invoice_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_fee->invoice_id->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $tb_fee->invoice_id->CellAttributes() ?>>
-<?php if ($tb_fee->invoice_id->getSessionValue() <> "") { ?>
-<span id="el_tb_fee_invoice_id">
-<span<?php echo $tb_fee->invoice_id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $tb_fee->invoice_id->ViewValue ?></p></span>
+		<label id="elh_tb_pelaksanaan_invoice_id" for="x_invoice_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_pelaksanaan->invoice_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $tb_pelaksanaan->invoice_id->CellAttributes() ?>>
+<?php if ($tb_pelaksanaan->invoice_id->getSessionValue() <> "") { ?>
+<span id="el_tb_pelaksanaan_invoice_id">
+<span<?php echo $tb_pelaksanaan->invoice_id->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $tb_pelaksanaan->invoice_id->ViewValue ?></p></span>
 </span>
-<input type="hidden" id="x_invoice_id" name="x_invoice_id" value="<?php echo ew_HtmlEncode($tb_fee->invoice_id->CurrentValue) ?>">
+<input type="hidden" id="x_invoice_id" name="x_invoice_id" value="<?php echo ew_HtmlEncode($tb_pelaksanaan->invoice_id->CurrentValue) ?>">
 <?php } else { ?>
-<span id="el_tb_fee_invoice_id">
-<input type="text" data-table="tb_fee" data-field="x_invoice_id" name="x_invoice_id" id="x_invoice_id" size="30" placeholder="<?php echo ew_HtmlEncode($tb_fee->invoice_id->getPlaceHolder()) ?>" value="<?php echo $tb_fee->invoice_id->EditValue ?>"<?php echo $tb_fee->invoice_id->EditAttributes() ?>>
+<span id="el_tb_pelaksanaan_invoice_id">
+<input type="text" data-table="tb_pelaksanaan" data-field="x_invoice_id" name="x_invoice_id" id="x_invoice_id" size="30" placeholder="<?php echo ew_HtmlEncode($tb_pelaksanaan->invoice_id->getPlaceHolder()) ?>" value="<?php echo $tb_pelaksanaan->invoice_id->EditValue ?>"<?php echo $tb_pelaksanaan->invoice_id->EditAttributes() ?>>
 </span>
 <?php } ?>
-<?php echo $tb_fee->invoice_id->CustomMsg ?></div></div>
+<?php echo $tb_pelaksanaan->invoice_id->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
-<?php if ($tb_fee->barang_id->Visible) { // barang_id ?>
-	<div id="r_barang_id" class="form-group">
-		<label id="elh_tb_fee_barang_id" for="x_barang_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_fee->barang_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="col-sm-10"><div<?php echo $tb_fee->barang_id->CellAttributes() ?>>
-<span id="el_tb_fee_barang_id">
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_barang_id"><?php echo (strval($tb_fee->barang_id->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $tb_fee->barang_id->ViewValue); ?></span>
-</span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($tb_fee->barang_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_barang_id',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="tb_fee" data-field="x_barang_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $tb_fee->barang_id->DisplayValueSeparatorAttribute() ?>" name="x_barang_id" id="x_barang_id" value="<?php echo $tb_fee->barang_id->CurrentValue ?>"<?php echo $tb_fee->barang_id->EditAttributes() ?>>
-<input type="hidden" name="s_x_barang_id" id="s_x_barang_id" value="<?php echo $tb_fee->barang_id->LookupFilterQuery() ?>">
-</span>
-<?php echo $tb_fee->barang_id->CustomMsg ?></div></div>
-	</div>
+<?php if ($tb_pelaksanaan->pelaksanaan_tgl->Visible) { // pelaksanaan_tgl ?>
+	<div id="r_pelaksanaan_tgl" class="form-group">
+		<label id="elh_tb_pelaksanaan_pelaksanaan_tgl" for="x_pelaksanaan_tgl" class="col-sm-2 control-label ewLabel"><?php echo $tb_pelaksanaan->pelaksanaan_tgl->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $tb_pelaksanaan->pelaksanaan_tgl->CellAttributes() ?>>
+<span id="el_tb_pelaksanaan_pelaksanaan_tgl">
+<input type="text" data-table="tb_pelaksanaan" data-field="x_pelaksanaan_tgl" data-format="7" name="x_pelaksanaan_tgl" id="x_pelaksanaan_tgl" placeholder="<?php echo ew_HtmlEncode($tb_pelaksanaan->pelaksanaan_tgl->getPlaceHolder()) ?>" value="<?php echo $tb_pelaksanaan->pelaksanaan_tgl->EditValue ?>"<?php echo $tb_pelaksanaan->pelaksanaan_tgl->EditAttributes() ?>>
+<?php if (!$tb_pelaksanaan->pelaksanaan_tgl->ReadOnly && !$tb_pelaksanaan->pelaksanaan_tgl->Disabled && !isset($tb_pelaksanaan->pelaksanaan_tgl->EditAttrs["readonly"]) && !isset($tb_pelaksanaan->pelaksanaan_tgl->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateCalendar("ftb_pelaksanaanadd", "x_pelaksanaan_tgl", 7);
+</script>
 <?php } ?>
-<?php if ($tb_fee->harga->Visible) { // harga ?>
-	<div id="r_harga" class="form-group">
-		<label id="elh_tb_fee_harga" for="x_harga" class="col-sm-2 control-label ewLabel"><?php echo $tb_fee->harga->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $tb_fee->harga->CellAttributes() ?>>
-<span id="el_tb_fee_harga">
-<input type="text" data-table="tb_fee" data-field="x_harga" name="x_harga" id="x_harga" size="30" placeholder="<?php echo ew_HtmlEncode($tb_fee->harga->getPlaceHolder()) ?>" value="<?php echo $tb_fee->harga->EditValue ?>"<?php echo $tb_fee->harga->EditAttributes() ?>>
 </span>
-<?php echo $tb_fee->harga->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
-<?php if ($tb_fee->qty->Visible) { // qty ?>
-	<div id="r_qty" class="form-group">
-		<label id="elh_tb_fee_qty" for="x_qty" class="col-sm-2 control-label ewLabel"><?php echo $tb_fee->qty->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $tb_fee->qty->CellAttributes() ?>>
-<span id="el_tb_fee_qty">
-<input type="text" data-table="tb_fee" data-field="x_qty" name="x_qty" id="x_qty" size="30" placeholder="<?php echo ew_HtmlEncode($tb_fee->qty->getPlaceHolder()) ?>" value="<?php echo $tb_fee->qty->EditValue ?>"<?php echo $tb_fee->qty->EditAttributes() ?>>
-</span>
-<?php echo $tb_fee->qty->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
-<?php if ($tb_fee->satuan->Visible) { // satuan ?>
-	<div id="r_satuan" class="form-group">
-		<label id="elh_tb_fee_satuan" for="x_satuan" class="col-sm-2 control-label ewLabel"><?php echo $tb_fee->satuan->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $tb_fee->satuan->CellAttributes() ?>>
-<span id="el_tb_fee_satuan">
-<input type="text" data-table="tb_fee" data-field="x_satuan" name="x_satuan" id="x_satuan" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($tb_fee->satuan->getPlaceHolder()) ?>" value="<?php echo $tb_fee->satuan->EditValue ?>"<?php echo $tb_fee->satuan->EditAttributes() ?>>
-</span>
-<?php echo $tb_fee->satuan->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
-<?php if ($tb_fee->keterangan->Visible) { // keterangan ?>
-	<div id="r_keterangan" class="form-group">
-		<label id="elh_tb_fee_keterangan" for="x_keterangan" class="col-sm-2 control-label ewLabel"><?php echo $tb_fee->keterangan->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $tb_fee->keterangan->CellAttributes() ?>>
-<span id="el_tb_fee_keterangan">
-<textarea data-table="tb_fee" data-field="x_keterangan" name="x_keterangan" id="x_keterangan" cols="35" rows="4" placeholder="<?php echo ew_HtmlEncode($tb_fee->keterangan->getPlaceHolder()) ?>"<?php echo $tb_fee->keterangan->EditAttributes() ?>><?php echo $tb_fee->keterangan->EditValue ?></textarea>
-</span>
-<?php echo $tb_fee->keterangan->CustomMsg ?></div></div>
+<?php echo $tb_pelaksanaan->pelaksanaan_tgl->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div>
-<?php if (!$tb_fee_add->IsModal) { ?>
+<?php if (!$tb_pelaksanaan_add->IsModal) { ?>
 <div class="form-group">
 	<div class="col-sm-offset-2 col-sm-10">
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("AddBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $tb_fee_add->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $tb_pelaksanaan_add->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
 	</div>
 </div>
 <?php } ?>
 </form>
 <script type="text/javascript">
-ftb_feeadd.Init();
+ftb_pelaksanaanadd.Init();
 </script>
 <?php
-$tb_fee_add->ShowPageFooter();
+$tb_pelaksanaan_add->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -1370,5 +1133,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$tb_fee_add->Page_Terminate();
+$tb_pelaksanaan_add->Page_Terminate();
 ?>

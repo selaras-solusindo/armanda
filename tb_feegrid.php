@@ -374,8 +374,13 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowCnt);
 <span<?php echo $tb_fee->invoice_id->ViewAttributes() ?>>
 <?php echo $tb_fee->invoice_id->ListViewValue() ?></span>
 </span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_fee" data-field="x_invoice_id" name="x<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" id="x<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" value="<?php echo ew_HtmlEncode($tb_fee->invoice_id->FormValue) ?>">
 <input type="hidden" data-table="tb_fee" data-field="x_invoice_id" name="o<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" id="o<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" value="<?php echo ew_HtmlEncode($tb_fee->invoice_id->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_invoice_id" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" value="<?php echo ew_HtmlEncode($tb_fee->invoice_id->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_invoice_id" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_invoice_id" value="<?php echo ew_HtmlEncode($tb_fee->invoice_id->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 <a id="<?php echo $tb_fee_grid->PageObjName . "_row_" . $tb_fee_grid->RowCnt ?>"></a></td>
 	<?php } ?>
@@ -414,8 +419,13 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowCnt);
 <span<?php echo $tb_fee->barang_id->ViewAttributes() ?>>
 <?php echo $tb_fee->barang_id->ListViewValue() ?></span>
 </span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_fee" data-field="x_barang_id" name="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->FormValue) ?>">
 <input type="hidden" data-table="tb_fee" data-field="x_barang_id" name="o<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="o<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_barang_id" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_barang_id" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_barang_id" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_barang_id" value="<?php echo ew_HtmlEncode($tb_fee->barang_id->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 </td>
 	<?php } ?>
@@ -437,8 +447,13 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowCnt);
 <span<?php echo $tb_fee->harga->ViewAttributes() ?>>
 <?php echo $tb_fee->harga->ListViewValue() ?></span>
 </span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_fee" data-field="x_harga" name="x<?php echo $tb_fee_grid->RowIndex ?>_harga" id="x<?php echo $tb_fee_grid->RowIndex ?>_harga" value="<?php echo ew_HtmlEncode($tb_fee->harga->FormValue) ?>">
 <input type="hidden" data-table="tb_fee" data-field="x_harga" name="o<?php echo $tb_fee_grid->RowIndex ?>_harga" id="o<?php echo $tb_fee_grid->RowIndex ?>_harga" value="<?php echo ew_HtmlEncode($tb_fee->harga->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_harga" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_harga" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_harga" value="<?php echo ew_HtmlEncode($tb_fee->harga->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_harga" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_harga" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_harga" value="<?php echo ew_HtmlEncode($tb_fee->harga->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 </td>
 	<?php } ?>
@@ -460,8 +475,13 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowCnt);
 <span<?php echo $tb_fee->qty->ViewAttributes() ?>>
 <?php echo $tb_fee->qty->ListViewValue() ?></span>
 </span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_fee" data-field="x_qty" name="x<?php echo $tb_fee_grid->RowIndex ?>_qty" id="x<?php echo $tb_fee_grid->RowIndex ?>_qty" value="<?php echo ew_HtmlEncode($tb_fee->qty->FormValue) ?>">
 <input type="hidden" data-table="tb_fee" data-field="x_qty" name="o<?php echo $tb_fee_grid->RowIndex ?>_qty" id="o<?php echo $tb_fee_grid->RowIndex ?>_qty" value="<?php echo ew_HtmlEncode($tb_fee->qty->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_qty" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_qty" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_qty" value="<?php echo ew_HtmlEncode($tb_fee->qty->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_qty" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_qty" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_qty" value="<?php echo ew_HtmlEncode($tb_fee->qty->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 </td>
 	<?php } ?>
@@ -483,8 +503,13 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowCnt);
 <span<?php echo $tb_fee->satuan->ViewAttributes() ?>>
 <?php echo $tb_fee->satuan->ListViewValue() ?></span>
 </span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_fee" data-field="x_satuan" name="x<?php echo $tb_fee_grid->RowIndex ?>_satuan" id="x<?php echo $tb_fee_grid->RowIndex ?>_satuan" value="<?php echo ew_HtmlEncode($tb_fee->satuan->FormValue) ?>">
 <input type="hidden" data-table="tb_fee" data-field="x_satuan" name="o<?php echo $tb_fee_grid->RowIndex ?>_satuan" id="o<?php echo $tb_fee_grid->RowIndex ?>_satuan" value="<?php echo ew_HtmlEncode($tb_fee->satuan->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_satuan" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_satuan" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_satuan" value="<?php echo ew_HtmlEncode($tb_fee->satuan->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_satuan" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_satuan" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_satuan" value="<?php echo ew_HtmlEncode($tb_fee->satuan->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 </td>
 	<?php } ?>
@@ -506,8 +531,13 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowCnt);
 <span<?php echo $tb_fee->jumlah->ViewAttributes() ?>>
 <?php echo $tb_fee->jumlah->ListViewValue() ?></span>
 </span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_fee" data-field="x_jumlah" name="x<?php echo $tb_fee_grid->RowIndex ?>_jumlah" id="x<?php echo $tb_fee_grid->RowIndex ?>_jumlah" value="<?php echo ew_HtmlEncode($tb_fee->jumlah->FormValue) ?>">
 <input type="hidden" data-table="tb_fee" data-field="x_jumlah" name="o<?php echo $tb_fee_grid->RowIndex ?>_jumlah" id="o<?php echo $tb_fee_grid->RowIndex ?>_jumlah" value="<?php echo ew_HtmlEncode($tb_fee->jumlah->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_jumlah" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_jumlah" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_jumlah" value="<?php echo ew_HtmlEncode($tb_fee->jumlah->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_jumlah" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_jumlah" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_jumlah" value="<?php echo ew_HtmlEncode($tb_fee->jumlah->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 </td>
 	<?php } ?>
@@ -529,8 +559,13 @@ $tb_fee_grid->ListOptions->Render("body", "left", $tb_fee_grid->RowCnt);
 <span<?php echo $tb_fee->keterangan->ViewAttributes() ?>>
 <?php echo $tb_fee->keterangan->ListViewValue() ?></span>
 </span>
+<?php if ($tb_fee->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_fee" data-field="x_keterangan" name="x<?php echo $tb_fee_grid->RowIndex ?>_keterangan" id="x<?php echo $tb_fee_grid->RowIndex ?>_keterangan" value="<?php echo ew_HtmlEncode($tb_fee->keterangan->FormValue) ?>">
 <input type="hidden" data-table="tb_fee" data-field="x_keterangan" name="o<?php echo $tb_fee_grid->RowIndex ?>_keterangan" id="o<?php echo $tb_fee_grid->RowIndex ?>_keterangan" value="<?php echo ew_HtmlEncode($tb_fee->keterangan->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_fee" data-field="x_keterangan" name="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_keterangan" id="ftb_feegrid$x<?php echo $tb_fee_grid->RowIndex ?>_keterangan" value="<?php echo ew_HtmlEncode($tb_fee->keterangan->FormValue) ?>">
+<input type="hidden" data-table="tb_fee" data-field="x_keterangan" name="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_keterangan" id="ftb_feegrid$o<?php echo $tb_fee_grid->RowIndex ?>_keterangan" value="<?php echo ew_HtmlEncode($tb_fee->keterangan->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 </td>
 	<?php } ?>

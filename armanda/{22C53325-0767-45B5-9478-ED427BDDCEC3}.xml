@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<configuration date="2017/01/04" author="e.World Technology Ltd.">
-<project id="{22C53325-0767-45B5-9478-ED427BDDCEC3}" file="D:\xampp\htdocs\armanda\armanda.prp" name="armanda" product="PHPReportMaker" version="9.0" datetime="2017/01/04 23:45:59" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
+<configuration date="2017/01/09" author="e.World Technology Ltd.">
+<project id="{22C53325-0767-45B5-9478-ED427BDDCEC3}" file="D:\xampp\htdocs\armanda\armanda.prp" name="armanda" product="PHPReportMaker" version="9.0" datetime="2017/01/09 16:30:39" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
 <table id="option_values" name="option_values" caption="option values" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1"/>
 <table id="options" name="options" caption="options" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1"/>
 <table id="products" name="products" caption="products" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1"/>
@@ -19,4 +19,5 @@
 <table id="Report3" name="Report3" caption="Report 3" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1"/>
 <table id="Report4" name="Report4" caption="Invoice (PPN)" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1"/>
 <table id="tb_user" name="tb_user" caption="tb user" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1"/>
+<table id="tb_pelaksanaan" name="tb_pelaksanaan" caption="tb pelaksanaan" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1"/>
 </project></configuration>

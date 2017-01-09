@@ -49,7 +49,7 @@ class ctb_invoice extends cTable {
 		$this->DetailAdd = TRUE; // Allow detail add
 		$this->DetailEdit = TRUE; // Allow detail edit
 		$this->DetailView = TRUE; // Allow detail view
-		$this->ShowMultipleDetails = FALSE; // Show multiple details
+		$this->ShowMultipleDetails = TRUE; // Show multiple details
 		$this->GridAddRowCount = 5;
 		$this->AllowAddDeleteRow = ew_AllowAddDeleteRow(); // Allow add/delete row
 		$this->UserIDAllowSecurity = 104; // User ID Allow
@@ -62,7 +62,7 @@ class ctb_invoice extends cTable {
 		$this->fields['id'] = &$this->id;
 
 		// customer_id
-		$this->customer_id = new cField('tb_invoice', 'tb_invoice', 'x_customer_id', 'customer_id', '`customer_id`', '`customer_id`', 3, -1, FALSE, '`customer_id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'SELECT');
+		$this->customer_id = new cField('tb_invoice', 'tb_invoice', 'x_customer_id', 'customer_id', '`customer_id`', '`customer_id`', 3, -1, FALSE, '`EV__customer_id`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'SELECT');
 		$this->customer_id->Sortable = TRUE; // Allow sort
 		$this->customer_id->UsePleaseSelect = TRUE; // Use PleaseSelect by default
 		$this->customer_id->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
@@ -75,7 +75,7 @@ class ctb_invoice extends cTable {
 		$this->fields['no_invoice'] = &$this->no_invoice;
 
 		// tgl_invoice
-		$this->tgl_invoice = new cField('tb_invoice', 'tb_invoice', 'x_tgl_invoice', 'tgl_invoice', '`tgl_invoice`', 'DATE_FORMAT(`tgl_invoice`, \'%Y/%m/%d\')', 133, 7, FALSE, '`tgl_invoice`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->tgl_invoice = new cField('tb_invoice', 'tb_invoice', 'x_tgl_invoice', 'tgl_invoice', '`tgl_invoice`', ew_CastDateFieldForLike('`tgl_invoice`', 7, "DB"), 133, 7, FALSE, '`tgl_invoice`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->tgl_invoice->Sortable = TRUE; // Allow sort
 		$this->tgl_invoice->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
 		$this->fields['tgl_invoice'] = &$this->tgl_invoice;
@@ -96,8 +96,8 @@ class ctb_invoice extends cTable {
 		$this->fields['kegiatan'] = &$this->kegiatan;
 
 		// tgl_pelaksanaan
-		$this->tgl_pelaksanaan = new cField('tb_invoice', 'tb_invoice', 'x_tgl_pelaksanaan', 'tgl_pelaksanaan', '`tgl_pelaksanaan`', 'DATE_FORMAT(`tgl_pelaksanaan`, \'%Y/%m/%d\')', 133, 7, FALSE, '`tgl_pelaksanaan`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->tgl_pelaksanaan->Sortable = TRUE; // Allow sort
+		$this->tgl_pelaksanaan = new cField('tb_invoice', 'tb_invoice', 'x_tgl_pelaksanaan', 'tgl_pelaksanaan', '`tgl_pelaksanaan`', ew_CastDateFieldForLike('`tgl_pelaksanaan`', 7, "DB"), 133, 7, FALSE, '`tgl_pelaksanaan`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->tgl_pelaksanaan->Sortable = FALSE; // Allow sort
 		$this->tgl_pelaksanaan->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
 		$this->fields['tgl_pelaksanaan'] = &$this->tgl_pelaksanaan;
 
@@ -172,9 +172,20 @@ class ctb_invoice extends cTable {
 			}
 			$ofld->setSort($sThisSort);
 			$this->setSessionOrderBy($sSortField . " " . $sThisSort); // Save to Session
+			$sSortFieldList = ($ofld->FldVirtualExpression <> "") ? $ofld->FldVirtualExpression : $sSortField;
+			$this->setSessionOrderByList($sSortFieldList . " " . $sThisSort); // Save to Session
 		} else {
 			$ofld->setSort("");
 		}
+	}
+
+	// Session ORDER BY for List page
+	function getSessionOrderByList() {
+		return @$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST];
+	}
+
+	function setSessionOrderByList($v) {
+		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST] = $v;
 	}
 
 	// Current detail table name
@@ -193,6 +204,10 @@ class ctb_invoice extends cTable {
 		$sDetailUrl = "";
 		if ($this->getCurrentDetailTable() == "tb_fee") {
 			$sDetailUrl = $GLOBALS["tb_fee"]->GetListUrl() . "?" . EW_TABLE_SHOW_MASTER . "=" . $this->TableVar;
+			$sDetailUrl .= "&fk_id=" . urlencode($this->id->CurrentValue);
+		}
+		if ($this->getCurrentDetailTable() == "tb_pelaksanaan") {
+			$sDetailUrl = $GLOBALS["tb_pelaksanaan"]->GetListUrl() . "?" . EW_TABLE_SHOW_MASTER . "=" . $this->TableVar;
 			$sDetailUrl .= "&fk_id=" . urlencode($this->id->CurrentValue);
 		}
 		if ($sDetailUrl == "") {
@@ -227,6 +242,23 @@ class ctb_invoice extends cTable {
 
 	function setSqlSelect($v) {
 		$this->_SqlSelect = $v;
+	}
+	var $_SqlSelectList = "";
+
+	function getSqlSelectList() { // Select for List page
+		$select = "";
+		$select = "SELECT * FROM (" .
+			"SELECT *, (SELECT `nama` FROM `tb_customer` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `tb_invoice`.`customer_id` LIMIT 1) AS `EV__customer_id` FROM `tb_invoice`" .
+			") `EW_TMP_TABLE`";
+		return ($this->_SqlSelectList <> "") ? $this->_SqlSelectList : $select;
+	}
+
+	function SqlSelectList() { // For backward compatibility
+		return $this->getSqlSelectList();
+	}
+
+	function setSqlSelectList($v) {
+		$this->_SqlSelectList = $v;
 	}
 	var $_SqlWhere = "";
 
@@ -339,15 +371,38 @@ class ctb_invoice extends cTable {
 		ew_AddFilter($sFilter, $this->CurrentFilter);
 		$sFilter = $this->ApplyUserIDFilters($sFilter);
 		$this->Recordset_Selecting($sFilter);
-		$sSort = $this->getSessionOrderBy();
-		return ew_BuildSelectSql($this->getSqlSelect(), $this->getSqlWhere(), $this->getSqlGroupBy(),
-			$this->getSqlHaving(), $this->getSqlOrderBy(), $sFilter, $sSort);
+		if ($this->UseVirtualFields()) {
+			$sSort = $this->getSessionOrderByList();
+			return ew_BuildSelectSql($this->getSqlSelectList(), $this->getSqlWhere(), $this->getSqlGroupBy(),
+				$this->getSqlHaving(), $this->getSqlOrderBy(), $sFilter, $sSort);
+		} else {
+			$sSort = $this->getSessionOrderBy();
+			return ew_BuildSelectSql($this->getSqlSelect(), $this->getSqlWhere(), $this->getSqlGroupBy(),
+				$this->getSqlHaving(), $this->getSqlOrderBy(), $sFilter, $sSort);
+		}
 	}
 
 	// Get ORDER BY clause
 	function GetOrderBy() {
-		$sSort = $this->getSessionOrderBy();
+		$sSort = ($this->UseVirtualFields()) ? $this->getSessionOrderByList() : $this->getSessionOrderBy();
 		return ew_BuildSelectSql("", "", "", "", $this->getSqlOrderBy(), "", $sSort);
+	}
+
+	// Check if virtual fields is used in SQL
+	function UseVirtualFields() {
+		$sWhere = $this->getSessionWhere();
+		$sOrderBy = $this->getSessionOrderByList();
+		if ($sWhere <> "")
+			$sWhere = " " . str_replace(array("(",")"), array("",""), $sWhere) . " ";
+		if ($sOrderBy <> "")
+			$sOrderBy = " " . str_replace(array("(",")"), array("",""), $sOrderBy) . " ";
+		if ($this->customer_id->AdvancedSearch->SearchValue <> "" ||
+			$this->customer_id->AdvancedSearch->SearchValue2 <> "" ||
+			strpos($sWhere, " " . $this->customer_id->FldVirtualExpression . " ") !== FALSE)
+			return TRUE;
+		if (strpos($sOrderBy, " " . $this->customer_id->FldVirtualExpression . " ") !== FALSE)
+			return TRUE;
+		return FALSE;
 	}
 
 	// Try to get record count
@@ -449,6 +504,38 @@ class ctb_invoice extends cTable {
 	// Update
 	function Update(&$rs, $where = "", $rsold = NULL, $curfilter = TRUE) {
 		$conn = &$this->Connection();
+
+		// Cascade Update detail table 'tb_fee'
+		$bCascadeUpdate = FALSE;
+		$rscascade = array();
+		if (!is_null($rsold) && (isset($rs['id']) && $rsold['id'] <> $rs['id'])) { // Update detail field 'invoice_id'
+			$bCascadeUpdate = TRUE;
+			$rscascade['invoice_id'] = $rs['id']; 
+		}
+		if ($bCascadeUpdate) {
+			if (!isset($GLOBALS["tb_fee"])) $GLOBALS["tb_fee"] = new ctb_fee();
+			$rswrk = $GLOBALS["tb_fee"]->LoadRs("`invoice_id` = " . ew_QuotedValue($rsold['id'], EW_DATATYPE_NUMBER, 'DB')); 
+			while ($rswrk && !$rswrk->EOF) {
+				$GLOBALS["tb_fee"]->Update($rscascade, "`invoice_id` = " . ew_QuotedValue($rsold['id'], EW_DATATYPE_NUMBER, 'DB'), $rswrk->fields);
+				$rswrk->MoveNext();
+			}
+		}
+
+		// Cascade Update detail table 'tb_pelaksanaan'
+		$bCascadeUpdate = FALSE;
+		$rscascade = array();
+		if (!is_null($rsold) && (isset($rs['id']) && $rsold['id'] <> $rs['id'])) { // Update detail field 'invoice_id'
+			$bCascadeUpdate = TRUE;
+			$rscascade['invoice_id'] = $rs['id']; 
+		}
+		if ($bCascadeUpdate) {
+			if (!isset($GLOBALS["tb_pelaksanaan"])) $GLOBALS["tb_pelaksanaan"] = new ctb_pelaksanaan();
+			$rswrk = $GLOBALS["tb_pelaksanaan"]->LoadRs("`invoice_id` = " . ew_QuotedValue($rsold['id'], EW_DATATYPE_NUMBER, 'DB')); 
+			while ($rswrk && !$rswrk->EOF) {
+				$GLOBALS["tb_pelaksanaan"]->Update($rscascade, "`invoice_id` = " . ew_QuotedValue($rsold['id'], EW_DATATYPE_NUMBER, 'DB'), $rswrk->fields);
+				$rswrk->MoveNext();
+			}
+		}
 		return $conn->Execute($this->UpdateSQL($rs, $where, $curfilter));
 	}
 
@@ -473,6 +560,22 @@ class ctb_invoice extends cTable {
 	// Delete
 	function Delete(&$rs, $where = "", $curfilter = TRUE) {
 		$conn = &$this->Connection();
+
+		// Cascade delete detail table 'tb_fee'
+		if (!isset($GLOBALS["tb_fee"])) $GLOBALS["tb_fee"] = new ctb_fee();
+		$rscascade = $GLOBALS["tb_fee"]->LoadRs("`invoice_id` = " . ew_QuotedValue($rs['id'], EW_DATATYPE_NUMBER, "DB")); 
+		while ($rscascade && !$rscascade->EOF) {
+			$GLOBALS["tb_fee"]->Delete($rscascade->fields);
+			$rscascade->MoveNext();
+		}
+
+		// Cascade delete detail table 'tb_pelaksanaan'
+		if (!isset($GLOBALS["tb_pelaksanaan"])) $GLOBALS["tb_pelaksanaan"] = new ctb_pelaksanaan();
+		$rscascade = $GLOBALS["tb_pelaksanaan"]->LoadRs("`invoice_id` = " . ew_QuotedValue($rs['id'], EW_DATATYPE_NUMBER, "DB")); 
+		while ($rscascade && !$rscascade->EOF) {
+			$GLOBALS["tb_pelaksanaan"]->Delete($rscascade->fields);
+			$rscascade->MoveNext();
+		}
 		return $conn->Execute($this->DeleteSQL($rs, $where, $curfilter));
 	}
 
@@ -699,6 +802,9 @@ class ctb_invoice extends cTable {
 		// no_referensi
 		// kegiatan
 		// tgl_pelaksanaan
+
+		$this->tgl_pelaksanaan->CellCssStyle = "white-space: nowrap;";
+
 		// no_sertifikat
 		// keterangan
 		// total
@@ -714,11 +820,14 @@ class ctb_invoice extends cTable {
 		$this->id->ViewCustomAttributes = "";
 
 		// customer_id
+		if ($this->customer_id->VirtualValue <> "") {
+			$this->customer_id->ViewValue = $this->customer_id->VirtualValue;
+		} else {
 		if (strval($this->customer_id->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->customer_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_customer`";
 		$sWhereWrk = "";
-		$this->customer_id->LookupFilters = array();
+		$this->customer_id->LookupFilters = array("dx1" => '`nama`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -733,6 +842,7 @@ class ctb_invoice extends cTable {
 			}
 		} else {
 			$this->customer_id->ViewValue = NULL;
+		}
 		}
 		$this->customer_id->ViewCustomAttributes = "";
 
@@ -1037,7 +1147,6 @@ class ctb_invoice extends cTable {
 					if ($this->no_order->Exportable) $Doc->ExportCaption($this->no_order);
 					if ($this->no_referensi->Exportable) $Doc->ExportCaption($this->no_referensi);
 					if ($this->kegiatan->Exportable) $Doc->ExportCaption($this->kegiatan);
-					if ($this->tgl_pelaksanaan->Exportable) $Doc->ExportCaption($this->tgl_pelaksanaan);
 					if ($this->no_sertifikat->Exportable) $Doc->ExportCaption($this->no_sertifikat);
 					if ($this->keterangan->Exportable) $Doc->ExportCaption($this->keterangan);
 					if ($this->total->Exportable) $Doc->ExportCaption($this->total);
@@ -1054,7 +1163,6 @@ class ctb_invoice extends cTable {
 					if ($this->no_order->Exportable) $Doc->ExportCaption($this->no_order);
 					if ($this->no_referensi->Exportable) $Doc->ExportCaption($this->no_referensi);
 					if ($this->kegiatan->Exportable) $Doc->ExportCaption($this->kegiatan);
-					if ($this->tgl_pelaksanaan->Exportable) $Doc->ExportCaption($this->tgl_pelaksanaan);
 					if ($this->no_sertifikat->Exportable) $Doc->ExportCaption($this->no_sertifikat);
 					if ($this->keterangan->Exportable) $Doc->ExportCaption($this->keterangan);
 					if ($this->total->Exportable) $Doc->ExportCaption($this->total);
@@ -1101,7 +1209,6 @@ class ctb_invoice extends cTable {
 						if ($this->no_order->Exportable) $Doc->ExportField($this->no_order);
 						if ($this->no_referensi->Exportable) $Doc->ExportField($this->no_referensi);
 						if ($this->kegiatan->Exportable) $Doc->ExportField($this->kegiatan);
-						if ($this->tgl_pelaksanaan->Exportable) $Doc->ExportField($this->tgl_pelaksanaan);
 						if ($this->no_sertifikat->Exportable) $Doc->ExportField($this->no_sertifikat);
 						if ($this->keterangan->Exportable) $Doc->ExportField($this->keterangan);
 						if ($this->total->Exportable) $Doc->ExportField($this->total);
@@ -1118,7 +1225,6 @@ class ctb_invoice extends cTable {
 						if ($this->no_order->Exportable) $Doc->ExportField($this->no_order);
 						if ($this->no_referensi->Exportable) $Doc->ExportField($this->no_referensi);
 						if ($this->kegiatan->Exportable) $Doc->ExportField($this->kegiatan);
-						if ($this->tgl_pelaksanaan->Exportable) $Doc->ExportField($this->tgl_pelaksanaan);
 						if ($this->no_sertifikat->Exportable) $Doc->ExportField($this->no_sertifikat);
 						if ($this->keterangan->Exportable) $Doc->ExportField($this->keterangan);
 						if ($this->total->Exportable) $Doc->ExportField($this->total);

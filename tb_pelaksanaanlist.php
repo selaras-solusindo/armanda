@@ -5,7 +5,8 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "tb_baranginfo.php" ?>
+<?php include_once "tb_pelaksanaaninfo.php" ?>
+<?php include_once "tb_invoiceinfo.php" ?>
 <?php include_once "tb_userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
@@ -14,9 +15,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$tb_barang_list = NULL; // Initialize page object first
+$tb_pelaksanaan_list = NULL; // Initialize page object first
 
-class ctb_barang_list extends ctb_barang {
+class ctb_pelaksanaan_list extends ctb_pelaksanaan {
 
 	// Page ID
 	var $PageID = 'list';
@@ -25,13 +26,13 @@ class ctb_barang_list extends ctb_barang {
 	var $ProjectID = "{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}";
 
 	// Table name
-	var $TableName = 'tb_barang';
+	var $TableName = 'tb_pelaksanaan';
 
 	// Page object name
-	var $PageObjName = 'tb_barang_list';
+	var $PageObjName = 'tb_pelaksanaan_list';
 
 	// Grid form hidden field names
-	var $FormName = 'ftb_baranglist';
+	var $FormName = 'ftb_pelaksanaanlist';
 	var $FormActionName = 'k_action';
 	var $FormKeyName = 'k_key';
 	var $FormOldKeyName = 'k_oldkey';
@@ -272,10 +273,10 @@ class ctb_barang_list extends ctb_barang {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (tb_barang)
-		if (!isset($GLOBALS["tb_barang"]) || get_class($GLOBALS["tb_barang"]) == "ctb_barang") {
-			$GLOBALS["tb_barang"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["tb_barang"];
+		// Table object (tb_pelaksanaan)
+		if (!isset($GLOBALS["tb_pelaksanaan"]) || get_class($GLOBALS["tb_pelaksanaan"]) == "ctb_pelaksanaan") {
+			$GLOBALS["tb_pelaksanaan"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["tb_pelaksanaan"];
 		}
 
 		// Initialize URLs
@@ -286,12 +287,15 @@ class ctb_barang_list extends ctb_barang {
 		$this->ExportXmlUrl = $this->PageUrl() . "export=xml";
 		$this->ExportCsvUrl = $this->PageUrl() . "export=csv";
 		$this->ExportPdfUrl = $this->PageUrl() . "export=pdf";
-		$this->AddUrl = "tb_barangadd.php";
+		$this->AddUrl = "tb_pelaksanaanadd.php";
 		$this->InlineAddUrl = $this->PageUrl() . "a=add";
 		$this->GridAddUrl = $this->PageUrl() . "a=gridadd";
 		$this->GridEditUrl = $this->PageUrl() . "a=gridedit";
-		$this->MultiDeleteUrl = "tb_barangdelete.php";
-		$this->MultiUpdateUrl = "tb_barangupdate.php";
+		$this->MultiDeleteUrl = "tb_pelaksanaandelete.php";
+		$this->MultiUpdateUrl = "tb_pelaksanaanupdate.php";
+
+		// Table object (tb_invoice)
+		if (!isset($GLOBALS['tb_invoice'])) $GLOBALS['tb_invoice'] = new ctb_invoice();
 
 		// Table object (tb_user)
 		if (!isset($GLOBALS['tb_user'])) $GLOBALS['tb_user'] = new ctb_user();
@@ -302,7 +306,7 @@ class ctb_barang_list extends ctb_barang {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'tb_barang', TRUE);
+			define("EW_TABLE_NAME", 'tb_pelaksanaan', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -339,7 +343,7 @@ class ctb_barang_list extends ctb_barang {
 		// Filter options
 		$this->FilterOptions = new cListOptions();
 		$this->FilterOptions->Tag = "div";
-		$this->FilterOptions->TagClassName = "ewFilterOption ftb_baranglistsrch";
+		$this->FilterOptions->TagClassName = "ewFilterOption ftb_pelaksanaanlistsrch";
 
 		// List actions
 		$this->ListActions = new cListActions();
@@ -411,7 +415,8 @@ class ctb_barang_list extends ctb_barang {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->nama->SetVisibility();
+		$this->invoice_id->SetVisibility();
+		$this->pelaksanaan_tgl->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -443,6 +448,9 @@ class ctb_barang_list extends ctb_barang {
 		// Create Token
 		$this->CreateToken();
 
+		// Set up master detail parameters
+		$this->SetUpMasterParms();
+
 		// Setup other options
 		$this->SetupOtherOptions();
 
@@ -472,13 +480,13 @@ class ctb_barang_list extends ctb_barang {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $tb_barang;
+		global $EW_EXPORT, $tb_pelaksanaan;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($tb_barang);
+				$doc = new $class($tb_pelaksanaan);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -594,28 +602,8 @@ class ctb_barang_list extends ctb_barang {
 					$option->HideAllOptions();
 			}
 
-			// Get default search criteria
-			ew_AddFilter($this->DefaultSearchWhere, $this->BasicSearchWhere(TRUE));
-
-			// Get basic search values
-			$this->LoadBasicSearchValues();
-
-			// Process filter list
-			$this->ProcessFilterList();
-
-			// Restore search parms from Session if not searching / reset / export
-			if (($this->Export <> "" || $this->Command <> "search" && $this->Command <> "reset" && $this->Command <> "resetall") && $this->CheckSearchParms())
-				$this->RestoreSearchParms();
-
-			// Call Recordset SearchValidated event
-			$this->Recordset_SearchValidated();
-
 			// Set up sorting order
 			$this->SetUpSortOrder();
-
-			// Get basic search criteria
-			if ($gsSearchError == "")
-				$sSrchBasic = $this->BasicSearchWhere();
 		}
 
 		// Restore display records
@@ -628,37 +616,32 @@ class ctb_barang_list extends ctb_barang {
 		// Load Sorting Order
 		$this->LoadSortOrder();
 
-		// Load search default if no existing search criteria
-		if (!$this->CheckSearchParms()) {
-
-			// Load basic search from default
-			$this->BasicSearch->LoadDefault();
-			if ($this->BasicSearch->Keyword != "")
-				$sSrchBasic = $this->BasicSearchWhere();
-		}
-
-		// Build search criteria
-		ew_AddFilter($this->SearchWhere, $sSrchAdvanced);
-		ew_AddFilter($this->SearchWhere, $sSrchBasic);
-
-		// Call Recordset_Searching event
-		$this->Recordset_Searching($this->SearchWhere);
-
-		// Save search criteria
-		if ($this->Command == "search" && !$this->RestoreSearch) {
-			$this->setSearchWhere($this->SearchWhere); // Save to Session
-			$this->StartRec = 1; // Reset start record counter
-			$this->setStartRecordNumber($this->StartRec);
-		} else {
-			$this->SearchWhere = $this->getSearchWhere();
-		}
-
 		// Build filter
 		$sFilter = "";
 		if (!$Security->CanList())
 			$sFilter = "(0=1)"; // Filter all records
+
+		// Restore master/detail filter
+		$this->DbMasterFilter = $this->GetMasterFilter(); // Restore master filter
+		$this->DbDetailFilter = $this->GetDetailFilter(); // Restore detail filter
 		ew_AddFilter($sFilter, $this->DbDetailFilter);
 		ew_AddFilter($sFilter, $this->SearchWhere);
+
+		// Load master record
+		if ($this->CurrentMode <> "add" && $this->GetMasterFilter() <> "" && $this->getCurrentMasterTable() == "tb_invoice") {
+			global $tb_invoice;
+			$rsmaster = $tb_invoice->LoadRs($this->DbMasterFilter);
+			$this->MasterRecordExists = ($rsmaster && !$rsmaster->EOF);
+			if (!$this->MasterRecordExists) {
+				$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record found
+				$this->Page_Terminate("tb_invoicelist.php"); // Return to master page
+			} else {
+				$tb_invoice->LoadListRowValues($rsmaster);
+				$tb_invoice->RowType = EW_ROWTYPE_MASTER; // Master row
+				$tb_invoice->RenderListRow();
+				$rsmaster->Close();
+			}
+		}
 
 		// Set up filter in session
 		$this->setSessionWhere($sFilter);
@@ -717,250 +700,11 @@ class ctb_barang_list extends ctb_barang {
 	function SetupKeyValues($key) {
 		$arrKeyFlds = explode($GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"], $key);
 		if (count($arrKeyFlds) >= 1) {
-			$this->barang_id->setFormValue($arrKeyFlds[0]);
-			if (!is_numeric($this->barang_id->FormValue))
+			$this->pelaksanaan_id->setFormValue($arrKeyFlds[0]);
+			if (!is_numeric($this->pelaksanaan_id->FormValue))
 				return FALSE;
 		}
 		return TRUE;
-	}
-
-	// Get list of filters
-	function GetFilterList() {
-		global $UserProfile;
-
-		// Load server side filters
-		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ftb_baranglistsrch");
-		} else {
-			$sSavedFilterList = "";
-		}
-
-		// Initialize
-		$sFilterList = "";
-		$sFilterList = ew_Concat($sFilterList, $this->barang_id->AdvancedSearch->ToJSON(), ","); // Field barang_id
-		$sFilterList = ew_Concat($sFilterList, $this->nama->AdvancedSearch->ToJSON(), ","); // Field nama
-		if ($this->BasicSearch->Keyword <> "") {
-			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
-			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
-		}
-		$sFilterList = preg_replace('/,$/', "", $sFilterList);
-
-		// Return filter list in json
-		if ($sFilterList <> "")
-			$sFilterList = "\"data\":{" . $sFilterList . "}";
-		if ($sSavedFilterList <> "") {
-			if ($sFilterList <> "")
-				$sFilterList .= ",";
-			$sFilterList .= "\"filters\":" . $sSavedFilterList;
-		}
-		return ($sFilterList <> "") ? "{" . $sFilterList . "}" : "null";
-	}
-
-	// Process filter list
-	function ProcessFilterList() {
-		global $UserProfile;
-		if (@$_POST["ajax"] == "savefilters") { // Save filter request (Ajax)
-			$filters = ew_StripSlashes(@$_POST["filters"]);
-			$UserProfile->SetSearchFilters(CurrentUserName(), "ftb_baranglistsrch", $filters);
-
-			// Clean output buffer
-			if (!EW_DEBUG_ENABLED && ob_get_length())
-				ob_end_clean();
-			echo ew_ArrayToJson(array(array("success" => TRUE))); // Success
-			$this->Page_Terminate();
-			exit();
-		} elseif (@$_POST["cmd"] == "resetfilter") {
-			$this->RestoreFilterList();
-		}
-	}
-
-	// Restore list of filters
-	function RestoreFilterList() {
-
-		// Return if not reset filter
-		if (@$_POST["cmd"] <> "resetfilter")
-			return FALSE;
-		$filter = json_decode(ew_StripSlashes(@$_POST["filter"]), TRUE);
-		$this->Command = "search";
-
-		// Field barang_id
-		$this->barang_id->AdvancedSearch->SearchValue = @$filter["x_barang_id"];
-		$this->barang_id->AdvancedSearch->SearchOperator = @$filter["z_barang_id"];
-		$this->barang_id->AdvancedSearch->SearchCondition = @$filter["v_barang_id"];
-		$this->barang_id->AdvancedSearch->SearchValue2 = @$filter["y_barang_id"];
-		$this->barang_id->AdvancedSearch->SearchOperator2 = @$filter["w_barang_id"];
-		$this->barang_id->AdvancedSearch->Save();
-
-		// Field nama
-		$this->nama->AdvancedSearch->SearchValue = @$filter["x_nama"];
-		$this->nama->AdvancedSearch->SearchOperator = @$filter["z_nama"];
-		$this->nama->AdvancedSearch->SearchCondition = @$filter["v_nama"];
-		$this->nama->AdvancedSearch->SearchValue2 = @$filter["y_nama"];
-		$this->nama->AdvancedSearch->SearchOperator2 = @$filter["w_nama"];
-		$this->nama->AdvancedSearch->Save();
-		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
-		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
-	}
-
-	// Return basic search SQL
-	function BasicSearchSQL($arKeywords, $type) {
-		$sWhere = "";
-		$this->BuildBasicSearchSQL($sWhere, $this->nama, $arKeywords, $type);
-		return $sWhere;
-	}
-
-	// Build basic search SQL
-	function BuildBasicSearchSQL(&$Where, &$Fld, $arKeywords, $type) {
-		$sDefCond = ($type == "OR") ? "OR" : "AND";
-		$arSQL = array(); // Array for SQL parts
-		$arCond = array(); // Array for search conditions
-		$cnt = count($arKeywords);
-		$j = 0; // Number of SQL parts
-		for ($i = 0; $i < $cnt; $i++) {
-			$Keyword = $arKeywords[$i];
-			$Keyword = trim($Keyword);
-			if (EW_BASIC_SEARCH_IGNORE_PATTERN <> "") {
-				$Keyword = preg_replace(EW_BASIC_SEARCH_IGNORE_PATTERN, "\\", $Keyword);
-				$ar = explode("\\", $Keyword);
-			} else {
-				$ar = array($Keyword);
-			}
-			foreach ($ar as $Keyword) {
-				if ($Keyword <> "") {
-					$sWrk = "";
-					if ($Keyword == "OR" && $type == "") {
-						if ($j > 0)
-							$arCond[$j-1] = "OR";
-					} elseif ($Keyword == EW_NULL_VALUE) {
-						$sWrk = $Fld->FldExpression . " IS NULL";
-					} elseif ($Keyword == EW_NOT_NULL_VALUE) {
-						$sWrk = $Fld->FldExpression . " IS NOT NULL";
-					} elseif ($Fld->FldIsVirtual) {
-						$sWrk = $Fld->FldVirtualExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
-					} elseif ($Fld->FldDataType != EW_DATATYPE_NUMBER || is_numeric($Keyword)) {
-						$sWrk = $Fld->FldBasicSearchExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
-					}
-					if ($sWrk <> "") {
-						$arSQL[$j] = $sWrk;
-						$arCond[$j] = $sDefCond;
-						$j += 1;
-					}
-				}
-			}
-		}
-		$cnt = count($arSQL);
-		$bQuoted = FALSE;
-		$sSql = "";
-		if ($cnt > 0) {
-			for ($i = 0; $i < $cnt-1; $i++) {
-				if ($arCond[$i] == "OR") {
-					if (!$bQuoted) $sSql .= "(";
-					$bQuoted = TRUE;
-				}
-				$sSql .= $arSQL[$i];
-				if ($bQuoted && $arCond[$i] <> "OR") {
-					$sSql .= ")";
-					$bQuoted = FALSE;
-				}
-				$sSql .= " " . $arCond[$i] . " ";
-			}
-			$sSql .= $arSQL[$cnt-1];
-			if ($bQuoted)
-				$sSql .= ")";
-		}
-		if ($sSql <> "") {
-			if ($Where <> "") $Where .= " OR ";
-			$Where .=  "(" . $sSql . ")";
-		}
-	}
-
-	// Return basic search WHERE clause based on search keyword and type
-	function BasicSearchWhere($Default = FALSE) {
-		global $Security;
-		$sSearchStr = "";
-		if (!$Security->CanSearch()) return "";
-		$sSearchKeyword = ($Default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
-		$sSearchType = ($Default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
-		if ($sSearchKeyword <> "") {
-			$sSearch = trim($sSearchKeyword);
-			if ($sSearchType <> "=") {
-				$ar = array();
-
-				// Match quoted keywords (i.e.: "...")
-				if (preg_match_all('/"([^"]*)"/i', $sSearch, $matches, PREG_SET_ORDER)) {
-					foreach ($matches as $match) {
-						$p = strpos($sSearch, $match[0]);
-						$str = substr($sSearch, 0, $p);
-						$sSearch = substr($sSearch, $p + strlen($match[0]));
-						if (strlen(trim($str)) > 0)
-							$ar = array_merge($ar, explode(" ", trim($str)));
-						$ar[] = $match[1]; // Save quoted keyword
-					}
-				}
-
-				// Match individual keywords
-				if (strlen(trim($sSearch)) > 0)
-					$ar = array_merge($ar, explode(" ", trim($sSearch)));
-
-				// Search keyword in any fields
-				if (($sSearchType == "OR" || $sSearchType == "AND") && $this->BasicSearch->BasicSearchAnyFields) {
-					foreach ($ar as $sKeyword) {
-						if ($sKeyword <> "") {
-							if ($sSearchStr <> "") $sSearchStr .= " " . $sSearchType . " ";
-							$sSearchStr .= "(" . $this->BasicSearchSQL(array($sKeyword), $sSearchType) . ")";
-						}
-					}
-				} else {
-					$sSearchStr = $this->BasicSearchSQL($ar, $sSearchType);
-				}
-			} else {
-				$sSearchStr = $this->BasicSearchSQL(array($sSearch), $sSearchType);
-			}
-			if (!$Default) $this->Command = "search";
-		}
-		if (!$Default && $this->Command == "search") {
-			$this->BasicSearch->setKeyword($sSearchKeyword);
-			$this->BasicSearch->setType($sSearchType);
-		}
-		return $sSearchStr;
-	}
-
-	// Check if search parm exists
-	function CheckSearchParms() {
-
-		// Check basic search
-		if ($this->BasicSearch->IssetSession())
-			return TRUE;
-		return FALSE;
-	}
-
-	// Clear all search parameters
-	function ResetSearchParms() {
-
-		// Clear search WHERE clause
-		$this->SearchWhere = "";
-		$this->setSearchWhere($this->SearchWhere);
-
-		// Clear basic search parameters
-		$this->ResetBasicSearchParms();
-	}
-
-	// Load advanced search default values
-	function LoadAdvancedSearchDefault() {
-		return FALSE;
-	}
-
-	// Clear all basic search parameters
-	function ResetBasicSearchParms() {
-		$this->BasicSearch->UnsetSession();
-	}
-
-	// Restore all search parameters
-	function RestoreSearchParms() {
-		$this->RestoreSearch = TRUE;
-
-		// Restore basic search values
-		$this->BasicSearch->Load();
 	}
 
 	// Set up sort parameters
@@ -970,7 +714,8 @@ class ctb_barang_list extends ctb_barang {
 		if (@$_GET["order"] <> "") {
 			$this->CurrentOrder = ew_StripSlashes(@$_GET["order"]);
 			$this->CurrentOrderType = @$_GET["ordertype"];
-			$this->UpdateSort($this->nama); // nama
+			$this->UpdateSort($this->invoice_id); // invoice_id
+			$this->UpdateSort($this->pelaksanaan_tgl); // pelaksanaan_tgl
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -995,15 +740,20 @@ class ctb_barang_list extends ctb_barang {
 		// Check if reset command
 		if (substr($this->Command,0,5) == "reset") {
 
-			// Reset search criteria
-			if ($this->Command == "reset" || $this->Command == "resetall")
-				$this->ResetSearchParms();
+			// Reset master/detail keys
+			if ($this->Command == "resetall") {
+				$this->setCurrentMasterTable(""); // Clear master table
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+				$this->invoice_id->setSessionValue("");
+			}
 
 			// Reset sorting order
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
-				$this->nama->setSort("");
+				$this->invoice_id->setSort("");
+				$this->pelaksanaan_tgl->setSort("");
 			}
 
 			// Reset start position
@@ -1160,7 +910,7 @@ class ctb_barang_list extends ctb_barang {
 
 		// "checkbox"
 		$oListOpt = &$this->ListOptions->Items["checkbox"];
-		$oListOpt->Body = "<input type=\"checkbox\" name=\"key_m[]\" value=\"" . ew_HtmlEncode($this->barang_id->CurrentValue) . "\" onclick='ew_ClickMultiCheckbox(event);'>";
+		$oListOpt->Body = "<input type=\"checkbox\" name=\"key_m[]\" value=\"" . ew_HtmlEncode($this->pelaksanaan_id->CurrentValue) . "\" onclick='ew_ClickMultiCheckbox(event);'>";
 		$this->RenderListOptionsExt();
 
 		// Call ListOptions_Rendered event
@@ -1196,11 +946,11 @@ class ctb_barang_list extends ctb_barang {
 
 		// Filter button
 		$item = &$this->FilterOptions->Add("savecurrentfilter");
-		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ftb_baranglistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
-		$item->Visible = TRUE;
+		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ftb_pelaksanaanlistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
+		$item->Visible = FALSE;
 		$item = &$this->FilterOptions->Add("deletefilter");
-		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ftb_baranglistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
-		$item->Visible = TRUE;
+		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ftb_pelaksanaanlistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
+		$item->Visible = FALSE;
 		$this->FilterOptions->UseDropDownButton = TRUE;
 		$this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
 		$this->FilterOptions->DropDownButtonPhrase = $Language->Phrase("Filters");
@@ -1223,7 +973,7 @@ class ctb_barang_list extends ctb_barang {
 					$item = &$option->Add("custom_" . $listaction->Action);
 					$caption = $listaction->Caption;
 					$icon = ($listaction->Icon <> "") ? "<span class=\"" . ew_HtmlEncode($listaction->Icon) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\"></span> " : $caption;
-					$item->Body = "<a class=\"ewAction ewListAction\" title=\"" . ew_HtmlEncode($caption) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\" href=\"\" onclick=\"ew_SubmitAction(event,jQuery.extend({f:document.ftb_baranglist}," . $listaction->ToJson(TRUE) . "));return false;\">" . $icon . "</a>";
+					$item->Body = "<a class=\"ewAction ewListAction\" title=\"" . ew_HtmlEncode($caption) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\" href=\"\" onclick=\"ew_SubmitAction(event,jQuery.extend({f:document.ftb_pelaksanaanlist}," . $listaction->ToJson(TRUE) . "));return false;\">" . $icon . "</a>";
 					$item->Visible = $listaction->Allow;
 				}
 			}
@@ -1324,17 +1074,6 @@ class ctb_barang_list extends ctb_barang {
 		$this->SearchOptions->Tag = "div";
 		$this->SearchOptions->TagClassName = "ewSearchOption";
 
-		// Search button
-		$item = &$this->SearchOptions->Add("searchtoggle");
-		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : " active";
-		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ftb_baranglistsrch\">" . $Language->Phrase("SearchBtn") . "</button>";
-		$item->Visible = TRUE;
-
-		// Show all button
-		$item = &$this->SearchOptions->Add("showall");
-		$item->Body = "<a class=\"btn btn-default ewShowAll\" title=\"" . $Language->Phrase("ShowAll") . "\" data-caption=\"" . $Language->Phrase("ShowAll") . "\" href=\"" . $this->PageUrl() . "cmd=reset\">" . $Language->Phrase("ShowAllBtn") . "</a>";
-		$item->Visible = ($this->SearchWhere <> $this->DefaultSearchWhere && $this->SearchWhere <> "0=101");
-
 		// Button group for search
 		$this->SearchOptions->UseDropDownButton = FALSE;
 		$this->SearchOptions->UseImageAndText = TRUE;
@@ -1400,13 +1139,6 @@ class ctb_barang_list extends ctb_barang {
 		}
 	}
 
-	// Load basic search values
-	function LoadBasicSearchValues() {
-		$this->BasicSearch->Keyword = @$_GET[EW_TABLE_BASIC_SEARCH];
-		if ($this->BasicSearch->Keyword <> "") $this->Command = "search";
-		$this->BasicSearch->Type = @$_GET[EW_TABLE_BASIC_SEARCH_TYPE];
-	}
-
 	// Load recordset
 	function LoadRecordset($offset = -1, $rowcnt = -1) {
 
@@ -1462,16 +1194,18 @@ class ctb_barang_list extends ctb_barang {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->barang_id->setDbValue($rs->fields('barang_id'));
-		$this->nama->setDbValue($rs->fields('nama'));
+		$this->pelaksanaan_id->setDbValue($rs->fields('pelaksanaan_id'));
+		$this->invoice_id->setDbValue($rs->fields('invoice_id'));
+		$this->pelaksanaan_tgl->setDbValue($rs->fields('pelaksanaan_tgl'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->barang_id->DbValue = $row['barang_id'];
-		$this->nama->DbValue = $row['nama'];
+		$this->pelaksanaan_id->DbValue = $row['pelaksanaan_id'];
+		$this->invoice_id->DbValue = $row['invoice_id'];
+		$this->pelaksanaan_tgl->DbValue = $row['pelaksanaan_tgl'];
 	}
 
 	// Load old record
@@ -1479,8 +1213,8 @@ class ctb_barang_list extends ctb_barang {
 
 		// Load key values from Session
 		$bValidKey = TRUE;
-		if (strval($this->getKey("barang_id")) <> "")
-			$this->barang_id->CurrentValue = $this->getKey("barang_id"); // barang_id
+		if (strval($this->getKey("pelaksanaan_id")) <> "")
+			$this->pelaksanaan_id->CurrentValue = $this->getKey("pelaksanaan_id"); // pelaksanaan_id
 		else
 			$bValidKey = FALSE;
 
@@ -1513,19 +1247,34 @@ class ctb_barang_list extends ctb_barang {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// barang_id
-		// nama
+		// pelaksanaan_id
+		// invoice_id
+		// pelaksanaan_tgl
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// nama
-		$this->nama->ViewValue = $this->nama->CurrentValue;
-		$this->nama->ViewCustomAttributes = "";
+		// pelaksanaan_id
+		$this->pelaksanaan_id->ViewValue = $this->pelaksanaan_id->CurrentValue;
+		$this->pelaksanaan_id->ViewCustomAttributes = "";
 
-			// nama
-			$this->nama->LinkCustomAttributes = "";
-			$this->nama->HrefValue = "";
-			$this->nama->TooltipValue = "";
+		// invoice_id
+		$this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
+		$this->invoice_id->ViewCustomAttributes = "";
+
+		// pelaksanaan_tgl
+		$this->pelaksanaan_tgl->ViewValue = $this->pelaksanaan_tgl->CurrentValue;
+		$this->pelaksanaan_tgl->ViewValue = ew_FormatDateTime($this->pelaksanaan_tgl->ViewValue, 7);
+		$this->pelaksanaan_tgl->ViewCustomAttributes = "";
+
+			// invoice_id
+			$this->invoice_id->LinkCustomAttributes = "";
+			$this->invoice_id->HrefValue = "";
+			$this->invoice_id->TooltipValue = "";
+
+			// pelaksanaan_tgl
+			$this->pelaksanaan_tgl->LinkCustomAttributes = "";
+			$this->pelaksanaan_tgl->HrefValue = "";
+			$this->pelaksanaan_tgl->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1575,7 +1324,7 @@ class ctb_barang_list extends ctb_barang {
 		// Export to Email
 		$item = &$this->ExportOptions->Add("email");
 		$url = "";
-		$item->Body = "<button id=\"emf_tb_barang\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_tb_barang',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ftb_baranglist,sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
+		$item->Body = "<button id=\"emf_tb_pelaksanaan\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_tb_pelaksanaan',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ftb_pelaksanaanlist,sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
 		$item->Visible = TRUE;
 
 		// Drop down button for export
@@ -1647,6 +1396,25 @@ class ctb_barang_list extends ctb_barang {
 		// Call Page Exporting server event
 		$this->ExportDoc->ExportCustom = !$this->Page_Exporting();
 		$ParentTable = "";
+
+		// Export master record
+		if (EW_EXPORT_MASTER_RECORD && $this->GetMasterFilter() <> "" && $this->getCurrentMasterTable() == "tb_invoice") {
+			global $tb_invoice;
+			if (!isset($tb_invoice)) $tb_invoice = new ctb_invoice;
+			$rsmaster = $tb_invoice->LoadRs($this->DbMasterFilter); // Load master record
+			if ($rsmaster && !$rsmaster->EOF) {
+				$ExportStyle = $Doc->Style;
+				$Doc->SetStyle("v"); // Change to vertical
+				if ($this->Export <> "csv" || EW_EXPORT_MASTER_RECORD_FOR_CSV) {
+					$Doc->Table = &$tb_invoice;
+					$tb_invoice->ExportDocument($Doc, $rsmaster, 1, 1);
+					$Doc->ExportEmptyRow();
+					$Doc->Table = &$this;
+				}
+				$Doc->SetStyle($ExportStyle); // Restore
+				$rsmaster->Close();
+			}
+		}
 		$sHeader = $this->PageHeader;
 		$this->Page_DataRendering($sHeader);
 		$Doc->Text .= $sHeader;
@@ -1782,11 +1550,8 @@ class ctb_barang_list extends ctb_barang {
 		$sQry = "export=html";
 
 		// Build QueryString for search
-		if ($this->BasicSearch->getKeyword() <> "") {
-			$sQry .= "&" . EW_TABLE_BASIC_SEARCH . "=" . urlencode($this->BasicSearch->getKeyword()) . "&" . EW_TABLE_BASIC_SEARCH_TYPE . "=" . urlencode($this->BasicSearch->getType());
-		}
-
 		// Build QueryString for pager
+
 		$sQry .= "&" . EW_TABLE_REC_PER_PAGE . "=" . urlencode($this->getRecordsPerPage()) . "&" . EW_TABLE_START_REC . "=" . urlencode($this->getStartRecordNumber());
 		return $sQry;
 	}
@@ -1805,6 +1570,72 @@ class ctb_barang_list extends ctb_barang {
 				"&y_" . $FldParm . "=" . urlencode($FldSearchValue2) .
 				"&w_" . $FldParm . "=" . urlencode($Fld->AdvancedSearch->getValue("w"));
 		}
+	}
+
+	// Set up master/detail based on QueryString
+	function SetUpMasterParms() {
+		$bValidMaster = FALSE;
+
+		// Get the keys for master table
+		if (isset($_GET[EW_TABLE_SHOW_MASTER])) {
+			$sMasterTblVar = $_GET[EW_TABLE_SHOW_MASTER];
+			if ($sMasterTblVar == "") {
+				$bValidMaster = TRUE;
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+			}
+			if ($sMasterTblVar == "tb_invoice") {
+				$bValidMaster = TRUE;
+				if (@$_GET["fk_id"] <> "") {
+					$GLOBALS["tb_invoice"]->id->setQueryStringValue($_GET["fk_id"]);
+					$this->invoice_id->setQueryStringValue($GLOBALS["tb_invoice"]->id->QueryStringValue);
+					$this->invoice_id->setSessionValue($this->invoice_id->QueryStringValue);
+					if (!is_numeric($GLOBALS["tb_invoice"]->id->QueryStringValue)) $bValidMaster = FALSE;
+				} else {
+					$bValidMaster = FALSE;
+				}
+			}
+		} elseif (isset($_POST[EW_TABLE_SHOW_MASTER])) {
+			$sMasterTblVar = $_POST[EW_TABLE_SHOW_MASTER];
+			if ($sMasterTblVar == "") {
+				$bValidMaster = TRUE;
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+			}
+			if ($sMasterTblVar == "tb_invoice") {
+				$bValidMaster = TRUE;
+				if (@$_POST["fk_id"] <> "") {
+					$GLOBALS["tb_invoice"]->id->setFormValue($_POST["fk_id"]);
+					$this->invoice_id->setFormValue($GLOBALS["tb_invoice"]->id->FormValue);
+					$this->invoice_id->setSessionValue($this->invoice_id->FormValue);
+					if (!is_numeric($GLOBALS["tb_invoice"]->id->FormValue)) $bValidMaster = FALSE;
+				} else {
+					$bValidMaster = FALSE;
+				}
+			}
+		}
+		if ($bValidMaster) {
+
+			// Update URL
+			$this->AddUrl = $this->AddMasterUrl($this->AddUrl);
+			$this->InlineAddUrl = $this->AddMasterUrl($this->InlineAddUrl);
+			$this->GridAddUrl = $this->AddMasterUrl($this->GridAddUrl);
+			$this->GridEditUrl = $this->AddMasterUrl($this->GridEditUrl);
+
+			// Save current master table
+			$this->setCurrentMasterTable($sMasterTblVar);
+
+			// Reset start record counter (new master key)
+			$this->StartRec = 1;
+			$this->setStartRecordNumber($this->StartRec);
+
+			// Clear previous master key from Session
+			if ($sMasterTblVar <> "tb_invoice") {
+				if ($this->invoice_id->CurrentValue == "") $this->invoice_id->setSessionValue("");
+			}
+		}
+		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
+		$this->DbDetailFilter = $this->GetDetailFilter(); // Get detail filter
 	}
 
 	// Set up Breadcrumb
@@ -1834,7 +1665,7 @@ class ctb_barang_list extends ctb_barang {
 
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
-		$table = 'tb_barang';
+		$table = 'tb_pelaksanaan';
 		$usr = CurrentUserName();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
@@ -1963,31 +1794,31 @@ class ctb_barang_list extends ctb_barang {
 <?php
 
 // Create page object
-if (!isset($tb_barang_list)) $tb_barang_list = new ctb_barang_list();
+if (!isset($tb_pelaksanaan_list)) $tb_pelaksanaan_list = new ctb_pelaksanaan_list();
 
 // Page init
-$tb_barang_list->Page_Init();
+$tb_pelaksanaan_list->Page_Init();
 
 // Page main
-$tb_barang_list->Page_Main();
+$tb_pelaksanaan_list->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$tb_barang_list->Page_Render();
+$tb_pelaksanaan_list->Page_Render();
 ?>
 <?php include_once "header.php" ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($tb_pelaksanaan->Export == "") { ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "list";
-var CurrentForm = ftb_baranglist = new ew_Form("ftb_baranglist", "list");
-ftb_baranglist.FormKeyCountName = '<?php echo $tb_barang_list->FormKeyCountName ?>';
+var CurrentForm = ftb_pelaksanaanlist = new ew_Form("ftb_pelaksanaanlist", "list");
+ftb_pelaksanaanlist.FormKeyCountName = '<?php echo $tb_pelaksanaan_list->FormKeyCountName ?>';
 
 // Form_CustomValidate event
-ftb_baranglist.Form_CustomValidate = 
+ftb_pelaksanaanlist.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -1996,231 +1827,220 @@ ftb_baranglist.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ftb_baranglist.ValidateRequired = true;
+ftb_pelaksanaanlist.ValidateRequired = true;
 <?php } else { ?>
-ftb_baranglist.ValidateRequired = false; 
+ftb_pelaksanaanlist.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
 // Form object for search
 
-var CurrentSearchForm = ftb_baranglistsrch = new ew_Form("ftb_baranglistsrch");
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
 <?php } ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($tb_pelaksanaan->Export == "") { ?>
 <div class="ewToolbar">
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($tb_pelaksanaan->Export == "") { ?>
 <?php $Breadcrumb->Render(); ?>
 <?php } ?>
-<?php if ($tb_barang_list->TotalRecs > 0 && $tb_barang_list->ExportOptions->Visible()) { ?>
-<?php $tb_barang_list->ExportOptions->Render("body") ?>
+<?php if ($tb_pelaksanaan_list->TotalRecs > 0 && $tb_pelaksanaan_list->ExportOptions->Visible()) { ?>
+<?php $tb_pelaksanaan_list->ExportOptions->Render("body") ?>
 <?php } ?>
-<?php if ($tb_barang_list->SearchOptions->Visible()) { ?>
-<?php $tb_barang_list->SearchOptions->Render("body") ?>
-<?php } ?>
-<?php if ($tb_barang_list->FilterOptions->Visible()) { ?>
-<?php $tb_barang_list->FilterOptions->Render("body") ?>
-<?php } ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($tb_pelaksanaan->Export == "") { ?>
 <?php echo $Language->SelectionForm(); ?>
 <?php } ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
+<?php if (($tb_pelaksanaan->Export == "") || (EW_EXPORT_MASTER_RECORD && $tb_pelaksanaan->Export == "print")) { ?>
 <?php
-	$bSelectLimit = $tb_barang_list->UseSelectLimit;
-	if ($bSelectLimit) {
-		if ($tb_barang_list->TotalRecs <= 0)
-			$tb_barang_list->TotalRecs = $tb_barang->SelectRecordCount();
-	} else {
-		if (!$tb_barang_list->Recordset && ($tb_barang_list->Recordset = $tb_barang_list->LoadRecordset()))
-			$tb_barang_list->TotalRecs = $tb_barang_list->Recordset->RecordCount();
+if ($tb_pelaksanaan_list->DbMasterFilter <> "" && $tb_pelaksanaan->getCurrentMasterTable() == "tb_invoice") {
+	if ($tb_pelaksanaan_list->MasterRecordExists) {
+?>
+<?php include_once "tb_invoicemaster.php" ?>
+<?php
 	}
-	$tb_barang_list->StartRec = 1;
-	if ($tb_barang_list->DisplayRecs <= 0 || ($tb_barang->Export <> "" && $tb_barang->ExportAll)) // Display all records
-		$tb_barang_list->DisplayRecs = $tb_barang_list->TotalRecs;
-	if (!($tb_barang->Export <> "" && $tb_barang->ExportAll))
-		$tb_barang_list->SetUpStartRec(); // Set up start record position
+}
+?>
+<?php } ?>
+<?php
+	$bSelectLimit = $tb_pelaksanaan_list->UseSelectLimit;
+	if ($bSelectLimit) {
+		if ($tb_pelaksanaan_list->TotalRecs <= 0)
+			$tb_pelaksanaan_list->TotalRecs = $tb_pelaksanaan->SelectRecordCount();
+	} else {
+		if (!$tb_pelaksanaan_list->Recordset && ($tb_pelaksanaan_list->Recordset = $tb_pelaksanaan_list->LoadRecordset()))
+			$tb_pelaksanaan_list->TotalRecs = $tb_pelaksanaan_list->Recordset->RecordCount();
+	}
+	$tb_pelaksanaan_list->StartRec = 1;
+	if ($tb_pelaksanaan_list->DisplayRecs <= 0 || ($tb_pelaksanaan->Export <> "" && $tb_pelaksanaan->ExportAll)) // Display all records
+		$tb_pelaksanaan_list->DisplayRecs = $tb_pelaksanaan_list->TotalRecs;
+	if (!($tb_pelaksanaan->Export <> "" && $tb_pelaksanaan->ExportAll))
+		$tb_pelaksanaan_list->SetUpStartRec(); // Set up start record position
 	if ($bSelectLimit)
-		$tb_barang_list->Recordset = $tb_barang_list->LoadRecordset($tb_barang_list->StartRec-1, $tb_barang_list->DisplayRecs);
+		$tb_pelaksanaan_list->Recordset = $tb_pelaksanaan_list->LoadRecordset($tb_pelaksanaan_list->StartRec-1, $tb_pelaksanaan_list->DisplayRecs);
 
 	// Set no record found message
-	if ($tb_barang->CurrentAction == "" && $tb_barang_list->TotalRecs == 0) {
+	if ($tb_pelaksanaan->CurrentAction == "" && $tb_pelaksanaan_list->TotalRecs == 0) {
 		if (!$Security->CanList())
-			$tb_barang_list->setWarningMessage(ew_DeniedMsg());
-		if ($tb_barang_list->SearchWhere == "0=101")
-			$tb_barang_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
+			$tb_pelaksanaan_list->setWarningMessage(ew_DeniedMsg());
+		if ($tb_pelaksanaan_list->SearchWhere == "0=101")
+			$tb_pelaksanaan_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
-			$tb_barang_list->setWarningMessage($Language->Phrase("NoRecord"));
+			$tb_pelaksanaan_list->setWarningMessage($Language->Phrase("NoRecord"));
 	}
-
-	// Audit trail on search
-	if ($tb_barang_list->AuditTrailOnSearch && $tb_barang_list->Command == "search" && !$tb_barang_list->RestoreSearch) {
-		$searchparm = ew_ServerVar("QUERY_STRING");
-		$searchsql = $tb_barang_list->getSessionWhere();
-		$tb_barang_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
-	}
-$tb_barang_list->RenderOtherOptions();
+$tb_pelaksanaan_list->RenderOtherOptions();
 ?>
-<?php if ($Security->CanSearch()) { ?>
-<?php if ($tb_barang->Export == "" && $tb_barang->CurrentAction == "") { ?>
-<form name="ftb_baranglistsrch" id="ftb_baranglistsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
-<?php $SearchPanelClass = ($tb_barang_list->SearchWhere <> "") ? " in" : " in"; ?>
-<div id="ftb_baranglistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
-<input type="hidden" name="cmd" value="search">
-<input type="hidden" name="t" value="tb_barang">
-	<div class="ewBasicSearch">
-<div id="xsr_1" class="ewRow">
-	<div class="ewQuickSearch input-group">
-	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="form-control" value="<?php echo ew_HtmlEncode($tb_barang_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo ew_HtmlEncode($Language->Phrase("Search")) ?>">
-	<input type="hidden" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" id="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="<?php echo ew_HtmlEncode($tb_barang_list->BasicSearch->getType()) ?>">
-	<div class="input-group-btn">
-		<button type="button" data-toggle="dropdown" class="btn btn-default"><span id="searchtype"><?php echo $tb_barang_list->BasicSearch->getTypeNameShort() ?></span><span class="caret"></span></button>
-		<ul class="dropdown-menu pull-right" role="menu">
-			<li<?php if ($tb_barang_list->BasicSearch->getType() == "") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this)"><?php echo $Language->Phrase("QuickSearchAuto") ?></a></li>
-			<li<?php if ($tb_barang_list->BasicSearch->getType() == "=") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'=')"><?php echo $Language->Phrase("QuickSearchExact") ?></a></li>
-			<li<?php if ($tb_barang_list->BasicSearch->getType() == "AND") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'AND')"><?php echo $Language->Phrase("QuickSearchAll") ?></a></li>
-			<li<?php if ($tb_barang_list->BasicSearch->getType() == "OR") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'OR')"><?php echo $Language->Phrase("QuickSearchAny") ?></a></li>
-		</ul>
-	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit"><?php echo $Language->Phrase("QuickSearchBtn") ?></button>
-	</div>
-	</div>
-</div>
-	</div>
-</div>
-</form>
-<?php } ?>
-<?php } ?>
-<?php $tb_barang_list->ShowPageHeader(); ?>
+<?php $tb_pelaksanaan_list->ShowPageHeader(); ?>
 <?php
-$tb_barang_list->ShowMessage();
+$tb_pelaksanaan_list->ShowMessage();
 ?>
-<?php if ($tb_barang_list->TotalRecs > 0 || $tb_barang->CurrentAction <> "") { ?>
-<div class="panel panel-default ewGrid tb_barang">
-<form name="ftb_baranglist" id="ftb_baranglist" class="form-inline ewForm ewListForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($tb_barang_list->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_barang_list->Token ?>">
+<?php if ($tb_pelaksanaan_list->TotalRecs > 0 || $tb_pelaksanaan->CurrentAction <> "") { ?>
+<div class="panel panel-default ewGrid tb_pelaksanaan">
+<form name="ftb_pelaksanaanlist" id="ftb_pelaksanaanlist" class="form-inline ewForm ewListForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($tb_pelaksanaan_list->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $tb_pelaksanaan_list->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="tb_barang">
-<div id="gmp_tb_barang" class="<?php if (ew_IsResponsiveLayout()) { echo "table-responsive "; } ?>ewGridMiddlePanel">
-<?php if ($tb_barang_list->TotalRecs > 0) { ?>
-<table id="tbl_tb_baranglist" class="table ewTable">
-<?php echo $tb_barang->TableCustomInnerHtml ?>
+<input type="hidden" name="t" value="tb_pelaksanaan">
+<?php if ($tb_pelaksanaan->getCurrentMasterTable() == "tb_invoice" && $tb_pelaksanaan->CurrentAction <> "") { ?>
+<input type="hidden" name="<?php echo EW_TABLE_SHOW_MASTER ?>" value="tb_invoice">
+<input type="hidden" name="fk_id" value="<?php echo $tb_pelaksanaan->invoice_id->getSessionValue() ?>">
+<?php } ?>
+<div id="gmp_tb_pelaksanaan" class="<?php if (ew_IsResponsiveLayout()) { echo "table-responsive "; } ?>ewGridMiddlePanel">
+<?php if ($tb_pelaksanaan_list->TotalRecs > 0) { ?>
+<table id="tbl_tb_pelaksanaanlist" class="table ewTable">
+<?php echo $tb_pelaksanaan->TableCustomInnerHtml ?>
 <thead><!-- Table header -->
 	<tr class="ewTableHeader">
 <?php
 
 // Header row
-$tb_barang_list->RowType = EW_ROWTYPE_HEADER;
+$tb_pelaksanaan_list->RowType = EW_ROWTYPE_HEADER;
 
 // Render list options
-$tb_barang_list->RenderListOptions();
+$tb_pelaksanaan_list->RenderListOptions();
 
 // Render list options (header, left)
-$tb_barang_list->ListOptions->Render("header", "left");
+$tb_pelaksanaan_list->ListOptions->Render("header", "left");
 ?>
-<?php if ($tb_barang->nama->Visible) { // nama ?>
-	<?php if ($tb_barang->SortUrl($tb_barang->nama) == "") { ?>
-		<th data-name="nama"><div id="elh_tb_barang_nama" class="tb_barang_nama"><div class="ewTableHeaderCaption"><?php echo $tb_barang->nama->FldCaption() ?></div></div></th>
+<?php if ($tb_pelaksanaan->invoice_id->Visible) { // invoice_id ?>
+	<?php if ($tb_pelaksanaan->SortUrl($tb_pelaksanaan->invoice_id) == "") { ?>
+		<th data-name="invoice_id"><div id="elh_tb_pelaksanaan_invoice_id" class="tb_pelaksanaan_invoice_id"><div class="ewTableHeaderCaption"><?php echo $tb_pelaksanaan->invoice_id->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="nama"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_barang->SortUrl($tb_barang->nama) ?>',1);"><div id="elh_tb_barang_nama" class="tb_barang_nama">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_barang->nama->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($tb_barang->nama->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_barang->nama->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="invoice_id"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_pelaksanaan->SortUrl($tb_pelaksanaan->invoice_id) ?>',1);"><div id="elh_tb_pelaksanaan_invoice_id" class="tb_pelaksanaan_invoice_id">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_pelaksanaan->invoice_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($tb_pelaksanaan->invoice_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_pelaksanaan->invoice_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($tb_pelaksanaan->pelaksanaan_tgl->Visible) { // pelaksanaan_tgl ?>
+	<?php if ($tb_pelaksanaan->SortUrl($tb_pelaksanaan->pelaksanaan_tgl) == "") { ?>
+		<th data-name="pelaksanaan_tgl"><div id="elh_tb_pelaksanaan_pelaksanaan_tgl" class="tb_pelaksanaan_pelaksanaan_tgl"><div class="ewTableHeaderCaption"><?php echo $tb_pelaksanaan->pelaksanaan_tgl->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="pelaksanaan_tgl"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $tb_pelaksanaan->SortUrl($tb_pelaksanaan->pelaksanaan_tgl) ?>',1);"><div id="elh_tb_pelaksanaan_pelaksanaan_tgl" class="tb_pelaksanaan_pelaksanaan_tgl">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $tb_pelaksanaan->pelaksanaan_tgl->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($tb_pelaksanaan->pelaksanaan_tgl->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($tb_pelaksanaan->pelaksanaan_tgl->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
 <?php
 
 // Render list options (header, right)
-$tb_barang_list->ListOptions->Render("header", "right");
+$tb_pelaksanaan_list->ListOptions->Render("header", "right");
 ?>
 	</tr>
 </thead>
 <tbody>
 <?php
-if ($tb_barang->ExportAll && $tb_barang->Export <> "") {
-	$tb_barang_list->StopRec = $tb_barang_list->TotalRecs;
+if ($tb_pelaksanaan->ExportAll && $tb_pelaksanaan->Export <> "") {
+	$tb_pelaksanaan_list->StopRec = $tb_pelaksanaan_list->TotalRecs;
 } else {
 
 	// Set the last record to display
-	if ($tb_barang_list->TotalRecs > $tb_barang_list->StartRec + $tb_barang_list->DisplayRecs - 1)
-		$tb_barang_list->StopRec = $tb_barang_list->StartRec + $tb_barang_list->DisplayRecs - 1;
+	if ($tb_pelaksanaan_list->TotalRecs > $tb_pelaksanaan_list->StartRec + $tb_pelaksanaan_list->DisplayRecs - 1)
+		$tb_pelaksanaan_list->StopRec = $tb_pelaksanaan_list->StartRec + $tb_pelaksanaan_list->DisplayRecs - 1;
 	else
-		$tb_barang_list->StopRec = $tb_barang_list->TotalRecs;
+		$tb_pelaksanaan_list->StopRec = $tb_pelaksanaan_list->TotalRecs;
 }
-$tb_barang_list->RecCnt = $tb_barang_list->StartRec - 1;
-if ($tb_barang_list->Recordset && !$tb_barang_list->Recordset->EOF) {
-	$tb_barang_list->Recordset->MoveFirst();
-	$bSelectLimit = $tb_barang_list->UseSelectLimit;
-	if (!$bSelectLimit && $tb_barang_list->StartRec > 1)
-		$tb_barang_list->Recordset->Move($tb_barang_list->StartRec - 1);
-} elseif (!$tb_barang->AllowAddDeleteRow && $tb_barang_list->StopRec == 0) {
-	$tb_barang_list->StopRec = $tb_barang->GridAddRowCount;
+$tb_pelaksanaan_list->RecCnt = $tb_pelaksanaan_list->StartRec - 1;
+if ($tb_pelaksanaan_list->Recordset && !$tb_pelaksanaan_list->Recordset->EOF) {
+	$tb_pelaksanaan_list->Recordset->MoveFirst();
+	$bSelectLimit = $tb_pelaksanaan_list->UseSelectLimit;
+	if (!$bSelectLimit && $tb_pelaksanaan_list->StartRec > 1)
+		$tb_pelaksanaan_list->Recordset->Move($tb_pelaksanaan_list->StartRec - 1);
+} elseif (!$tb_pelaksanaan->AllowAddDeleteRow && $tb_pelaksanaan_list->StopRec == 0) {
+	$tb_pelaksanaan_list->StopRec = $tb_pelaksanaan->GridAddRowCount;
 }
 
 // Initialize aggregate
-$tb_barang->RowType = EW_ROWTYPE_AGGREGATEINIT;
-$tb_barang->ResetAttrs();
-$tb_barang_list->RenderRow();
-while ($tb_barang_list->RecCnt < $tb_barang_list->StopRec) {
-	$tb_barang_list->RecCnt++;
-	if (intval($tb_barang_list->RecCnt) >= intval($tb_barang_list->StartRec)) {
-		$tb_barang_list->RowCnt++;
+$tb_pelaksanaan->RowType = EW_ROWTYPE_AGGREGATEINIT;
+$tb_pelaksanaan->ResetAttrs();
+$tb_pelaksanaan_list->RenderRow();
+while ($tb_pelaksanaan_list->RecCnt < $tb_pelaksanaan_list->StopRec) {
+	$tb_pelaksanaan_list->RecCnt++;
+	if (intval($tb_pelaksanaan_list->RecCnt) >= intval($tb_pelaksanaan_list->StartRec)) {
+		$tb_pelaksanaan_list->RowCnt++;
 
 		// Set up key count
-		$tb_barang_list->KeyCount = $tb_barang_list->RowIndex;
+		$tb_pelaksanaan_list->KeyCount = $tb_pelaksanaan_list->RowIndex;
 
 		// Init row class and style
-		$tb_barang->ResetAttrs();
-		$tb_barang->CssClass = "";
-		if ($tb_barang->CurrentAction == "gridadd") {
+		$tb_pelaksanaan->ResetAttrs();
+		$tb_pelaksanaan->CssClass = "";
+		if ($tb_pelaksanaan->CurrentAction == "gridadd") {
 		} else {
-			$tb_barang_list->LoadRowValues($tb_barang_list->Recordset); // Load row values
+			$tb_pelaksanaan_list->LoadRowValues($tb_pelaksanaan_list->Recordset); // Load row values
 		}
-		$tb_barang->RowType = EW_ROWTYPE_VIEW; // Render view
+		$tb_pelaksanaan->RowType = EW_ROWTYPE_VIEW; // Render view
 
 		// Set up row id / data-rowindex
-		$tb_barang->RowAttrs = array_merge($tb_barang->RowAttrs, array('data-rowindex'=>$tb_barang_list->RowCnt, 'id'=>'r' . $tb_barang_list->RowCnt . '_tb_barang', 'data-rowtype'=>$tb_barang->RowType));
+		$tb_pelaksanaan->RowAttrs = array_merge($tb_pelaksanaan->RowAttrs, array('data-rowindex'=>$tb_pelaksanaan_list->RowCnt, 'id'=>'r' . $tb_pelaksanaan_list->RowCnt . '_tb_pelaksanaan', 'data-rowtype'=>$tb_pelaksanaan->RowType));
 
 		// Render row
-		$tb_barang_list->RenderRow();
+		$tb_pelaksanaan_list->RenderRow();
 
 		// Render list options
-		$tb_barang_list->RenderListOptions();
+		$tb_pelaksanaan_list->RenderListOptions();
 ?>
-	<tr<?php echo $tb_barang->RowAttributes() ?>>
+	<tr<?php echo $tb_pelaksanaan->RowAttributes() ?>>
 <?php
 
 // Render list options (body, left)
-$tb_barang_list->ListOptions->Render("body", "left", $tb_barang_list->RowCnt);
+$tb_pelaksanaan_list->ListOptions->Render("body", "left", $tb_pelaksanaan_list->RowCnt);
 ?>
-	<?php if ($tb_barang->nama->Visible) { // nama ?>
-		<td data-name="nama"<?php echo $tb_barang->nama->CellAttributes() ?>>
-<span id="el<?php echo $tb_barang_list->RowCnt ?>_tb_barang_nama" class="tb_barang_nama">
-<span<?php echo $tb_barang->nama->ViewAttributes() ?>>
-<?php echo $tb_barang->nama->ListViewValue() ?></span>
+	<?php if ($tb_pelaksanaan->invoice_id->Visible) { // invoice_id ?>
+		<td data-name="invoice_id"<?php echo $tb_pelaksanaan->invoice_id->CellAttributes() ?>>
+<span id="el<?php echo $tb_pelaksanaan_list->RowCnt ?>_tb_pelaksanaan_invoice_id" class="tb_pelaksanaan_invoice_id">
+<span<?php echo $tb_pelaksanaan->invoice_id->ViewAttributes() ?>>
+<?php echo $tb_pelaksanaan->invoice_id->ListViewValue() ?></span>
 </span>
-<a id="<?php echo $tb_barang_list->PageObjName . "_row_" . $tb_barang_list->RowCnt ?>"></a></td>
+<a id="<?php echo $tb_pelaksanaan_list->PageObjName . "_row_" . $tb_pelaksanaan_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($tb_pelaksanaan->pelaksanaan_tgl->Visible) { // pelaksanaan_tgl ?>
+		<td data-name="pelaksanaan_tgl"<?php echo $tb_pelaksanaan->pelaksanaan_tgl->CellAttributes() ?>>
+<span id="el<?php echo $tb_pelaksanaan_list->RowCnt ?>_tb_pelaksanaan_pelaksanaan_tgl" class="tb_pelaksanaan_pelaksanaan_tgl">
+<span<?php echo $tb_pelaksanaan->pelaksanaan_tgl->ViewAttributes() ?>>
+<?php echo $tb_pelaksanaan->pelaksanaan_tgl->ListViewValue() ?></span>
+</span>
+</td>
 	<?php } ?>
 <?php
 
 // Render list options (body, right)
-$tb_barang_list->ListOptions->Render("body", "right", $tb_barang_list->RowCnt);
+$tb_pelaksanaan_list->ListOptions->Render("body", "right", $tb_pelaksanaan_list->RowCnt);
 ?>
 	</tr>
 <?php
 	}
-	if ($tb_barang->CurrentAction <> "gridadd")
-		$tb_barang_list->Recordset->MoveNext();
+	if ($tb_pelaksanaan->CurrentAction <> "gridadd")
+		$tb_pelaksanaan_list->Recordset->MoveNext();
 }
 ?>
 </tbody>
 </table>
 <?php } ?>
-<?php if ($tb_barang->CurrentAction == "") { ?>
+<?php if ($tb_pelaksanaan->CurrentAction == "") { ?>
 <input type="hidden" name="a_list" id="a_list" value="">
 <?php } ?>
 </div>
@@ -2228,61 +2048,61 @@ $tb_barang_list->ListOptions->Render("body", "right", $tb_barang_list->RowCnt);
 <?php
 
 // Close recordset
-if ($tb_barang_list->Recordset)
-	$tb_barang_list->Recordset->Close();
+if ($tb_pelaksanaan_list->Recordset)
+	$tb_pelaksanaan_list->Recordset->Close();
 ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($tb_pelaksanaan->Export == "") { ?>
 <div class="panel-footer ewGridLowerPanel">
-<?php if ($tb_barang->CurrentAction <> "gridadd" && $tb_barang->CurrentAction <> "gridedit") { ?>
+<?php if ($tb_pelaksanaan->CurrentAction <> "gridadd" && $tb_pelaksanaan->CurrentAction <> "gridedit") { ?>
 <form name="ewPagerForm" class="ewForm form-inline ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
-<?php if (!isset($tb_barang_list->Pager)) $tb_barang_list->Pager = new cPrevNextPager($tb_barang_list->StartRec, $tb_barang_list->DisplayRecs, $tb_barang_list->TotalRecs) ?>
-<?php if ($tb_barang_list->Pager->RecordCount > 0 && $tb_barang_list->Pager->Visible) { ?>
+<?php if (!isset($tb_pelaksanaan_list->Pager)) $tb_pelaksanaan_list->Pager = new cPrevNextPager($tb_pelaksanaan_list->StartRec, $tb_pelaksanaan_list->DisplayRecs, $tb_pelaksanaan_list->TotalRecs) ?>
+<?php if ($tb_pelaksanaan_list->Pager->RecordCount > 0 && $tb_pelaksanaan_list->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($tb_barang_list->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $tb_barang_list->PageUrl() ?>start=<?php echo $tb_barang_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($tb_pelaksanaan_list->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $tb_pelaksanaan_list->PageUrl() ?>start=<?php echo $tb_pelaksanaan_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($tb_barang_list->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $tb_barang_list->PageUrl() ?>start=<?php echo $tb_barang_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($tb_pelaksanaan_list->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $tb_pelaksanaan_list->PageUrl() ?>start=<?php echo $tb_pelaksanaan_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $tb_barang_list->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $tb_pelaksanaan_list->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($tb_barang_list->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $tb_barang_list->PageUrl() ?>start=<?php echo $tb_barang_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($tb_pelaksanaan_list->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $tb_pelaksanaan_list->PageUrl() ?>start=<?php echo $tb_pelaksanaan_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($tb_barang_list->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $tb_barang_list->PageUrl() ?>start=<?php echo $tb_barang_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($tb_pelaksanaan_list->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $tb_pelaksanaan_list->PageUrl() ?>start=<?php echo $tb_pelaksanaan_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $tb_barang_list->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $tb_pelaksanaan_list->Pager->PageCount ?></span>
 </div>
 <div class="ewPager ewRec">
-	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $tb_barang_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $tb_barang_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $tb_barang_list->Pager->RecordCount ?></span>
+	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $tb_pelaksanaan_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $tb_pelaksanaan_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $tb_pelaksanaan_list->Pager->RecordCount ?></span>
 </div>
 <?php } ?>
 </form>
 <?php } ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($tb_barang_list->OtherOptions as &$option)
+	foreach ($tb_pelaksanaan_list->OtherOptions as &$option)
 		$option->Render("body", "bottom");
 ?>
 </div>
@@ -2291,10 +2111,10 @@ if ($tb_barang_list->Recordset)
 <?php } ?>
 </div>
 <?php } ?>
-<?php if ($tb_barang_list->TotalRecs == 0 && $tb_barang->CurrentAction == "") { // Show other options ?>
+<?php if ($tb_pelaksanaan_list->TotalRecs == 0 && $tb_pelaksanaan->CurrentAction == "") { // Show other options ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($tb_barang_list->OtherOptions as &$option) {
+	foreach ($tb_pelaksanaan_list->OtherOptions as &$option) {
 		$option->ButtonClass = "";
 		$option->Render("body", "");
 	}
@@ -2302,19 +2122,17 @@ if ($tb_barang_list->Recordset)
 </div>
 <div class="clearfix"></div>
 <?php } ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($tb_pelaksanaan->Export == "") { ?>
 <script type="text/javascript">
-ftb_baranglistsrch.FilterList = <?php echo $tb_barang_list->GetFilterList() ?>;
-ftb_baranglistsrch.Init();
-ftb_baranglist.Init();
+ftb_pelaksanaanlist.Init();
 </script>
 <?php } ?>
 <?php
-$tb_barang_list->ShowPageFooter();
+$tb_pelaksanaan_list->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
-<?php if ($tb_barang->Export == "") { ?>
+<?php if ($tb_pelaksanaan->Export == "") { ?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
@@ -2324,5 +2142,5 @@ if (EW_DEBUG_ENABLED)
 <?php } ?>
 <?php include_once "footer.php" ?>
 <?php
-$tb_barang_list->Page_Terminate();
+$tb_pelaksanaan_list->Page_Terminate();
 ?>

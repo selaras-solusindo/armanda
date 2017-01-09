@@ -40,7 +40,7 @@
 
 				$pGeneratorElement = $(this);
 
-				$pGeneratorElement.bind(settings.bind, function(e){
+				$pGeneratorElement.data("pGenerator", true).bind(settings.bind, function(e){
 					e.preventDefault();
 					methods.generatePassword.call(this, settings); //***
 				});

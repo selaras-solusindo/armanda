@@ -8,6 +8,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "tb_invoiceinfo.php" ?>
 <?php include_once "tb_userinfo.php" ?>
 <?php include_once "tb_feegridcls.php" ?>
+<?php include_once "tb_pelaksanaangridcls.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -391,7 +392,6 @@ class ctb_invoice_view extends ctb_invoice {
 		$this->no_order->SetVisibility();
 		$this->no_referensi->SetVisibility();
 		$this->kegiatan->SetVisibility();
-		$this->tgl_pelaksanaan->SetVisibility();
 		$this->no_sertifikat->SetVisibility();
 		$this->keterangan->SetVisibility();
 		$this->total->SetVisibility();
@@ -401,6 +401,9 @@ class ctb_invoice_view extends ctb_invoice {
 		$this->terbayar->SetVisibility();
 		$this->pasal23->SetVisibility();
 		$this->no_kuitansi->SetVisibility();
+
+		// Set up detail page object
+		$this->SetupDetailPages();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -482,6 +485,7 @@ class ctb_invoice_view extends ctb_invoice {
 	var $RecKey = array();
 	var $IsModal = FALSE;
 	var $Recordset;
+	var $DetailPages; // Detail pages object
 
 	//
 	// Page main
@@ -499,10 +503,6 @@ class ctb_invoice_view extends ctb_invoice {
 		$bLoadCurrentRecord = FALSE;
 		$sReturnUrl = "";
 		$bMatchRecord = FALSE;
-
-		// Set up Breadcrumb
-		if ($this->Export == "")
-			$this->SetupBreadcrumb();
 		if ($this->IsPageRequest()) { // Validate request
 			if (@$_GET["id"] <> "") {
 				$this->id->setQueryStringValue($_GET["id"]);
@@ -536,6 +536,10 @@ class ctb_invoice_view extends ctb_invoice {
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
+
+		// Set up Breadcrumb
+		if ($this->Export == "")
+			$this->SetupBreadcrumb();
 
 		// Render row
 		$this->RowType = EW_ROWTYPE_VIEW;
@@ -622,6 +626,39 @@ class ctb_invoice_view extends ctb_invoice {
 		if ($item->Visible) {
 			if ($DetailTableLink <> "") $DetailTableLink .= ",";
 			$DetailTableLink .= "tb_fee";
+		}
+		if ($this->ShowMultipleDetails) $item->Visible = FALSE;
+
+		// "detail_tb_pelaksanaan"
+		$item = &$option->Add("detail_tb_pelaksanaan");
+		$body = $Language->Phrase("ViewPageDetailLink") . $Language->TablePhrase("tb_pelaksanaan", "TblCaption");
+		$body = "<a class=\"btn btn-default btn-sm ewRowLink ewDetail\" data-action=\"list\" href=\"" . ew_HtmlEncode("tb_pelaksanaanlist.php?" . EW_TABLE_SHOW_MASTER . "=tb_invoice&fk_id=" . urlencode(strval($this->id->CurrentValue)) . "") . "\">" . $body . "</a>";
+		$links = "";
+		if ($GLOBALS["tb_pelaksanaan_grid"] && $GLOBALS["tb_pelaksanaan_grid"]->DetailView && $Security->CanView() && $Security->AllowView(CurrentProjectID() . 'tb_pelaksanaan')) {
+			$links .= "<li><a class=\"ewRowLink ewDetailView\" data-action=\"view\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailViewLink")) . "\" href=\"" . ew_HtmlEncode($this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=tb_pelaksanaan")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailViewLink")) . "</a></li>";
+			if ($DetailViewTblVar <> "") $DetailViewTblVar .= ",";
+			$DetailViewTblVar .= "tb_pelaksanaan";
+		}
+		if ($GLOBALS["tb_pelaksanaan_grid"] && $GLOBALS["tb_pelaksanaan_grid"]->DetailEdit && $Security->CanEdit() && $Security->AllowEdit(CurrentProjectID() . 'tb_pelaksanaan')) {
+			$links .= "<li><a class=\"ewRowLink ewDetailEdit\" data-action=\"edit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GetEditUrl(EW_TABLE_SHOW_DETAIL . "=tb_pelaksanaan")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailEditLink")) . "</a></li>";
+			if ($DetailEditTblVar <> "") $DetailEditTblVar .= ",";
+			$DetailEditTblVar .= "tb_pelaksanaan";
+		}
+		if ($GLOBALS["tb_pelaksanaan_grid"] && $GLOBALS["tb_pelaksanaan_grid"]->DetailAdd && $Security->CanAdd() && $Security->AllowAdd(CurrentProjectID() . 'tb_pelaksanaan')) {
+			$links .= "<li><a class=\"ewRowLink ewDetailCopy\" data-action=\"add\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->GetCopyUrl(EW_TABLE_SHOW_DETAIL . "=tb_pelaksanaan")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailCopyLink")) . "</a></li>";
+			if ($DetailCopyTblVar <> "") $DetailCopyTblVar .= ",";
+			$DetailCopyTblVar .= "tb_pelaksanaan";
+		}
+		if ($links <> "") {
+			$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewDetail\" data-toggle=\"dropdown\"><b class=\"caret\"></b></button>";
+			$body .= "<ul class=\"dropdown-menu\">". $links . "</ul>";
+		}
+		$body = "<div class=\"btn-group\">" . $body . "</div>";
+		$item->Body = $body;
+		$item->Visible = $Security->AllowList(CurrentProjectID() . 'tb_pelaksanaan');
+		if ($item->Visible) {
+			if ($DetailTableLink <> "") $DetailTableLink .= ",";
+			$DetailTableLink .= "tb_pelaksanaan";
 		}
 		if ($this->ShowMultipleDetails) $item->Visible = FALSE;
 
@@ -721,7 +758,7 @@ class ctb_invoice_view extends ctb_invoice {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -767,6 +804,11 @@ class ctb_invoice_view extends ctb_invoice {
 		if ($this->AuditTrailOnView) $this->WriteAuditTrailOnView($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->customer_id->setDbValue($rs->fields('customer_id'));
+		if (array_key_exists('EV__customer_id', $rs->fields)) {
+			$this->customer_id->VirtualValue = $rs->fields('EV__customer_id'); // Set up virtual field value
+		} else {
+			$this->customer_id->VirtualValue = ""; // Clear value
+		}
 		$this->no_invoice->setDbValue($rs->fields('no_invoice'));
 		$this->tgl_invoice->setDbValue($rs->fields('tgl_invoice'));
 		$this->no_order->setDbValue($rs->fields('no_order'));
@@ -852,11 +894,14 @@ class ctb_invoice_view extends ctb_invoice {
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
 		// customer_id
+		if ($this->customer_id->VirtualValue <> "") {
+			$this->customer_id->ViewValue = $this->customer_id->VirtualValue;
+		} else {
 		if (strval($this->customer_id->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->customer_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_customer`";
 		$sWhereWrk = "";
-		$this->customer_id->LookupFilters = array();
+		$this->customer_id->LookupFilters = array("dx1" => '`nama`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -871,6 +916,7 @@ class ctb_invoice_view extends ctb_invoice {
 			}
 		} else {
 			$this->customer_id->ViewValue = NULL;
+		}
 		}
 		$this->customer_id->ViewCustomAttributes = "";
 
@@ -894,11 +940,6 @@ class ctb_invoice_view extends ctb_invoice {
 		// kegiatan
 		$this->kegiatan->ViewValue = $this->kegiatan->CurrentValue;
 		$this->kegiatan->ViewCustomAttributes = "";
-
-		// tgl_pelaksanaan
-		$this->tgl_pelaksanaan->ViewValue = $this->tgl_pelaksanaan->CurrentValue;
-		$this->tgl_pelaksanaan->ViewValue = ew_FormatDateTime($this->tgl_pelaksanaan->ViewValue, 7);
-		$this->tgl_pelaksanaan->ViewCustomAttributes = "";
 
 		// no_sertifikat
 		$this->no_sertifikat->ViewValue = $this->no_sertifikat->CurrentValue;
@@ -977,11 +1018,6 @@ class ctb_invoice_view extends ctb_invoice {
 			$this->kegiatan->LinkCustomAttributes = "";
 			$this->kegiatan->HrefValue = "";
 			$this->kegiatan->TooltipValue = "";
-
-			// tgl_pelaksanaan
-			$this->tgl_pelaksanaan->LinkCustomAttributes = "";
-			$this->tgl_pelaksanaan->HrefValue = "";
-			$this->tgl_pelaksanaan->TooltipValue = "";
 
 			// no_sertifikat
 			$this->no_sertifikat->LinkCustomAttributes = "";
@@ -1164,6 +1200,24 @@ class ctb_invoice_view extends ctb_invoice {
 				$rsdetail->Close();
 			}
 		}
+
+		// Export detail records (tb_pelaksanaan)
+		if (EW_EXPORT_DETAIL_RECORDS && in_array("tb_pelaksanaan", explode(",", $this->getCurrentDetailTable()))) {
+			global $tb_pelaksanaan;
+			if (!isset($tb_pelaksanaan)) $tb_pelaksanaan = new ctb_pelaksanaan;
+			$rsdetail = $tb_pelaksanaan->LoadRs($tb_pelaksanaan->GetDetailFilter()); // Load detail records
+			if ($rsdetail && !$rsdetail->EOF) {
+				$ExportStyle = $Doc->Style;
+				$Doc->SetStyle("h"); // Change to horizontal
+				if ($this->Export <> "csv" || EW_EXPORT_DETAIL_RECORDS_FOR_CSV) {
+					$Doc->ExportEmptyRow();
+					$detailcnt = $rsdetail->RecordCount();
+					$tb_pelaksanaan->ExportDocument($Doc, $rsdetail, 1, $detailcnt);
+				}
+				$Doc->SetStyle($ExportStyle); // Restore
+				$rsdetail->Close();
+			}
+		}
 		$sFooter = $this->PageFooter;
 		$this->Page_DataRendered($sFooter);
 		$Doc->Text .= $sFooter;
@@ -1325,6 +1379,20 @@ class ctb_invoice_view extends ctb_invoice {
 					$GLOBALS["tb_fee_grid"]->invoice_id->setSessionValue($GLOBALS["tb_fee_grid"]->invoice_id->CurrentValue);
 				}
 			}
+			if (in_array("tb_pelaksanaan", $DetailTblVar)) {
+				if (!isset($GLOBALS["tb_pelaksanaan_grid"]))
+					$GLOBALS["tb_pelaksanaan_grid"] = new ctb_pelaksanaan_grid;
+				if ($GLOBALS["tb_pelaksanaan_grid"]->DetailView) {
+					$GLOBALS["tb_pelaksanaan_grid"]->CurrentMode = "view";
+
+					// Save current master table to detail table
+					$GLOBALS["tb_pelaksanaan_grid"]->setCurrentMasterTable($this->TableVar);
+					$GLOBALS["tb_pelaksanaan_grid"]->setStartRecordNumber(1);
+					$GLOBALS["tb_pelaksanaan_grid"]->invoice_id->FldIsDetailKey = TRUE;
+					$GLOBALS["tb_pelaksanaan_grid"]->invoice_id->CurrentValue = $this->id->CurrentValue;
+					$GLOBALS["tb_pelaksanaan_grid"]->invoice_id->setSessionValue($GLOBALS["tb_pelaksanaan_grid"]->invoice_id->CurrentValue);
+				}
+			}
 		}
 	}
 
@@ -1336,6 +1404,15 @@ class ctb_invoice_view extends ctb_invoice {
 		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("tb_invoicelist.php"), "", $this->TableVar, TRUE);
 		$PageId = "view";
 		$Breadcrumb->Add("view", $PageId, $url);
+	}
+
+	// Set up detail pages
+	function SetupDetailPages() {
+		$pages = new cSubPages();
+		$pages->Style = "tabs";
+		$pages->Add('tb_fee');
+		$pages->Add('tb_pelaksanaan');
+		$this->DetailPages = $pages;
 	}
 
 	// Setup lookup filters of a field
@@ -1602,17 +1679,6 @@ $tb_invoice_view->ShowMessage();
 </td>
 	</tr>
 <?php } ?>
-<?php if ($tb_invoice->tgl_pelaksanaan->Visible) { // tgl_pelaksanaan ?>
-	<tr id="r_tgl_pelaksanaan">
-		<td><span id="elh_tb_invoice_tgl_pelaksanaan"><?php echo $tb_invoice->tgl_pelaksanaan->FldCaption() ?></span></td>
-		<td data-name="tgl_pelaksanaan"<?php echo $tb_invoice->tgl_pelaksanaan->CellAttributes() ?>>
-<span id="el_tb_invoice_tgl_pelaksanaan">
-<span<?php echo $tb_invoice->tgl_pelaksanaan->ViewAttributes() ?>>
-<?php echo $tb_invoice->tgl_pelaksanaan->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
 <?php if ($tb_invoice->no_sertifikat->Visible) { // no_sertifikat ?>
 	<tr id="r_no_sertifikat">
 		<td><span id="elh_tb_invoice_no_sertifikat"><?php echo $tb_invoice->no_sertifikat->FldCaption() ?></span></td>
@@ -1713,13 +1779,59 @@ $tb_invoice_view->ShowMessage();
 	</tr>
 <?php } ?>
 </table>
+<?php if ($tb_invoice->getCurrentDetailTable() <> "") { ?>
+<?php
+	$tb_invoice_view->DetailPages->ValidKeys = explode(",", $tb_invoice->getCurrentDetailTable());
+	$FirstActiveDetailTable = $tb_invoice_view->DetailPages->ActivePageIndex();
+?>
+<div class="ewDetailPages">
+<div class="tabbable" id="tb_invoice_view_details">
+	<ul class="nav<?php echo $tb_invoice_view->DetailPages->NavStyle() ?>">
 <?php
 	if (in_array("tb_fee", explode(",", $tb_invoice->getCurrentDetailTable())) && $tb_fee->DetailView) {
+		if ($FirstActiveDetailTable == "" || $FirstActiveDetailTable == "tb_fee") {
+			$FirstActiveDetailTable = "tb_fee";
+		}
 ?>
-<?php if ($tb_invoice->getCurrentDetailTable() <> "") { ?>
-<h4 class="ewDetailCaption"><?php echo $Language->TablePhrase("tb_fee", "TblCaption") ?></h4>
-<?php } ?>
+		<li<?php echo $tb_invoice_view->DetailPages->TabStyle("tb_fee") ?>><a href="#tab_tb_fee" data-toggle="tab"><?php echo $Language->TablePhrase("tb_fee", "TblCaption") ?></a></li>
+<?php
+	}
+?>
+<?php
+	if (in_array("tb_pelaksanaan", explode(",", $tb_invoice->getCurrentDetailTable())) && $tb_pelaksanaan->DetailView) {
+		if ($FirstActiveDetailTable == "" || $FirstActiveDetailTable == "tb_pelaksanaan") {
+			$FirstActiveDetailTable = "tb_pelaksanaan";
+		}
+?>
+		<li<?php echo $tb_invoice_view->DetailPages->TabStyle("tb_pelaksanaan") ?>><a href="#tab_tb_pelaksanaan" data-toggle="tab"><?php echo $Language->TablePhrase("tb_pelaksanaan", "TblCaption") ?></a></li>
+<?php
+	}
+?>
+	</ul>
+	<div class="tab-content">
+<?php
+	if (in_array("tb_fee", explode(",", $tb_invoice->getCurrentDetailTable())) && $tb_fee->DetailView) {
+		if ($FirstActiveDetailTable == "" || $FirstActiveDetailTable == "tb_fee") {
+			$FirstActiveDetailTable = "tb_fee";
+		}
+?>
+		<div class="tab-pane<?php echo $tb_invoice_view->DetailPages->PageStyle("tb_fee") ?>" id="tab_tb_fee">
 <?php include_once "tb_feegrid.php" ?>
+		</div>
+<?php } ?>
+<?php
+	if (in_array("tb_pelaksanaan", explode(",", $tb_invoice->getCurrentDetailTable())) && $tb_pelaksanaan->DetailView) {
+		if ($FirstActiveDetailTable == "" || $FirstActiveDetailTable == "tb_pelaksanaan") {
+			$FirstActiveDetailTable = "tb_pelaksanaan";
+		}
+?>
+		<div class="tab-pane<?php echo $tb_invoice_view->DetailPages->PageStyle("tb_pelaksanaan") ?>" id="tab_tb_pelaksanaan">
+<?php include_once "tb_pelaksanaangrid.php" ?>
+		</div>
+<?php } ?>
+	</div>
+</div>
+</div>
 <?php } ?>
 </form>
 <?php if ($tb_invoice->Export == "") { ?>

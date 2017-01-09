@@ -403,9 +403,6 @@ class ctb_fee_edit extends ctb_fee {
 		// Set up master detail parameters
 		$this->SetUpMasterParms();
 
-		// Set up Breadcrumb
-		$this->SetupBreadcrumb();
-
 		// Process form if post back
 		if (@$_POST["a_edit"] <> "") {
 			$this->CurrentAction = $_POST["a_edit"]; // Get action code
@@ -451,6 +448,9 @@ class ctb_fee_edit extends ctb_fee {
 					$this->RestoreFormValues(); // Restore form values if update failed
 				}
 		}
+
+		// Set up Breadcrumb
+		$this->SetupBreadcrumb();
 
 		// Render the record
 		$this->RowType = EW_ROWTYPE_EDIT; // Render as Edit
@@ -632,12 +632,11 @@ class ctb_fee_edit extends ctb_fee {
 		if ($this->barang_id->VirtualValue <> "") {
 			$this->barang_id->ViewValue = $this->barang_id->VirtualValue;
 		} else {
-			$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
 		if (strval($this->barang_id->CurrentValue) <> "") {
 			$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 		$sWhereWrk = "";
-		$this->barang_id->LookupFilters = array("dx1" => "`nama`");
+		$this->barang_id->LookupFilters = array("dx1" => '`nama`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -724,30 +723,29 @@ class ctb_fee_edit extends ctb_fee {
 			}
 
 			// barang_id
-			$this->barang_id->EditAttrs["class"] = "form-control";
 			$this->barang_id->EditCustomAttributes = "";
-			$this->barang_id->EditValue = ew_HtmlEncode($this->barang_id->CurrentValue);
-			if (strval($this->barang_id->CurrentValue) <> "") {
+			if (trim(strval($this->barang_id->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
+			} else {
 				$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
+			}
+			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `tb_barang`";
 			$sWhereWrk = "";
-			$this->barang_id->LookupFilters = array("dx1" => "`nama`");
+			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-				$rswrk = Conn()->Execute($sSqlWrk);
-				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$arwrk = array();
-					$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-					$this->barang_id->EditValue = $this->barang_id->DisplayValue($arwrk);
-					$rswrk->Close();
-				} else {
-					$this->barang_id->EditValue = ew_HtmlEncode($this->barang_id->CurrentValue);
-				}
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
+				$this->barang_id->ViewValue = $this->barang_id->DisplayValue($arwrk);
 			} else {
-				$this->barang_id->EditValue = NULL;
+				$this->barang_id->ViewValue = $Language->Phrase("PleaseSelect");
 			}
-			$this->barang_id->PlaceHolder = ew_RemoveHtml($this->barang_id->FldCaption());
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			$this->barang_id->EditValue = $arwrk;
 
 			// harga
 			$this->harga->EditAttrs["class"] = "form-control";
@@ -887,6 +885,28 @@ class ctb_fee_edit extends ctb_fee {
 			// keterangan
 			$this->keterangan->SetDbValueDef($rsnew, $this->keterangan->CurrentValue, NULL, $this->keterangan->ReadOnly);
 
+			// Check referential integrity for master table 'tb_invoice'
+			$bValidMasterRecord = TRUE;
+			$sMasterFilter = $this->SqlMasterFilter_tb_invoice();
+			$KeyValue = isset($rsnew['invoice_id']) ? $rsnew['invoice_id'] : $rsold['invoice_id'];
+			if (strval($KeyValue) <> "") {
+				$sMasterFilter = str_replace("@id@", ew_AdjustSql($KeyValue), $sMasterFilter);
+			} else {
+				$bValidMasterRecord = FALSE;
+			}
+			if ($bValidMasterRecord) {
+				if (!isset($GLOBALS["tb_invoice"])) $GLOBALS["tb_invoice"] = new ctb_invoice();
+				$rsmaster = $GLOBALS["tb_invoice"]->LoadRs($sMasterFilter);
+				$bValidMasterRecord = ($rsmaster && !$rsmaster->EOF);
+				$rsmaster->Close();
+			}
+			if (!$bValidMasterRecord) {
+				$sRelatedRecordMsg = str_replace("%t", "tb_invoice", $Language->Phrase("RelatedRecordRequired"));
+				$this->setFailureMessage($sRelatedRecordMsg);
+				$rs->Close();
+				return FALSE;
+			}
+
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
 			if ($bUpdateRow) {
@@ -1002,8 +1022,8 @@ class ctb_fee_edit extends ctb_fee {
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `barang_id` AS `LinkFld`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 			$sWhereWrk = "{filter}";
-			$this->barang_id->LookupFilters = array("dx1" => "`nama`");
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => "`barang_id` = {filter_value}", "t0" => "3", "fn0" => "");
+			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`barang_id` = {filter_value}', "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1018,19 +1038,6 @@ class ctb_fee_edit extends ctb_fee {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
-		case "x_barang_id":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld` FROM `tb_barang`";
-			$sWhereWrk = "`nama` LIKE '{query_value}%'";
-			$this->barang_id->LookupFilters = array("dx1" => "`nama`");
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$sSqlWrk .= " LIMIT " . EW_AUTO_SUGGEST_MAX_ENTRIES;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
 		}
 	}
 
@@ -1294,7 +1301,7 @@ $tb_fee_edit->ShowMessage();
 <?php } ?>
 <?php if ($tb_fee->barang_id->Visible) { // barang_id ?>
 	<div id="r_barang_id" class="form-group">
-		<label id="elh_tb_fee_barang_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_fee->barang_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<label id="elh_tb_fee_barang_id" for="x_barang_id" class="col-sm-2 control-label ewLabel"><?php echo $tb_fee->barang_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
 		<div class="col-sm-10"><div<?php echo $tb_fee->barang_id->CellAttributes() ?>>
 <span id="el_tb_fee_barang_id">
 <span class="ewLookupList">

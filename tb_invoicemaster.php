@@ -6,7 +6,6 @@
 // no_order
 // no_referensi
 // kegiatan
-// tgl_pelaksanaan
 // no_sertifikat
 // keterangan
 // total
@@ -85,17 +84,6 @@
 <span id="el_tb_invoice_kegiatan">
 <span<?php echo $tb_invoice->kegiatan->ViewAttributes() ?>>
 <?php echo $tb_invoice->kegiatan->ListViewValue() ?></span>
-</span>
-</td>
-		</tr>
-<?php } ?>
-<?php if ($tb_invoice->tgl_pelaksanaan->Visible) { // tgl_pelaksanaan ?>
-		<tr id="r_tgl_pelaksanaan">
-			<td><?php echo $tb_invoice->tgl_pelaksanaan->FldCaption() ?></td>
-			<td<?php echo $tb_invoice->tgl_pelaksanaan->CellAttributes() ?>>
-<span id="el_tb_invoice_tgl_pelaksanaan">
-<span<?php echo $tb_invoice->tgl_pelaksanaan->ViewAttributes() ?>>
-<?php echo $tb_invoice->tgl_pelaksanaan->ListViewValue() ?></span>
 </span>
 </td>
 		</tr>

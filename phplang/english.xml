@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/1/4" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/1/9" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -585,6 +585,9 @@
     <menu id="10071">
       <phrase id="menutext" value="view 1" />
     </menu>
+    <menu id="10072">
+      <phrase id="menutext" value="Pelaksanaan" />
+    </menu>
     <menu id="10036">
       <phrase id="menutext" value="view 2" />
     </menu>
@@ -1154,9 +1157,6 @@
       <field id="kegiatan">
         <phrase id="fldcaption" value="Kegiatan" />
       </field>
-      <field id="tgl_pelaksanaan">
-        <phrase id="fldcaption" value="Tgl. Pelaksanaan" />
-      </field>
       <field id="no_sertifikat">
         <phrase id="fldcaption" value="No. Sertifikat" />
       </field>
@@ -1199,6 +1199,30 @@
         <phrase id="fldtagcaption1" value="Tidak" />
         <phrase id="fldtagvalue2" value="1" />
         <phrase id="fldtagcaption2" value="Ya" />
+      </field>
+      <field id="terbayar">
+        <phrase id="fldcaption" value="terbayar" />
+      </field>
+      <field id="no_kuitansi">
+        <phrase id="fldcaption" value="no kuitansi" />
+      </field>
+      <field id="pelaksanaan_tgl">
+        <phrase id="fldcaption" value="pelaksanaan tgl" />
+      </field>
+      <field id="barang_id">
+        <phrase id="fldcaption" value="barang id" />
+      </field>
+    </table>
+    <table id="tb_pelaksanaan">
+      <phrase id="tblcaption" value="Pelaksanaan" />
+      <field id="pelaksanaan_id">
+        <phrase id="fldcaption" value="Pelaksanaan ID" />
+      </field>
+      <field id="invoice_id">
+        <phrase id="fldcaption" value="No. Invoice" />
+      </field>
+      <field id="pelaksanaan_tgl">
+        <phrase id="fldcaption" value="Tgl. Pelaksanaan" />
       </field>
     </table>
   </project>

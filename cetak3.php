@@ -330,5 +330,5 @@ $html .= '</table>';
 
 //echo $html;
 $pdf->writeHTML($html, true, false, true, false, '');
-$pdf->Output('Invoice.pdf', 'D');
+$pdf->Output('Invoice.pdf', 'I');
 ?>

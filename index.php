@@ -282,6 +282,8 @@ class cdefault {
 			$this->Page_Terminate("tb_userlist.php");
 		if ($Security->AllowList(CurrentProjectID() . 'kuitansi_01.php'))
 			$this->Page_Terminate("kuitansi_01.php");
+		if ($Security->AllowList(CurrentProjectID() . 'tb_pelaksanaan'))
+			$this->Page_Terminate("tb_pelaksanaanlist.php");
 		if ($Security->IsLoggedIn()) {
 			$this->setFailureMessage(ew_DeniedMsg() . "<br><br><a href=\"logout.php\">" . $Language->Phrase("BackToLogin") . "</a>");
 		} else {

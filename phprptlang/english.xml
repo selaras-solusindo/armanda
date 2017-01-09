@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ew-language date="2017/1/4" version="9.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/1/9" version="9.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
 	<locale>
 		<phrase id="locale" value=""/><!-- *** system locale for this language -->
 		<phrase id="use_system_locale" value="1"/><!-- *** change to "0" to disable system locale and use the following settings *** -->
@@ -237,6 +237,8 @@
 	</global>
 	<project><phrase id="footertext" value="&amp;copy;2017 e.World Technology Ltd. All rights reserved."/>
 <menu id="18"><phrase id="menutext" value="tb user"/>
+</menu>
+<menu id="19"><phrase id="menutext" value="tb pelaksanaan"/>
 </menu>
 <menu id="15"><phrase id="menutext" value="view 5"/>
 </menu>
@@ -708,6 +710,14 @@
 <field id="password"><phrase id="fldcaption" value="password"/>
 </field>
 <field id="userlevel"><phrase id="fldcaption" value="userlevel"/>
+</field>
+</table>
+<table id="tb_pelaksanaan"><phrase id="tblcaption" value="tb pelaksanaan"/>
+<field id="pelaksanaan_id"><phrase id="fldcaption" value="pelaksanaan id"/>
+</field>
+<field id="invoice_id"><phrase id="fldcaption" value="invoice id"/>
+</field>
+<field id="pelaksanaan_tgl"><phrase id="fldcaption" value="pelaksanaan tgl"/>
 </field>
 </table>
 </project>

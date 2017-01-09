@@ -1,4 +1,4 @@
-<?php include_once "tb_feeinfo.php" ?>
+<?php include_once "tb_pelaksanaaninfo.php" ?>
 <?php include_once "tb_userinfo.php" ?>
 <?php
 
@@ -6,9 +6,9 @@
 // Page class
 //
 
-$tb_fee_grid = NULL; // Initialize page object first
+$tb_pelaksanaan_grid = NULL; // Initialize page object first
 
-class ctb_fee_grid extends ctb_fee {
+class ctb_pelaksanaan_grid extends ctb_pelaksanaan {
 
 	// Page ID
 	var $PageID = 'grid';
@@ -17,13 +17,13 @@ class ctb_fee_grid extends ctb_fee {
 	var $ProjectID = "{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}";
 
 	// Table name
-	var $TableName = 'tb_fee';
+	var $TableName = 'tb_pelaksanaan';
 
 	// Page object name
-	var $PageObjName = 'tb_fee_grid';
+	var $PageObjName = 'tb_pelaksanaan_grid';
 
 	// Grid form hidden field names
-	var $FormName = 'ftb_feegrid';
+	var $FormName = 'ftb_pelaksanaangrid';
 	var $FormActionName = 'k_action';
 	var $FormKeyName = 'k_key';
 	var $FormOldKeyName = 'k_oldkey';
@@ -245,15 +245,15 @@ class ctb_fee_grid extends ctb_fee {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (tb_fee)
-		if (!isset($GLOBALS["tb_fee"]) || get_class($GLOBALS["tb_fee"]) == "ctb_fee") {
-			$GLOBALS["tb_fee"] = &$this;
+		// Table object (tb_pelaksanaan)
+		if (!isset($GLOBALS["tb_pelaksanaan"]) || get_class($GLOBALS["tb_pelaksanaan"]) == "ctb_pelaksanaan") {
+			$GLOBALS["tb_pelaksanaan"] = &$this;
 
 //			$GLOBALS["MasterTable"] = &$GLOBALS["Table"];
-//			if (!isset($GLOBALS["Table"])) $GLOBALS["Table"] = &$GLOBALS["tb_fee"];
+//			if (!isset($GLOBALS["Table"])) $GLOBALS["Table"] = &$GLOBALS["tb_pelaksanaan"];
 
 		}
-		$this->AddUrl = "tb_feeadd.php";
+		$this->AddUrl = "tb_pelaksanaanadd.php";
 
 		// Table object (tb_user)
 		if (!isset($GLOBALS['tb_user'])) $GLOBALS['tb_user'] = new ctb_user();
@@ -264,7 +264,7 @@ class ctb_fee_grid extends ctb_fee {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'tb_fee', TRUE);
+			define("EW_TABLE_NAME", 'tb_pelaksanaan', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -314,12 +314,7 @@ class ctb_fee_grid extends ctb_fee {
 		// Set up list options
 		$this->SetupListOptions();
 		$this->invoice_id->SetVisibility();
-		$this->barang_id->SetVisibility();
-		$this->harga->SetVisibility();
-		$this->qty->SetVisibility();
-		$this->satuan->SetVisibility();
-		$this->jumlah->SetVisibility();
-		$this->keterangan->SetVisibility();
+		$this->pelaksanaan_tgl->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -365,13 +360,13 @@ class ctb_fee_grid extends ctb_fee {
 		global $gsExportFile, $gTmpImages;
 
 		// Export
-		global $EW_EXPORT, $tb_fee;
+		global $EW_EXPORT, $tb_pelaksanaan;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($tb_fee);
+				$doc = new $class($tb_pelaksanaan);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -537,8 +532,6 @@ class ctb_fee_grid extends ctb_fee {
 
 	//  Exit inline mode
 	function ClearInlineMode() {
-		$this->harga->FormValue = ""; // Clear form value
-		$this->jumlah->FormValue = ""; // Clear form value
 		$this->LastAction = $this->CurrentAction; // Save last action
 		$this->CurrentAction = ""; // Clear action
 		$_SESSION[EW_SESSION_INLINE_MODE] = ""; // Clear inline mode
@@ -683,8 +676,8 @@ class ctb_fee_grid extends ctb_fee {
 	function SetupKeyValues($key) {
 		$arrKeyFlds = explode($GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"], $key);
 		if (count($arrKeyFlds) >= 1) {
-			$this->id->setFormValue($arrKeyFlds[0]);
-			if (!is_numeric($this->id->FormValue))
+			$this->pelaksanaan_id->setFormValue($arrKeyFlds[0]);
+			if (!is_numeric($this->pelaksanaan_id->FormValue))
 				return FALSE;
 		}
 		return TRUE;
@@ -743,7 +736,7 @@ class ctb_fee_grid extends ctb_fee {
 				}
 				if ($bGridInsert) {
 					if ($sKey <> "") $sKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-					$sKey .= $this->id->CurrentValue;
+					$sKey .= $this->pelaksanaan_id->CurrentValue;
 
 					// Add filter for this record
 					$sFilter = $this->KeyFilter();
@@ -786,17 +779,7 @@ class ctb_fee_grid extends ctb_fee {
 		global $objForm;
 		if ($objForm->HasValue("x_invoice_id") && $objForm->HasValue("o_invoice_id") && $this->invoice_id->CurrentValue <> $this->invoice_id->OldValue)
 			return FALSE;
-		if ($objForm->HasValue("x_barang_id") && $objForm->HasValue("o_barang_id") && $this->barang_id->CurrentValue <> $this->barang_id->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_harga") && $objForm->HasValue("o_harga") && $this->harga->CurrentValue <> $this->harga->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_qty") && $objForm->HasValue("o_qty") && $this->qty->CurrentValue <> $this->qty->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_satuan") && $objForm->HasValue("o_satuan") && $this->satuan->CurrentValue <> $this->satuan->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_jumlah") && $objForm->HasValue("o_jumlah") && $this->jumlah->CurrentValue <> $this->jumlah->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_keterangan") && $objForm->HasValue("o_keterangan") && $this->keterangan->CurrentValue <> $this->keterangan->OldValue)
+		if ($objForm->HasValue("x_pelaksanaan_tgl") && $objForm->HasValue("o_pelaksanaan_tgl") && $this->pelaksanaan_tgl->CurrentValue <> $this->pelaksanaan_tgl->OldValue)
 			return FALSE;
 		return TRUE;
 	}
@@ -912,7 +895,6 @@ class ctb_fee_grid extends ctb_fee {
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
-				$this->setSessionOrderByList($sOrderBy);
 			}
 
 			// Reset start position
@@ -1064,7 +1046,7 @@ class ctb_fee_grid extends ctb_fee {
 			$oListOpt->Body = "";
 		} // End View mode
 		if ($this->CurrentMode == "edit" && is_numeric($this->RowIndex)) {
-			$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $KeyName . "\" id=\"" . $KeyName . "\" value=\"" . $this->id->CurrentValue . "\">";
+			$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $KeyName . "\" id=\"" . $KeyName . "\" value=\"" . $this->pelaksanaan_id->CurrentValue . "\">";
 		}
 		$this->RenderListOptionsExt();
 	}
@@ -1073,7 +1055,7 @@ class ctb_fee_grid extends ctb_fee {
 	function SetRecordKey(&$key, $rs) {
 		$key = "";
 		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rs->fields('id');
+		$key .= $rs->fields('pelaksanaan_id');
 	}
 
 	// Set up other options
@@ -1170,18 +1152,8 @@ class ctb_fee_grid extends ctb_fee {
 	function LoadDefaultValues() {
 		$this->invoice_id->CurrentValue = NULL;
 		$this->invoice_id->OldValue = $this->invoice_id->CurrentValue;
-		$this->barang_id->CurrentValue = NULL;
-		$this->barang_id->OldValue = $this->barang_id->CurrentValue;
-		$this->harga->CurrentValue = NULL;
-		$this->harga->OldValue = $this->harga->CurrentValue;
-		$this->qty->CurrentValue = NULL;
-		$this->qty->OldValue = $this->qty->CurrentValue;
-		$this->satuan->CurrentValue = NULL;
-		$this->satuan->OldValue = $this->satuan->CurrentValue;
-		$this->jumlah->CurrentValue = NULL;
-		$this->jumlah->OldValue = $this->jumlah->CurrentValue;
-		$this->keterangan->CurrentValue = NULL;
-		$this->keterangan->OldValue = $this->keterangan->CurrentValue;
+		$this->pelaksanaan_tgl->CurrentValue = NULL;
+		$this->pelaksanaan_tgl->OldValue = $this->pelaksanaan_tgl->CurrentValue;
 	}
 
 	// Load form values
@@ -1194,46 +1166,23 @@ class ctb_fee_grid extends ctb_fee {
 			$this->invoice_id->setFormValue($objForm->GetValue("x_invoice_id"));
 		}
 		$this->invoice_id->setOldValue($objForm->GetValue("o_invoice_id"));
-		if (!$this->barang_id->FldIsDetailKey) {
-			$this->barang_id->setFormValue($objForm->GetValue("x_barang_id"));
+		if (!$this->pelaksanaan_tgl->FldIsDetailKey) {
+			$this->pelaksanaan_tgl->setFormValue($objForm->GetValue("x_pelaksanaan_tgl"));
+			$this->pelaksanaan_tgl->CurrentValue = ew_UnFormatDateTime($this->pelaksanaan_tgl->CurrentValue, 7);
 		}
-		$this->barang_id->setOldValue($objForm->GetValue("o_barang_id"));
-		if (!$this->harga->FldIsDetailKey) {
-			$this->harga->setFormValue($objForm->GetValue("x_harga"));
-		}
-		$this->harga->setOldValue($objForm->GetValue("o_harga"));
-		if (!$this->qty->FldIsDetailKey) {
-			$this->qty->setFormValue($objForm->GetValue("x_qty"));
-		}
-		$this->qty->setOldValue($objForm->GetValue("o_qty"));
-		if (!$this->satuan->FldIsDetailKey) {
-			$this->satuan->setFormValue($objForm->GetValue("x_satuan"));
-		}
-		$this->satuan->setOldValue($objForm->GetValue("o_satuan"));
-		if (!$this->jumlah->FldIsDetailKey) {
-			$this->jumlah->setFormValue($objForm->GetValue("x_jumlah"));
-		}
-		$this->jumlah->setOldValue($objForm->GetValue("o_jumlah"));
-		if (!$this->keterangan->FldIsDetailKey) {
-			$this->keterangan->setFormValue($objForm->GetValue("x_keterangan"));
-		}
-		$this->keterangan->setOldValue($objForm->GetValue("o_keterangan"));
-		if (!$this->id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
-			$this->id->setFormValue($objForm->GetValue("x_id"));
+		$this->pelaksanaan_tgl->setOldValue($objForm->GetValue("o_pelaksanaan_tgl"));
+		if (!$this->pelaksanaan_id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
+			$this->pelaksanaan_id->setFormValue($objForm->GetValue("x_pelaksanaan_id"));
 	}
 
 	// Restore form values
 	function RestoreFormValues() {
 		global $objForm;
 		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
-			$this->id->CurrentValue = $this->id->FormValue;
+			$this->pelaksanaan_id->CurrentValue = $this->pelaksanaan_id->FormValue;
 		$this->invoice_id->CurrentValue = $this->invoice_id->FormValue;
-		$this->barang_id->CurrentValue = $this->barang_id->FormValue;
-		$this->harga->CurrentValue = $this->harga->FormValue;
-		$this->qty->CurrentValue = $this->qty->FormValue;
-		$this->satuan->CurrentValue = $this->satuan->FormValue;
-		$this->jumlah->CurrentValue = $this->jumlah->FormValue;
-		$this->keterangan->CurrentValue = $this->keterangan->FormValue;
+		$this->pelaksanaan_tgl->CurrentValue = $this->pelaksanaan_tgl->FormValue;
+		$this->pelaksanaan_tgl->CurrentValue = ew_UnFormatDateTime($this->pelaksanaan_tgl->CurrentValue, 7);
 	}
 
 	// Load recordset
@@ -1248,7 +1197,7 @@ class ctb_fee_grid extends ctb_fee {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -1291,33 +1240,18 @@ class ctb_fee_grid extends ctb_fee {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->id->setDbValue($rs->fields('id'));
+		$this->pelaksanaan_id->setDbValue($rs->fields('pelaksanaan_id'));
 		$this->invoice_id->setDbValue($rs->fields('invoice_id'));
-		$this->barang_id->setDbValue($rs->fields('barang_id'));
-		if (array_key_exists('EV__barang_id', $rs->fields)) {
-			$this->barang_id->VirtualValue = $rs->fields('EV__barang_id'); // Set up virtual field value
-		} else {
-			$this->barang_id->VirtualValue = ""; // Clear value
-		}
-		$this->harga->setDbValue($rs->fields('harga'));
-		$this->qty->setDbValue($rs->fields('qty'));
-		$this->satuan->setDbValue($rs->fields('satuan'));
-		$this->jumlah->setDbValue($rs->fields('jumlah'));
-		$this->keterangan->setDbValue($rs->fields('keterangan'));
+		$this->pelaksanaan_tgl->setDbValue($rs->fields('pelaksanaan_tgl'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->id->DbValue = $row['id'];
+		$this->pelaksanaan_id->DbValue = $row['pelaksanaan_id'];
 		$this->invoice_id->DbValue = $row['invoice_id'];
-		$this->barang_id->DbValue = $row['barang_id'];
-		$this->harga->DbValue = $row['harga'];
-		$this->qty->DbValue = $row['qty'];
-		$this->satuan->DbValue = $row['satuan'];
-		$this->jumlah->DbValue = $row['jumlah'];
-		$this->keterangan->DbValue = $row['keterangan'];
+		$this->pelaksanaan_tgl->DbValue = $row['pelaksanaan_tgl'];
 	}
 
 	// Load old record
@@ -1329,7 +1263,7 @@ class ctb_fee_grid extends ctb_fee {
 		$cnt = count($arKeys);
 		if ($cnt >= 1) {
 			if (strval($arKeys[0]) <> "")
-				$this->id->CurrentValue = strval($arKeys[0]); // id
+				$this->pelaksanaan_id->CurrentValue = strval($arKeys[0]); // pelaksanaan_id
 			else
 				$bValidKey = FALSE;
 		} else {
@@ -1359,118 +1293,38 @@ class ctb_fee_grid extends ctb_fee {
 		$this->CopyUrl = $this->GetCopyUrl();
 		$this->DeleteUrl = $this->GetDeleteUrl();
 
-		// Convert decimal values if posted back
-		if ($this->harga->FormValue == $this->harga->CurrentValue && is_numeric(ew_StrToFloat($this->harga->CurrentValue)))
-			$this->harga->CurrentValue = ew_StrToFloat($this->harga->CurrentValue);
-
-		// Convert decimal values if posted back
-		if ($this->jumlah->FormValue == $this->jumlah->CurrentValue && is_numeric(ew_StrToFloat($this->jumlah->CurrentValue)))
-			$this->jumlah->CurrentValue = ew_StrToFloat($this->jumlah->CurrentValue);
-
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// id
+		// pelaksanaan_id
 		// invoice_id
-		// barang_id
-		// harga
-		// qty
-		// satuan
-		// jumlah
-		// keterangan
+		// pelaksanaan_tgl
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
+
+		// pelaksanaan_id
+		$this->pelaksanaan_id->ViewValue = $this->pelaksanaan_id->CurrentValue;
+		$this->pelaksanaan_id->ViewCustomAttributes = "";
 
 		// invoice_id
 		$this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
 		$this->invoice_id->ViewCustomAttributes = "";
 
-		// barang_id
-		if ($this->barang_id->VirtualValue <> "") {
-			$this->barang_id->ViewValue = $this->barang_id->VirtualValue;
-		} else {
-		if (strval($this->barang_id->CurrentValue) <> "") {
-			$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
-		$sWhereWrk = "";
-		$this->barang_id->LookupFilters = array("dx1" => '`nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->barang_id->ViewValue = $this->barang_id->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->barang_id->ViewValue = $this->barang_id->CurrentValue;
-			}
-		} else {
-			$this->barang_id->ViewValue = NULL;
-		}
-		}
-		$this->barang_id->ViewCustomAttributes = "";
-
-		// harga
-		$this->harga->ViewValue = $this->harga->CurrentValue;
-		$this->harga->ViewValue = ew_FormatNumber($this->harga->ViewValue, 2, -2, -2, -1);
-		$this->harga->CellCssStyle .= "text-align: right;";
-		$this->harga->ViewCustomAttributes = "";
-
-		// qty
-		$this->qty->ViewValue = $this->qty->CurrentValue;
-		$this->qty->ViewCustomAttributes = "";
-
-		// satuan
-		$this->satuan->ViewValue = $this->satuan->CurrentValue;
-		$this->satuan->ViewCustomAttributes = "";
-
-		// jumlah
-		$this->jumlah->ViewValue = $this->jumlah->CurrentValue;
-		$this->jumlah->ViewValue = ew_FormatNumber($this->jumlah->ViewValue, 2, -2, -2, -1);
-		$this->jumlah->CellCssStyle .= "text-align: right;";
-		$this->jumlah->ViewCustomAttributes = "";
-
-		// keterangan
-		$this->keterangan->ViewValue = $this->keterangan->CurrentValue;
-		$this->keterangan->ViewCustomAttributes = "";
+		// pelaksanaan_tgl
+		$this->pelaksanaan_tgl->ViewValue = $this->pelaksanaan_tgl->CurrentValue;
+		$this->pelaksanaan_tgl->ViewValue = ew_FormatDateTime($this->pelaksanaan_tgl->ViewValue, 7);
+		$this->pelaksanaan_tgl->ViewCustomAttributes = "";
 
 			// invoice_id
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
 			$this->invoice_id->TooltipValue = "";
 
-			// barang_id
-			$this->barang_id->LinkCustomAttributes = "";
-			$this->barang_id->HrefValue = "";
-			$this->barang_id->TooltipValue = "";
-
-			// harga
-			$this->harga->LinkCustomAttributes = "";
-			$this->harga->HrefValue = "";
-			$this->harga->TooltipValue = "";
-
-			// qty
-			$this->qty->LinkCustomAttributes = "";
-			$this->qty->HrefValue = "";
-			$this->qty->TooltipValue = "";
-
-			// satuan
-			$this->satuan->LinkCustomAttributes = "";
-			$this->satuan->HrefValue = "";
-			$this->satuan->TooltipValue = "";
-
-			// jumlah
-			$this->jumlah->LinkCustomAttributes = "";
-			$this->jumlah->HrefValue = "";
-			$this->jumlah->TooltipValue = "";
-
-			// keterangan
-			$this->keterangan->LinkCustomAttributes = "";
-			$this->keterangan->HrefValue = "";
-			$this->keterangan->TooltipValue = "";
+			// pelaksanaan_tgl
+			$this->pelaksanaan_tgl->LinkCustomAttributes = "";
+			$this->pelaksanaan_tgl->HrefValue = "";
+			$this->pelaksanaan_tgl->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
 			// invoice_id
@@ -1486,68 +1340,11 @@ class ctb_fee_grid extends ctb_fee {
 			$this->invoice_id->PlaceHolder = ew_RemoveHtml($this->invoice_id->FldCaption());
 			}
 
-			// barang_id
-			$this->barang_id->EditCustomAttributes = "";
-			if (trim(strval($this->barang_id->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `tb_barang`";
-			$sWhereWrk = "";
-			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$this->barang_id->ViewValue = $this->barang_id->DisplayValue($arwrk);
-			} else {
-				$this->barang_id->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->barang_id->EditValue = $arwrk;
-
-			// harga
-			$this->harga->EditAttrs["class"] = "form-control";
-			$this->harga->EditCustomAttributes = "";
-			$this->harga->EditValue = ew_HtmlEncode($this->harga->CurrentValue);
-			$this->harga->PlaceHolder = ew_RemoveHtml($this->harga->FldCaption());
-			if (strval($this->harga->EditValue) <> "" && is_numeric($this->harga->EditValue)) {
-			$this->harga->EditValue = ew_FormatNumber($this->harga->EditValue, -2, -2, -2, -1);
-			$this->harga->OldValue = $this->harga->EditValue;
-			}
-
-			// qty
-			$this->qty->EditAttrs["class"] = "form-control";
-			$this->qty->EditCustomAttributes = "";
-			$this->qty->EditValue = ew_HtmlEncode($this->qty->CurrentValue);
-			$this->qty->PlaceHolder = ew_RemoveHtml($this->qty->FldCaption());
-
-			// satuan
-			$this->satuan->EditAttrs["class"] = "form-control";
-			$this->satuan->EditCustomAttributes = "";
-			$this->satuan->EditValue = ew_HtmlEncode($this->satuan->CurrentValue);
-			$this->satuan->PlaceHolder = ew_RemoveHtml($this->satuan->FldCaption());
-
-			// jumlah
-			$this->jumlah->EditAttrs["class"] = "form-control";
-			$this->jumlah->EditCustomAttributes = "";
-			$this->jumlah->EditValue = ew_HtmlEncode($this->jumlah->CurrentValue);
-			$this->jumlah->PlaceHolder = ew_RemoveHtml($this->jumlah->FldCaption());
-			if (strval($this->jumlah->EditValue) <> "" && is_numeric($this->jumlah->EditValue)) {
-			$this->jumlah->EditValue = ew_FormatNumber($this->jumlah->EditValue, -2, -2, -2, -1);
-			$this->jumlah->OldValue = $this->jumlah->EditValue;
-			}
-
-			// keterangan
-			$this->keterangan->EditAttrs["class"] = "form-control";
-			$this->keterangan->EditCustomAttributes = "";
-			$this->keterangan->EditValue = ew_HtmlEncode($this->keterangan->CurrentValue);
-			$this->keterangan->PlaceHolder = ew_RemoveHtml($this->keterangan->FldCaption());
+			// pelaksanaan_tgl
+			$this->pelaksanaan_tgl->EditAttrs["class"] = "form-control";
+			$this->pelaksanaan_tgl->EditCustomAttributes = "";
+			$this->pelaksanaan_tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->pelaksanaan_tgl->CurrentValue, 7));
+			$this->pelaksanaan_tgl->PlaceHolder = ew_RemoveHtml($this->pelaksanaan_tgl->FldCaption());
 
 			// Add refer script
 			// invoice_id
@@ -1555,29 +1352,9 @@ class ctb_fee_grid extends ctb_fee {
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
 
-			// barang_id
-			$this->barang_id->LinkCustomAttributes = "";
-			$this->barang_id->HrefValue = "";
-
-			// harga
-			$this->harga->LinkCustomAttributes = "";
-			$this->harga->HrefValue = "";
-
-			// qty
-			$this->qty->LinkCustomAttributes = "";
-			$this->qty->HrefValue = "";
-
-			// satuan
-			$this->satuan->LinkCustomAttributes = "";
-			$this->satuan->HrefValue = "";
-
-			// jumlah
-			$this->jumlah->LinkCustomAttributes = "";
-			$this->jumlah->HrefValue = "";
-
-			// keterangan
-			$this->keterangan->LinkCustomAttributes = "";
-			$this->keterangan->HrefValue = "";
+			// pelaksanaan_tgl
+			$this->pelaksanaan_tgl->LinkCustomAttributes = "";
+			$this->pelaksanaan_tgl->HrefValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
 			// invoice_id
@@ -1593,68 +1370,11 @@ class ctb_fee_grid extends ctb_fee {
 			$this->invoice_id->PlaceHolder = ew_RemoveHtml($this->invoice_id->FldCaption());
 			}
 
-			// barang_id
-			$this->barang_id->EditCustomAttributes = "";
-			if (trim(strval($this->barang_id->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `tb_barang`";
-			$sWhereWrk = "";
-			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$this->barang_id->ViewValue = $this->barang_id->DisplayValue($arwrk);
-			} else {
-				$this->barang_id->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->barang_id->EditValue = $arwrk;
-
-			// harga
-			$this->harga->EditAttrs["class"] = "form-control";
-			$this->harga->EditCustomAttributes = "";
-			$this->harga->EditValue = ew_HtmlEncode($this->harga->CurrentValue);
-			$this->harga->PlaceHolder = ew_RemoveHtml($this->harga->FldCaption());
-			if (strval($this->harga->EditValue) <> "" && is_numeric($this->harga->EditValue)) {
-			$this->harga->EditValue = ew_FormatNumber($this->harga->EditValue, -2, -2, -2, -1);
-			$this->harga->OldValue = $this->harga->EditValue;
-			}
-
-			// qty
-			$this->qty->EditAttrs["class"] = "form-control";
-			$this->qty->EditCustomAttributes = "";
-			$this->qty->EditValue = ew_HtmlEncode($this->qty->CurrentValue);
-			$this->qty->PlaceHolder = ew_RemoveHtml($this->qty->FldCaption());
-
-			// satuan
-			$this->satuan->EditAttrs["class"] = "form-control";
-			$this->satuan->EditCustomAttributes = "";
-			$this->satuan->EditValue = ew_HtmlEncode($this->satuan->CurrentValue);
-			$this->satuan->PlaceHolder = ew_RemoveHtml($this->satuan->FldCaption());
-
-			// jumlah
-			$this->jumlah->EditAttrs["class"] = "form-control";
-			$this->jumlah->EditCustomAttributes = "";
-			$this->jumlah->EditValue = ew_HtmlEncode($this->jumlah->CurrentValue);
-			$this->jumlah->PlaceHolder = ew_RemoveHtml($this->jumlah->FldCaption());
-			if (strval($this->jumlah->EditValue) <> "" && is_numeric($this->jumlah->EditValue)) {
-			$this->jumlah->EditValue = ew_FormatNumber($this->jumlah->EditValue, -2, -2, -2, -1);
-			$this->jumlah->OldValue = $this->jumlah->EditValue;
-			}
-
-			// keterangan
-			$this->keterangan->EditAttrs["class"] = "form-control";
-			$this->keterangan->EditCustomAttributes = "";
-			$this->keterangan->EditValue = ew_HtmlEncode($this->keterangan->CurrentValue);
-			$this->keterangan->PlaceHolder = ew_RemoveHtml($this->keterangan->FldCaption());
+			// pelaksanaan_tgl
+			$this->pelaksanaan_tgl->EditAttrs["class"] = "form-control";
+			$this->pelaksanaan_tgl->EditCustomAttributes = "";
+			$this->pelaksanaan_tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->pelaksanaan_tgl->CurrentValue, 7));
+			$this->pelaksanaan_tgl->PlaceHolder = ew_RemoveHtml($this->pelaksanaan_tgl->FldCaption());
 
 			// Edit refer script
 			// invoice_id
@@ -1662,29 +1382,9 @@ class ctb_fee_grid extends ctb_fee {
 			$this->invoice_id->LinkCustomAttributes = "";
 			$this->invoice_id->HrefValue = "";
 
-			// barang_id
-			$this->barang_id->LinkCustomAttributes = "";
-			$this->barang_id->HrefValue = "";
-
-			// harga
-			$this->harga->LinkCustomAttributes = "";
-			$this->harga->HrefValue = "";
-
-			// qty
-			$this->qty->LinkCustomAttributes = "";
-			$this->qty->HrefValue = "";
-
-			// satuan
-			$this->satuan->LinkCustomAttributes = "";
-			$this->satuan->HrefValue = "";
-
-			// jumlah
-			$this->jumlah->LinkCustomAttributes = "";
-			$this->jumlah->HrefValue = "";
-
-			// keterangan
-			$this->keterangan->LinkCustomAttributes = "";
-			$this->keterangan->HrefValue = "";
+			// pelaksanaan_tgl
+			$this->pelaksanaan_tgl->LinkCustomAttributes = "";
+			$this->pelaksanaan_tgl->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -1704,20 +1404,17 @@ class ctb_fee_grid extends ctb_fee {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
+		if (!$this->invoice_id->FldIsDetailKey && !is_null($this->invoice_id->FormValue) && $this->invoice_id->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->invoice_id->FldCaption(), $this->invoice_id->ReqErrMsg));
+		}
 		if (!ew_CheckInteger($this->invoice_id->FormValue)) {
 			ew_AddMessage($gsFormError, $this->invoice_id->FldErrMsg());
 		}
-		if (!$this->barang_id->FldIsDetailKey && !is_null($this->barang_id->FormValue) && $this->barang_id->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->barang_id->FldCaption(), $this->barang_id->ReqErrMsg));
+		if (!$this->pelaksanaan_tgl->FldIsDetailKey && !is_null($this->pelaksanaan_tgl->FormValue) && $this->pelaksanaan_tgl->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->pelaksanaan_tgl->FldCaption(), $this->pelaksanaan_tgl->ReqErrMsg));
 		}
-		if (!ew_CheckNumber($this->harga->FormValue)) {
-			ew_AddMessage($gsFormError, $this->harga->FldErrMsg());
-		}
-		if (!ew_CheckInteger($this->qty->FormValue)) {
-			ew_AddMessage($gsFormError, $this->qty->FldErrMsg());
-		}
-		if (!ew_CheckNumber($this->jumlah->FormValue)) {
-			ew_AddMessage($gsFormError, $this->jumlah->FldErrMsg());
+		if (!ew_CheckEuroDate($this->pelaksanaan_tgl->FormValue)) {
+			ew_AddMessage($gsFormError, $this->pelaksanaan_tgl->FldErrMsg());
 		}
 
 		// Return validate result
@@ -1778,7 +1475,7 @@ class ctb_fee_grid extends ctb_fee {
 			foreach ($rsold as $row) {
 				$sThisKey = "";
 				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-				$sThisKey .= $row['id'];
+				$sThisKey .= $row['pelaksanaan_id'];
 				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 				$DeleteRows = $this->Delete($row); // Delete
 				$conn->raiseErrorFn = '';
@@ -1842,25 +1539,10 @@ class ctb_fee_grid extends ctb_fee {
 			$rsnew = array();
 
 			// invoice_id
-			$this->invoice_id->SetDbValueDef($rsnew, $this->invoice_id->CurrentValue, NULL, $this->invoice_id->ReadOnly);
+			$this->invoice_id->SetDbValueDef($rsnew, $this->invoice_id->CurrentValue, 0, $this->invoice_id->ReadOnly);
 
-			// barang_id
-			$this->barang_id->SetDbValueDef($rsnew, $this->barang_id->CurrentValue, 0, $this->barang_id->ReadOnly);
-
-			// harga
-			$this->harga->SetDbValueDef($rsnew, $this->harga->CurrentValue, NULL, $this->harga->ReadOnly);
-
-			// qty
-			$this->qty->SetDbValueDef($rsnew, $this->qty->CurrentValue, NULL, $this->qty->ReadOnly);
-
-			// satuan
-			$this->satuan->SetDbValueDef($rsnew, $this->satuan->CurrentValue, NULL, $this->satuan->ReadOnly);
-
-			// jumlah
-			$this->jumlah->SetDbValueDef($rsnew, $this->jumlah->CurrentValue, NULL, $this->jumlah->ReadOnly);
-
-			// keterangan
-			$this->keterangan->SetDbValueDef($rsnew, $this->keterangan->CurrentValue, NULL, $this->keterangan->ReadOnly);
+			// pelaksanaan_tgl
+			$this->pelaksanaan_tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->pelaksanaan_tgl->CurrentValue, 7), ew_CurrentDate(), $this->pelaksanaan_tgl->ReadOnly);
 
 			// Check referential integrity for master table 'tb_invoice'
 			$bValidMasterRecord = TRUE;
@@ -1956,25 +1638,10 @@ class ctb_fee_grid extends ctb_fee {
 		$rsnew = array();
 
 		// invoice_id
-		$this->invoice_id->SetDbValueDef($rsnew, $this->invoice_id->CurrentValue, NULL, FALSE);
+		$this->invoice_id->SetDbValueDef($rsnew, $this->invoice_id->CurrentValue, 0, FALSE);
 
-		// barang_id
-		$this->barang_id->SetDbValueDef($rsnew, $this->barang_id->CurrentValue, 0, FALSE);
-
-		// harga
-		$this->harga->SetDbValueDef($rsnew, $this->harga->CurrentValue, NULL, FALSE);
-
-		// qty
-		$this->qty->SetDbValueDef($rsnew, $this->qty->CurrentValue, NULL, FALSE);
-
-		// satuan
-		$this->satuan->SetDbValueDef($rsnew, $this->satuan->CurrentValue, NULL, FALSE);
-
-		// jumlah
-		$this->jumlah->SetDbValueDef($rsnew, $this->jumlah->CurrentValue, NULL, FALSE);
-
-		// keterangan
-		$this->keterangan->SetDbValueDef($rsnew, $this->keterangan->CurrentValue, NULL, FALSE);
+		// pelaksanaan_tgl
+		$this->pelaksanaan_tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->pelaksanaan_tgl->CurrentValue, 7), ew_CurrentDate(), FALSE);
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -1986,8 +1653,8 @@ class ctb_fee_grid extends ctb_fee {
 			if ($AddRow) {
 
 				// Get insert id if necessary
-				$this->id->setDbValue($conn->Insert_ID());
-				$rsnew['id'] = $this->id->DbValue;
+				$this->pelaksanaan_id->setDbValue($conn->Insert_ID());
+				$rsnew['pelaksanaan_id'] = $this->pelaksanaan_id->DbValue;
 			}
 		} else {
 			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
@@ -2029,18 +1696,6 @@ class ctb_fee_grid extends ctb_fee {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
-		case "x_barang_id":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `barang_id` AS `LinkFld`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
-			$sWhereWrk = "{filter}";
-			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`barang_id` = {filter_value}', "t0" => "3", "fn0" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
 		}
 	}
 
@@ -2054,7 +1709,7 @@ class ctb_fee_grid extends ctb_fee {
 
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
-		$table = 'tb_fee';
+		$table = 'tb_pelaksanaan';
 		$usr = CurrentUserName();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
@@ -2063,12 +1718,12 @@ class ctb_fee_grid extends ctb_fee {
 	function WriteAuditTrailOnAdd(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnAdd) return;
-		$table = 'tb_fee';
+		$table = 'tb_pelaksanaan';
 
 		// Get key value
 		$key = "";
 		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rs['id'];
+		$key .= $rs['pelaksanaan_id'];
 
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
@@ -2097,12 +1752,12 @@ class ctb_fee_grid extends ctb_fee {
 	function WriteAuditTrailOnEdit(&$rsold, &$rsnew) {
 		global $Language;
 		if (!$this->AuditTrailOnEdit) return;
-		$table = 'tb_fee';
+		$table = 'tb_pelaksanaan';
 
 		// Get key value
 		$key = "";
 		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rsold['id'];
+		$key .= $rsold['pelaksanaan_id'];
 
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
@@ -2144,13 +1799,13 @@ class ctb_fee_grid extends ctb_fee {
 	function WriteAuditTrailOnDelete(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnDelete) return;
-		$table = 'tb_fee';
+		$table = 'tb_pelaksanaan';
 
 		// Get key value
 		$key = "";
 		if ($key <> "")
 			$key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rs['id'];
+		$key .= $rs['pelaksanaan_id'];
 
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
