@@ -503,10 +503,6 @@ class ctb_invoice_view extends ctb_invoice {
 		$bLoadCurrentRecord = FALSE;
 		$sReturnUrl = "";
 		$bMatchRecord = FALSE;
-
-		// Set up Breadcrumb
-		if ($this->Export == "")
-			$this->SetupBreadcrumb();
 		if ($this->IsPageRequest()) { // Validate request
 			if (@$_GET["id"] <> "") {
 				$this->id->setQueryStringValue($_GET["id"]);
@@ -540,6 +536,10 @@ class ctb_invoice_view extends ctb_invoice {
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
+
+		// Set up Breadcrumb
+		if ($this->Export == "")
+			$this->SetupBreadcrumb();
 
 		// Render row
 		$this->RowType = EW_ROWTYPE_VIEW;
@@ -901,7 +901,7 @@ class ctb_invoice_view extends ctb_invoice {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->customer_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_customer`";
 		$sWhereWrk = "";
-		$this->customer_id->LookupFilters = array("dx1" => "`nama`");
+		$this->customer_id->LookupFilters = array("dx1" => '`nama`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1781,6 +1781,7 @@ $tb_invoice_view->ShowMessage();
 </table>
 <?php if ($tb_invoice->getCurrentDetailTable() <> "") { ?>
 <?php
+	$tb_invoice_view->DetailPages->ValidKeys = explode(",", $tb_invoice->getCurrentDetailTable());
 	$FirstActiveDetailTable = $tb_invoice_view->DetailPages->ActivePageIndex();
 ?>
 <div class="ewDetailPages">

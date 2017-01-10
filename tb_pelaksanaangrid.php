@@ -320,8 +320,13 @@ $tb_pelaksanaan_grid->ListOptions->Render("body", "left", $tb_pelaksanaan_grid->
 <span<?php echo $tb_pelaksanaan->invoice_id->ViewAttributes() ?>>
 <?php echo $tb_pelaksanaan->invoice_id->ListViewValue() ?></span>
 </span>
+<?php if ($tb_pelaksanaan->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_pelaksanaan" data-field="x_invoice_id" name="x<?php echo $tb_pelaksanaan_grid->RowIndex ?>_invoice_id" id="x<?php echo $tb_pelaksanaan_grid->RowIndex ?>_invoice_id" value="<?php echo ew_HtmlEncode($tb_pelaksanaan->invoice_id->FormValue) ?>">
 <input type="hidden" data-table="tb_pelaksanaan" data-field="x_invoice_id" name="o<?php echo $tb_pelaksanaan_grid->RowIndex ?>_invoice_id" id="o<?php echo $tb_pelaksanaan_grid->RowIndex ?>_invoice_id" value="<?php echo ew_HtmlEncode($tb_pelaksanaan->invoice_id->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_pelaksanaan" data-field="x_invoice_id" name="ftb_pelaksanaangrid$x<?php echo $tb_pelaksanaan_grid->RowIndex ?>_invoice_id" id="ftb_pelaksanaangrid$x<?php echo $tb_pelaksanaan_grid->RowIndex ?>_invoice_id" value="<?php echo ew_HtmlEncode($tb_pelaksanaan->invoice_id->FormValue) ?>">
+<input type="hidden" data-table="tb_pelaksanaan" data-field="x_invoice_id" name="ftb_pelaksanaangrid$o<?php echo $tb_pelaksanaan_grid->RowIndex ?>_invoice_id" id="ftb_pelaksanaangrid$o<?php echo $tb_pelaksanaan_grid->RowIndex ?>_invoice_id" value="<?php echo ew_HtmlEncode($tb_pelaksanaan->invoice_id->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 <a id="<?php echo $tb_pelaksanaan_grid->PageObjName . "_row_" . $tb_pelaksanaan_grid->RowCnt ?>"></a></td>
 	<?php } ?>
@@ -360,8 +365,13 @@ ew_CreateCalendar("ftb_pelaksanaangrid", "x<?php echo $tb_pelaksanaan_grid->RowI
 <span<?php echo $tb_pelaksanaan->pelaksanaan_tgl->ViewAttributes() ?>>
 <?php echo $tb_pelaksanaan->pelaksanaan_tgl->ListViewValue() ?></span>
 </span>
+<?php if ($tb_pelaksanaan->CurrentAction <> "F") { ?>
 <input type="hidden" data-table="tb_pelaksanaan" data-field="x_pelaksanaan_tgl" name="x<?php echo $tb_pelaksanaan_grid->RowIndex ?>_pelaksanaan_tgl" id="x<?php echo $tb_pelaksanaan_grid->RowIndex ?>_pelaksanaan_tgl" value="<?php echo ew_HtmlEncode($tb_pelaksanaan->pelaksanaan_tgl->FormValue) ?>">
 <input type="hidden" data-table="tb_pelaksanaan" data-field="x_pelaksanaan_tgl" name="o<?php echo $tb_pelaksanaan_grid->RowIndex ?>_pelaksanaan_tgl" id="o<?php echo $tb_pelaksanaan_grid->RowIndex ?>_pelaksanaan_tgl" value="<?php echo ew_HtmlEncode($tb_pelaksanaan->pelaksanaan_tgl->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="tb_pelaksanaan" data-field="x_pelaksanaan_tgl" name="ftb_pelaksanaangrid$x<?php echo $tb_pelaksanaan_grid->RowIndex ?>_pelaksanaan_tgl" id="ftb_pelaksanaangrid$x<?php echo $tb_pelaksanaan_grid->RowIndex ?>_pelaksanaan_tgl" value="<?php echo ew_HtmlEncode($tb_pelaksanaan->pelaksanaan_tgl->FormValue) ?>">
+<input type="hidden" data-table="tb_pelaksanaan" data-field="x_pelaksanaan_tgl" name="ftb_pelaksanaangrid$o<?php echo $tb_pelaksanaan_grid->RowIndex ?>_pelaksanaan_tgl" id="ftb_pelaksanaangrid$o<?php echo $tb_pelaksanaan_grid->RowIndex ?>_pelaksanaan_tgl" value="<?php echo ew_HtmlEncode($tb_pelaksanaan->pelaksanaan_tgl->OldValue) ?>">
+<?php } ?>
 <?php } ?>
 </td>
 	<?php } ?>

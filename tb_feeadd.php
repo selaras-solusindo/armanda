@@ -654,7 +654,7 @@ class ctb_fee_add extends ctb_fee {
 			$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 		$sWhereWrk = "";
-		$this->barang_id->LookupFilters = array("dx1" => "`nama`");
+		$this->barang_id->LookupFilters = array("dx1" => '`nama`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -749,7 +749,7 @@ class ctb_fee_add extends ctb_fee {
 			}
 			$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `tb_barang`";
 			$sWhereWrk = "";
-			$this->barang_id->LookupFilters = array("dx1" => "`nama`");
+			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1025,8 +1025,8 @@ class ctb_fee_add extends ctb_fee {
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `barang_id` AS `LinkFld`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 			$sWhereWrk = "{filter}";
-			$this->barang_id->LookupFilters = array("dx1" => "`nama`");
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => "`barang_id` = {filter_value}", "t0" => "3", "fn0" => "");
+			$this->barang_id->LookupFilters = array("dx1" => '`nama`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`barang_id` = {filter_value}', "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;

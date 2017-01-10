@@ -29,5 +29,3 @@ mysql_select_db($database_conn) or die ("Database tidak ditemukan");
 </html>
 
 
-
-

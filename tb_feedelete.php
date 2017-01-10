@@ -541,7 +541,7 @@ class ctb_fee_delete extends ctb_fee {
 			$sFilterWrk = "`barang_id`" . ew_SearchString("=", $this->barang_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `barang_id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_barang`";
 		$sWhereWrk = "";
-		$this->barang_id->LookupFilters = array("dx1" => "`nama`");
+		$this->barang_id->LookupFilters = array("dx1" => '`nama`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->barang_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
