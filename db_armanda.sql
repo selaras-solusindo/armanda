@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jan 10, 2017 at 09:04 AM
+-- Generation Time: Jan 10, 2017 at 10:13 AM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.1
 
@@ -484,16 +484,16 @@ INSERT INTO `view4` (`nama`, `no_kuitansi`, `no_invoice`, `total_ppn`, `tgl_pela
 -- Table structure for table `view5`
 --
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `db_armanda`.`view5` AS select `db_armanda`.`tb_invoice`.`id` AS `id`,`db_armanda`.`tb_invoice`.`customer_id` AS `customer_id`,`db_armanda`.`tb_invoice`.`no_invoice` AS `no_invoice`,`db_armanda`.`tb_invoice`.`tgl_invoice` AS `tgl_invoice`,`db_armanda`.`tb_invoice`.`no_order` AS `no_order`,`db_armanda`.`tb_invoice`.`no_referensi` AS `no_referensi`,`db_armanda`.`tb_invoice`.`kegiatan` AS `kegiatan`,`db_armanda`.`tb_invoice`.`tgl_pelaksanaan` AS `tgl_pelaksanaan`,`db_armanda`.`tb_invoice`.`no_sertifikat` AS `no_sertifikat`,`db_armanda`.`tb_invoice`.`keterangan` AS `keterangan`,`db_armanda`.`tb_invoice`.`total` AS `total`,`db_armanda`.`tb_invoice`.`ppn` AS `ppn`,`db_armanda`.`tb_invoice`.`total_ppn` AS `total_ppn`,`db_armanda`.`tb_invoice`.`terbilang` AS `terbilang`,`db_armanda`.`tb_customer`.`nama` AS `nama`,`db_armanda`.`tb_invoice`.`no_kuitansi` AS `no_kuitansi` from ((`db_armanda`.`tb_invoice` join `db_armanda`.`tb_customer` on((`db_armanda`.`tb_invoice`.`customer_id` = `db_armanda`.`tb_customer`.`id`))) left join `db_armanda`.`tb_kuitansi` on((`db_armanda`.`tb_kuitansi`.`invoice_id` = `db_armanda`.`tb_invoice`.`id`))) where (`db_armanda`.`tb_invoice`.`ppn` <> 0);
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `db_armanda`.`view5` AS select `db_armanda`.`tb_invoice`.`id` AS `id`,`db_armanda`.`tb_invoice`.`customer_id` AS `customer_id`,`db_armanda`.`tb_invoice`.`no_invoice` AS `no_invoice`,`db_armanda`.`tb_invoice`.`tgl_invoice` AS `tgl_invoice`,`db_armanda`.`tb_invoice`.`no_order` AS `no_order`,`db_armanda`.`tb_invoice`.`no_referensi` AS `no_referensi`,`db_armanda`.`tb_invoice`.`kegiatan` AS `kegiatan`,`db_armanda`.`tb_invoice`.`tgl_pelaksanaan` AS `tgl_pelaksanaan`,`db_armanda`.`tb_invoice`.`no_sertifikat` AS `no_sertifikat`,`db_armanda`.`tb_invoice`.`keterangan` AS `keterangan`,`db_armanda`.`tb_invoice`.`total` AS `total`,`db_armanda`.`tb_invoice`.`ppn` AS `ppn`,`db_armanda`.`tb_invoice`.`total_ppn` AS `total_ppn`,`db_armanda`.`tb_invoice`.`terbilang` AS `terbilang`,`db_armanda`.`tb_customer`.`nama` AS `nama`,`db_armanda`.`tb_invoice`.`no_kuitansi` AS `no_kuitansi`,((`db_armanda`.`tb_invoice`.`ppn` / 100) * `db_armanda`.`tb_invoice`.`total`) AS `ppn_nilai` from ((`db_armanda`.`tb_invoice` join `db_armanda`.`tb_customer` on((`db_armanda`.`tb_invoice`.`customer_id` = `db_armanda`.`tb_customer`.`id`))) left join `db_armanda`.`tb_kuitansi` on((`db_armanda`.`tb_kuitansi`.`invoice_id` = `db_armanda`.`tb_invoice`.`id`))) where (`db_armanda`.`tb_invoice`.`ppn` <> 0);
 
 --
 -- Dumping data for table `view5`
 --
 
-INSERT INTO `view5` (`id`, `customer_id`, `no_invoice`, `tgl_invoice`, `no_order`, `no_referensi`, `kegiatan`, `tgl_pelaksanaan`, `no_sertifikat`, `keterangan`, `total`, `ppn`, `total_ppn`, `terbilang`, `nama`, `no_kuitansi`) VALUES
-(2, 1, 'q123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 555000.00, 10, 610500.00, ' enam ratus sepuluh ribu lima ratus ', 'PT. Angkasa Buana Cipta', NULL),
-(3, 1, '007', '2016-12-20', '7', '8', 'tes', '2016-12-21', '9', '-', 56000.00, 10, 61600.00, ' enam puluh satu ribu enam ratus ', 'PT. Angkasa Buana Cipta', 'x2x2'),
-(4, 2, 'mjs123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 60000.00, 10, 66000.00, ' enam puluh enam ribu ', 'MJS, PT', NULL);
+INSERT INTO `view5` (`id`, `customer_id`, `no_invoice`, `tgl_invoice`, `no_order`, `no_referensi`, `kegiatan`, `tgl_pelaksanaan`, `no_sertifikat`, `keterangan`, `total`, `ppn`, `total_ppn`, `terbilang`, `nama`, `no_kuitansi`, `ppn_nilai`) VALUES
+(2, 1, 'q123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 555000.00, 10, 610500.00, ' enam ratus sepuluh ribu lima ratus ', 'PT. Angkasa Buana Cipta', NULL, 55500.0000),
+(3, 1, '007', '2016-12-20', '7', '8', 'tes', '2016-12-21', '9', '-', 56000.00, 10, 61600.00, ' enam puluh satu ribu enam ratus ', 'PT. Angkasa Buana Cipta', 'x2x2', 5600.0000),
+(4, 2, 'mjs123', '2016-12-20', NULL, NULL, NULL, NULL, NULL, NULL, 60000.00, 10, 66000.00, ' enam puluh enam ribu ', 'MJS, PT', NULL, 6000.0000);
 
 -- --------------------------------------------------------
 

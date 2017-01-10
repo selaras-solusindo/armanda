@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ew-language date="2017/1/9" version="9.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/1/10" version="9.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
 	<locale>
 		<phrase id="locale" value=""/><!-- *** system locale for this language -->
 		<phrase id="use_system_locale" value="1"/><!-- *** change to "0" to disable system locale and use the following settings *** -->
@@ -595,6 +595,8 @@
 </field>
 <field id="terbilang"><phrase id="fldcaption" value="terbilang"/>
 </field>
+<field id="ppn_nilai"><phrase id="fldcaption" value="ppn nilai"/>
+</field>
 </table>
 <table id="report4"><phrase id="tblcaption" value="Invoice (PPN)"/>
 <field id="tgl_invoice"><phrase id="fldcaption" value="Tgl. INV"/>
@@ -604,8 +606,6 @@
 <field id="no_kuitansi"><phrase id="fldcaption" value="No. KW"/>
 </field>
 <field id="no_referensi"><phrase id="fldcaption" value="No. Seri Faktur Pajak"/>
-</field>
-<field id="ppn_nilai"><phrase id="fldcaption" value="PPN 10%"/>
 </field>
 <field id="total_ppn"><phrase id="fldcaption" value="Rp."/>
 </field>
@@ -630,6 +630,8 @@
 <field id="ppn"><phrase id="fldcaption" value="ppn"/>
 </field>
 <field id="terbilang"><phrase id="fldcaption" value="terbilang"/>
+</field>
+<field id="ppn_nilai"><phrase id="fldcaption" value="PPN 10%"/>
 </field>
 </table>
 <table id="tb_user"><phrase id="tblcaption" value="tb user"/>
@@ -824,6 +826,8 @@
 <field id="nama"><phrase id="fldcaption" value="nama"/>
 </field>
 <field id="no_kuitansi"><phrase id="fldcaption" value="no kuitansi"/>
+</field>
+<field id="ppn_nilai"><phrase id="fldcaption" value="ppn nilai"/>
 </field>
 </table>
 </project>

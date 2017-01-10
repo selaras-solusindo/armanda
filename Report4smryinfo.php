@@ -71,8 +71,7 @@ class crReport4 extends crTableBase {
 		$this->no_referensi->SqlOrderBy = "";
 
 		// ppn_nilai
-		$this->ppn_nilai = new crField('Report4', 'Report4', 'x_ppn_nilai', 'ppn_nilai', '(`ppn`/100) * `total`', 5, EWR_DATATYPE_NUMBER, -1);
-		$this->ppn_nilai->FldIsCustom = TRUE; // Custom field
+		$this->ppn_nilai = new crField('Report4', 'Report4', 'x_ppn_nilai', 'ppn_nilai', '`ppn_nilai`', 5, EWR_DATATYPE_NUMBER, -1);
 		$this->ppn_nilai->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['ppn_nilai'] = &$this->ppn_nilai;
 		$this->ppn_nilai->DateFilter = "";
@@ -358,7 +357,7 @@ class crReport4 extends crTableBase {
 	var $_SqlSelectAgg = "";
 
 	function getSqlSelectAgg() {
-		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT SUM((`ppn`/100) * `total`) AS `sum_ppn_nilai`, SUM(`total_ppn`) AS `sum_total_ppn` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT SUM(`ppn_nilai`) AS `sum_ppn_nilai`, SUM(`total_ppn`) AS `sum_total_ppn` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelectAgg() { // For backward compatibility

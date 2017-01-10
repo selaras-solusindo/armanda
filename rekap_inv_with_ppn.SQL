@@ -13,7 +13,8 @@ Select tb_invoice.id As id,
   tb_invoice.total_ppn As total_ppn,
   tb_invoice.terbilang As terbilang,
   tb_customer.nama As nama,
-  tb_invoice.no_kuitansi
+  tb_invoice.no_kuitansi As no_kuitansi,
+  (tb_invoice.ppn / 100) * tb_invoice.total As ppn_nilai
 From (tb_invoice
   Join tb_customer On tb_invoice.customer_id = tb_customer.id)
   Left Join tb_kuitansi On tb_kuitansi.invoice_id = tb_invoice.id
