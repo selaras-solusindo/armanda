@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/1/10" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/1/17" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -926,17 +926,8 @@
         <phrase id="fldtagvalue2" value="1" />
         <phrase id="fldtagcaption2" value="Ya" />
       </field>
-      <field id="terbayar">
-        <phrase id="fldcaption" value="terbayar" />
-      </field>
-      <field id="no_kuitansi">
-        <phrase id="fldcaption" value="no kuitansi" />
-      </field>
-      <field id="pelaksanaan_tgl">
-        <phrase id="fldcaption" value="pelaksanaan tgl" />
-      </field>
-      <field id="barang_id">
-        <phrase id="fldcaption" value="barang id" />
+      <field id="tgl_pelaksanaan">
+        <phrase id="fldcaption" value="tgl pelaksanaan" />
       </field>
     </table>
     <table id="tb_pelaksanaan">
@@ -1144,9 +1135,6 @@
       </field>
       <field id="no_kuitansi">
         <phrase id="fldcaption" value="no kuitansi" />
-      </field>
-      <field id="ppn_nilai">
-        <phrase id="fldcaption" value="ppn nilai" />
       </field>
     </table>
   </project>

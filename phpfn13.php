@@ -2043,7 +2043,6 @@ class cField {
 				$html = "<input type=\"radio\" data-table=\"" . $this->TblVar . "\" data-field=\"" . $this->FldVar . "\"" .
 					(($page > -1) ? " data-page=\"" . $page . "\"" : "") .
 					" name=\"" . $name . "\" id=\"" . $name . "_" . $rowcntwrk . "\"" .
-					" data-value-separator=\"" . $this->DisplayValueSeparatorAttribute() . "\"" .
 					" value=\"" . ew_HtmlEncode($arwrk[$rowcntwrk][0]) . "\" checked" . $this->EditAttributes() . ">" . $this->DisplayValue($arwrk[$rowcntwrk]);
 				if (!$isDropdown)
 					$html = "<label class=\"radio-inline\">" . $html . "</label>";
@@ -2053,7 +2052,6 @@ class cField {
 				$html = "<input type=\"radio\" data-table=\"" . $this->TblVar . "\" data-field=\"" . $this->FldVar . "\"" .
 					(($page > -1) ? " data-page=\"" . $page . "\"" : "") .
 					" name=\"" . $name . "\" id=\"" . $name . "_" .  $rowswrk . "\"" .
-					" data-value-separator=\"" . $this->DisplayValueSeparatorAttribute() . "\"" .
 					" value=\"" . ew_HtmlEncode($curValue) . "\" checked" . $this->EditAttributes() . ">" . $curValue;
 				if (!$isDropdown)
 					$html = "<label class=\"radio-inline\">" . $html . "</label>";
@@ -2091,7 +2089,6 @@ class cField {
 				$html = "<input type=\"checkbox\" data-table=\"" . $this->TblVar . "\" data-field=\"" . $this->FldVar . "\"" .
 					(($page > -1) ? " data-page=\"" . $page . "\"" : "") .
 					" name=\"" . $name . "\" id=\"" . $name . "_" . $rowcntwrk . "\"" .
-					" data-value-separator=\"" . $this->DisplayValueSeparatorAttribute() . "\"" .
 					" value=\"" . ew_HtmlEncode($arwrk[$rowcntwrk][0]) . "\" checked" . $this->EditAttributes() . ">" . $this->DisplayValue($arwrk[$rowcntwrk]);
 				if (!$isDropdown)
 					$html = "<label class=\"checkbox-inline\">" . $html . "</label>"; // Note: No spacing within the LABEL tag
@@ -2102,7 +2099,6 @@ class cField {
 					$html = "<input type=\"checkbox\" data-table=\"" . $this->TblVar . "\" data-field=\"" . $this->FldVar . "\"" .
 						(($page > -1) ? " data-page=\"" . $page . "\"" : "") .
 						" name=\"" . $name . "\" value=\"" . ew_HtmlEncode($armultiwrk[$ari]) . "\" checked" .
-						" data-value-separator=\"" . $this->DisplayValueSeparatorAttribute() . "\"" .
 						$this->EditAttributes() . ">" . $armultiwrk[$ari];
 					if (!$isDropdown)
 						$html = "<label class=\"checkbox-inline\">" . $html . "</label>";
@@ -2424,37 +2420,26 @@ class cField {
 
 	// Form value
 	function setFormValue($v, $current = TRUE) {
-		$v = ew_StripSlashes($v);
-		if (is_array($v))
-			$v = implode(",", $v);
-		if ($this->FldDataType == EW_DATATYPE_NUMBER && !ew_IsNumeric($v)) // Check data type
-			$this->FormValue = NULL;
-		else
-			$this->FormValue = $v;
+		$this->FormValue = ew_StripSlashes($v);
+		if (is_array($this->FormValue))
+			$this->FormValue = implode(",", $this->FormValue);
 		if ($current)
 			$this->CurrentValue = $this->FormValue;
 	}
 
 	// Old value (from $_POST)
 	function setOldValue($v) {
-		$v = ew_StripSlashes($v);
-		if (is_array($v))
-			$v = implode(",", $v);
-		if ($this->FldDataType == EW_DATATYPE_NUMBER && !ew_IsNumeric($v)) // Check data type
-			$this->OldValue = NULL;
-		else
+		$this->OldValue = ew_StripSlashes($v);
+		if (is_array($this->OldValue)) {
+			$this->OldValue = implode(",", $this->OldValue);
+		} else {
 			$this->OldValue = $v;
+		}
 	}
 
 	// QueryString value
 	function setQueryStringValue($v, $current = TRUE) {
-		$v = ew_StripSlashes($v);
-		if (is_array($v))
-			$v = implode(",", $v);
-		if ($this->FldDataType == EW_DATATYPE_NUMBER && !ew_IsNumeric($v)) // Check data type
-			$this->QueryStringValue = NULL;
-		else
-			$this->QueryStringValue = $v;
+		$this->QueryStringValue = ew_StripSlashes($v);
 		if ($current)
 			$this->CurrentValue = $this->QueryStringValue;
 	}
@@ -2476,14 +2461,12 @@ class cField {
 			case 17:
 			case 18:  // Integer
 				$value = trim($value);
-				$value = ew_StrToInt($value);
 				$DbValue = (is_numeric($value)) ? intval($value) : $default;
 				break;
 			case 19:
 			case 20:
 			case 21: // Big integer
 				$value = trim($value);
-				$value = ew_StrToInt($value);
 				$DbValue = (is_numeric($value)) ? $value : $default;
 				break;
 			case 5:
@@ -2544,7 +2527,6 @@ class cField {
 
 	// Lookup filter query
 	function LookupFilterQuery($isAutoSuggest = FALSE, $pageId = NULL) {
-		global $gsLanguage;
 		$tbl = $GLOBALS[$this->TblVar];
 		if ($isAutoSuggest) {
 			if (method_exists($tbl, "SetupAutoSuggestFilters"))
@@ -2557,7 +2539,6 @@ class cField {
 			if (preg_match('/^f\d+$|^s$|^dx\d+$/', $key)) // "f<n>" or "s" or "dx<n>"
 				$value = ew_Encrypt($value); // Encrypt SQL and filter
 		}
-		$this->LookupFilters["lang"] = @$gsLanguage;
 		return http_build_query($this->LookupFilters);
 	}
 }
@@ -3218,8 +3199,6 @@ class cSubPages {
 	var $Justified = FALSE;
 	var $Style = ""; // "tabs" or "pills" or "" (panels)
 	var $Items = array();
-	var $ValidKeys = NULL;
-	var $ActiveIndex = "";
 
 	// Get nav style
 	function NavStyle() {
@@ -3284,17 +3263,13 @@ class cSubPages {
 
 		// Return first active page
 		foreach ($this->Items as $key => $item)
-			if ((!is_array($this->ValidKeys) || in_array($key, $this->ValidKeys)) && $item->Visible && !$item->Disabled && $item->Active && $key !== 0) { // Not common page
-				$this->ActiveIndex = $key;
-				return $this->ActiveIndex;
-			}
+			if ($item->Visible && !$item->Disabled && $item->Active && $key !== 0) // Not common page
+				return $key;
 
 		// If not found, return first visible page
 		foreach ($this->Items as $key => $item)
-			if ((!is_array($this->ValidKeys) || in_array($key, $this->ValidKeys)) && $item->Visible && !$item->Disabled && $key !== 0) { // Not common page
-				$this->ActiveIndex = $key;
-				return $this->ActiveIndex;
-			}
+			if ($item->Visible && !$item->Disabled && $key !== 0) // Not common page
+				return $key;
 
 		// Not found
 		return NULL;
@@ -3505,7 +3480,7 @@ class cAdvancedSearch {
 
 	// Convert to JSON
 	function ToJSON() {
-		if ($this->SearchValue <> "" || $this->SearchValue2 <> "" || in_array($this->SearchOperator, array("IS NULL", "IS NOT NULL")) || in_array($this->SearchOperator2, array("IS NULL", "IS NOT NULL"))) {
+		if ($this->SearchValue <> "" || $this->SearchValue2 <> "") {
 			return "\"x" . $this->_Suffix . "\":\"" . ew_JsEncode2($this->SearchValue) . "\"," .
 				"\"z" . $this->_Suffix . "\":\"" . ew_JsEncode2($this->SearchOperator) . "\"," .
 				"\"v" . $this->_Suffix . "\":\"" . ew_JsEncode2($this->SearchCondition) . "\"," .
@@ -4780,101 +4755,6 @@ function ew_IsHttpPost() {
 	return strpos($ct, "application/x-www-form-urlencoded") !== FALSE;
 }
 
-// Cast date/time field for LIKE
-function ew_CastDateFieldForLike($fld, $namedformat, $dbid = 0) {
-	global $EW_DATE_SEPARATOR, $EW_TIME_SEPARATOR, $EW_DATE_FORMAT, $EW_DATE_FORMAT_ID;
-	$dbtype = ew_GetConnectionType($dbid);
-	$isDateTime = FALSE; // Date/Time
-	if ($namedformat == 0 || $namedformat == 1 || $namedformat == 2 || $namedformat == 8) {
-		$isDateTime = ($namedformat == 1 || $namedformat == 8);
-		$namedformat = $EW_DATE_FORMAT_ID;
-	}
-	$shortYear = ($namedformat >= 12 && $namedformat <= 17);
-	$isDateTime = $isDateTime || in_array($namedformat, array(9, 10, 11, 15, 16, 17));
-	$dateFormat = "";
-	switch ($namedformat) {
-		case 3:
-			if ($dbtype == "MYSQL") {
-				$dateFormat = "%h" . $EW_TIME_SEPARATOR . "%i" . $EW_TIME_SEPARATOR . "%s %p";
-			} else if ($dbtype == "ACCESS") {
-				$dateFormat = "hh" . $EW_TIME_SEPARATOR . "nn" . $EW_TIME_SEPARATOR . "ss AM/PM";
-			} else if ($dbtype == "MSSQL") {
-				$dateFormat = "REPLACE(LTRIM(RIGHT(CONVERT(VARCHAR(19), %s, 0), 7)), ':', '" . $EW_TIME_SEPARATOR . "')"; // Use hh:miAM (or PM) only or SQL too lengthy
-			} else if ($dbtype == "ORACLE") {
-				$dateFormat = "HH" . $EW_TIME_SEPARATOR . "MI" . $EW_TIME_SEPARATOR . "SS AM";
-			}
-			break;
-		case 4:
-			if ($dbtype == "MYSQL") {
-				$dateFormat = "%H" . $EW_TIME_SEPARATOR . "%i" . $EW_TIME_SEPARATOR . "%s";
-			} else if ($dbtype == "ACCESS") {
-				$dateFormat = "hh" . $EW_TIME_SEPARATOR . "nn" . $EW_TIME_SEPARATOR . "ss";
-			} else if ($dbtype == "MSSQL") {
-				$dateFormat = "REPLACE(CONVERT(VARCHAR(8), %s, 108), ':', '" . $EW_TIME_SEPARATOR . "')";
-			} else if ($dbtype == "ORACLE") {
-				$dateFormat = "HH24" . $EW_TIME_SEPARATOR . "MI" . $EW_TIME_SEPARATOR . "SS";
-			}
-			break;
-		case 5: case 9: case 12: case 15:
-			if ($dbtype == "MYSQL") {
-				$dateFormat = ($shortYear ? "%y" : "%Y") . $EW_DATE_SEPARATOR . "%m" . $EW_DATE_SEPARATOR . "%d";
-				if ($isDateTime) $dateFormat .= " %H" . $EW_TIME_SEPARATOR . "%i" . $EW_TIME_SEPARATOR . "%s";
-			} else if ($dbtype == "ACCESS") {
-				$dateFormat = ($shortYear ? "yy" : "yyyy") . $EW_DATE_SEPARATOR . "mm" . $EW_DATE_SEPARATOR . "dd";
-				if ($isDateTime) $dateFormat .= " hh" . $EW_TIME_SEPARATOR . "nn" . $EW_TIME_SEPARATOR . "ss";
-			} else if ($dbtype == "MSSQL") {
-				$dateFormat = "REPLACE(" . ($shortYear ? "CONVERT(VARCHAR(8), %s, 2)" : "CONVERT(VARCHAR(10), %s, 102)") . ", '.', '" . $EW_DATE_SEPARATOR . "')";
-				if ($isDateTime) $dateFormat = "(" . $dateFormat . " + ' ' + REPLACE(CONVERT(VARCHAR(8), %s, 108), ':', '" . $EW_TIME_SEPARATOR . "'))";
-			} else if ($dbtype == "ORACLE") {
-				$dateFormat = ($shortYear ? "YY" : "YYYY") . $EW_DATE_SEPARATOR . "MM" . $EW_DATE_SEPARATOR . "DD";
-				if ($isDateTime) $dateFormat .= " HH24" . $EW_TIME_SEPARATOR . "MI" . $EW_TIME_SEPARATOR . "SS";
-			}
-			break;
-		case 6: case 10: case 13: case 16:
-			if ($dbtype == "MYSQL") {
-				$dateFormat = "%m" . $EW_DATE_SEPARATOR . "%d" . $EW_DATE_SEPARATOR . ($shortYear ? "%y" : "%Y");
-				if ($isDateTime) $dateFormat .= " %H" . $EW_TIME_SEPARATOR . "%i" . $EW_TIME_SEPARATOR . "%s";
-			} else if ($dbtype == "ACCESS") {
-				$dateFormat = "mm" . $EW_DATE_SEPARATOR . "dd" . $EW_DATE_SEPARATOR . ($shortYear ? "yy" : "yyyy");
-				if ($isDateTime) $dateFormat .= " hh" . $EW_TIME_SEPARATOR . "nn" . $EW_TIME_SEPARATOR . "ss";
-			} else if ($dbtype == "MSSQL") {
-				$dateFormat = "REPLACE(" . ($shortYear ? "CONVERT(VARCHAR(8), %s, 1)" : "CONVERT(VARCHAR(10), %s, 101)") . ", '/', '" . $EW_DATE_SEPARATOR . "')";
-				if ($isDateTime) $dateFormat = "(" . $dateFormat . " + ' ' + REPLACE(CONVERT(VARCHAR(8), %s, 108), ':', '" . $EW_TIME_SEPARATOR . "'))";
-			} else if ($dbtype == "ORACLE") {
-				$dateFormat = "MM" . $EW_DATE_SEPARATOR . "DD" . $EW_DATE_SEPARATOR . ($shortYear ? "YY" : "YYYY");
-				if ($isDateTime) $dateFormat .= " HH24" . $EW_TIME_SEPARATOR . "MI" . $EW_TIME_SEPARATOR . "SS";
-			}
-			break;
-		case 7: case 11: case 14: case 17:
-			if ($dbtype == "MYSQL") {
-				$dateFormat = "%d" . $EW_DATE_SEPARATOR . "%m" . $EW_DATE_SEPARATOR . ($shortYear ? "%y" : "%Y");
-				if ($isDateTime) $dateFormat .= " %H" . $EW_TIME_SEPARATOR . "%i" . $EW_TIME_SEPARATOR . "%s";
-			} else if ($dbtype == "ACCESS") {
-				$dateFormat = "dd" . $EW_DATE_SEPARATOR . "mm" . $EW_DATE_SEPARATOR . ($shortYear ? "yy" : "yyyy");
-				if ($isDateTime) $dateFormat .= " hh" . $EW_TIME_SEPARATOR . "nn" . $EW_TIME_SEPARATOR . "ss";
-			} else if ($dbtype == "MSSQL") {
-				$dateFormat = "REPLACE(" . ($shortYear ? "CONVERT(VARCHAR(8), %s, 3)" : "CONVERT(VARCHAR(10), %s, 103)") . ", '/', '" . $EW_DATE_SEPARATOR . "')";
-				if ($isDateTime) $dateFormat = "(" . $dateFormat . " + ' ' + REPLACE(CONVERT(VARCHAR(8), %s, 108), ':', '" . $EW_TIME_SEPARATOR . "'))";
-			} else if ($dbtype == "ORACLE") {
-				$dateFormat = "DD" . $EW_DATE_SEPARATOR . "MM" . $EW_DATE_SEPARATOR . ($shortYear ? "YY" : "YYYY");
-				if ($isDateTime) $dateFormat .= " HH24" . $EW_TIME_SEPARATOR . "MI" . $EW_TIME_SEPARATOR . "SS";
-			}
-			break;
-	}
-	if ($dateFormat) {
-		if ($dbtype == "MYSQL") {
-			return "DATE_FORMAT(" . $fld . ", '" . $dateFormat . "')";
-		} else if ($dbtype == "ACCESS") {
-			return "FORMAT(" . $fld . ", '" . $dateFormat . "')";
-		} else if ($dbtype == "MSSQL") {
-			return str_replace("%s", $fld, $dateFormat);
-		} else if ($dbtype == "ORACLE") {
-			return "TO_CHAR(" . $fld . ", '" . $dateFormat . "')";
-		}
-	}
-	return $fld;
-}
-
 // Append like operator
 function ew_Like($pat, $dbid = 0) {
 	$dbtype = ew_GetConnectionType($dbid);
@@ -4902,10 +4782,7 @@ function ew_GetMultiSearchSql(&$Fld, $FldOpr, $FldVal, $dbid) {
 	if ($FldOpr == "IS NULL" || $FldOpr == "IS NOT NULL") {
 		return $Fld->FldExpression . " " . $FldOpr;
 	} else {
-		if ($FldOpr == "LIKE")
-			$sWrk = "";
-		else
-			$sWrk = $Fld->FldExpression . ew_SearchString($FldOpr, $FldVal, EW_DATATYPE_STRING, $dbid);
+		$sWrk = "";
 		$arVal = explode(",", $FldVal);
 		$dbtype = ew_GetConnectionType($dbid);
 		foreach ($arVal as $sVal) {
@@ -4914,19 +4791,13 @@ function ew_GetMultiSearchSql(&$Fld, $FldOpr, $FldVal, $dbid) {
 				$sSql = $Fld->FldExpression . " IS NULL";
 			} elseif ($sVal == EW_NOT_NULL_VALUE) {
 				$sSql = $Fld->FldExpression . " IS NOT NULL";
+			} elseif ($dbtype == "MYSQL") {
+				$sSql = "FIND_IN_SET('" . ew_AdjustSql($sVal, $dbid) . "', " . $Fld->FldExpression . ")";
 			} else {
-				if ($FldOpr == "LIKE") {
-					if ($dbtype == "MYSQL") {
-						$sSql = "FIND_IN_SET('" . ew_AdjustSql($sVal, $dbid) . "', " . $Fld->FldExpression . ")";
-					} else {
-						if (count($arVal) == 1 || EW_SEARCH_MULTI_VALUE_OPTION == 3) {
-							$sSql = $Fld->FldExpression . " = '" . ew_AdjustSql($sVal, $dbid) . "' OR " . ew_GetMultiSearchSqlPart($Fld, $sVal, $dbid);
-						} else {
-							$sSql = ew_GetMultiSearchSqlPart($Fld, $sVal, $dbid);
-						}
-					}
+				if (count($arVal) == 1 || EW_SEARCH_MULTI_VALUE_OPTION == 3) {
+					$sSql = $Fld->FldExpression . " = '" . ew_AdjustSql($sVal, $dbid) . "' OR " . ew_GetMultiSearchSqlPart($Fld, $sVal, $dbid);
 				} else {
-					$sSql = $Fld->FldExpression . ew_SearchString($FldOpr, $sVal, EW_DATATYPE_STRING, $dbid);
+					$sSql = ew_GetMultiSearchSqlPart($Fld, $sVal, $dbid);
 				}
 			}
 			if ($sWrk <> "") {
@@ -4952,12 +4823,6 @@ function ew_GetMultiSearchSqlPart(&$Fld, $FldVal, $dbid) {
 // Check if float format
 function ew_IsFloatFormat($FldType) {
 	return ($FldType == 4 || $FldType == 5 || $FldType == 131 || $FldType == 6);
-}
-
-// Check if is numeric
-function ew_IsNumeric($Value) {
-	$Value = ew_StrToFloat($Value);
-	return is_numeric($Value);
 }
 
 // Get search SQL
@@ -5049,10 +4914,10 @@ function ew_SearchString($FldOpr, $FldVal, $FldType, $dbid) {
 	} elseif ($FldOpr == "ENDS WITH") {
 		return ew_Like(ew_QuotedValue("%$FldVal", $FldType, $dbid), $dbid);
 	} else {
+		$str = " $FldOpr " . ew_QuotedValue($FldVal, $FldType, $dbid);
 		if ($FldType == EW_DATATYPE_NUMBER && !is_numeric($FldVal)) // Invalid field value
- 			return " = -1 AND 1 = 0"; // Always false
-		else
-			return " " . $FldOpr . " " . ew_QuotedValue($FldVal, $FldType, $dbid);
+ 			$str .= " AND 1=0";
+		return $str;
 	}
 }
 
@@ -5128,11 +4993,6 @@ function ew_QuotedValue($Value, $FldType, $DbId = 0) {
 				return "'" . $Value . "'"; // 'Y'|'N' or 'y'|'n' or '1'|'0' or 't'|'f'
 			else
 				return $Value;
-		case EW_DATATYPE_NUMBER:
-			if (ew_IsNumeric($Value))
-				return $Value;
-			else
-				return "NULL"; // Treat as null
 		default:
 			return $Value;
 	}
@@ -5165,14 +5025,6 @@ function ew_StrToFloat($v) {
 	$v = str_replace(" ", "", $v);
 	$v = str_replace(array($EW_THOUSANDS_SEP, $EW_DECIMAL_POINT), array("", "."), $v);
 	return $v;
-}
-
-// Convert string to int
-function ew_StrToInt($v) {
-	global $EW_DECIMAL_POINT;
-	$v = ew_StrToFloat($v);
-	$ar = explode($EW_DECIMAL_POINT, $v);
-	return $ar[0];
 }
 
 // Concat string
@@ -5672,7 +5524,7 @@ function ew_FormatDateTime($ts, $namedformat) {
 					if ($min == 0 && $sec == 0)
 						return "12 " . $Language->Phrase("Noon");
 					else
-						return strftime("%I" . $EW_TIME_SEPARATOR . "%M" . $EW_TIME_SEPARATOR . "%S", $uts) . " " . $Language->Phrase("PM");
+						return $strftime("%I" . $EW_TIME_SEPARATOR . "%M" . $EW_TIME_SEPARATOR . "%S", $uts) . " " . $Language->Phrase("PM");
 				} elseif (intval($hour) > 12 && intval($hour) <= 23) {
 					return strftime("%I" . $EW_TIME_SEPARATOR . "%M" . $EW_TIME_SEPARATOR . "%S", $uts) . " " . $Language->Phrase("PM");
 				} else {
@@ -6759,18 +6611,14 @@ class cFormObj {
 	// Has value for form element
 	function HasValue($name) {
 		$wrkname = $this->GetIndexedName($name);
-		if (preg_match('/^(fn_)?(x|o)\d*_/', $name) && $this->FormName <> "") {
-			if (isset($_POST[$this->FormName . '$' . $wrkname]))
-				return TRUE;
-		}
 		return isset($_POST[$wrkname]);
-	}	
+	}
 
 	// Get value for form element
 	function GetValue($name) {
 		$wrkname = $this->GetIndexedName($name);
 		$value = @$_POST[$wrkname];
-		if (preg_match('/^(fn_)?(x|o)\d*_/', $name) && $this->FormName <> "") {
+		if ($this->FormName <> "") {
 			$wrkname = $this->FormName . '$' . $wrkname;
 			if (isset($_POST[$wrkname]))
 				$value = $_POST[$wrkname];

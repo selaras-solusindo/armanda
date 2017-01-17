@@ -424,6 +424,9 @@ class ctb_invoice_edit extends ctb_invoice {
 			$this->id->setQueryStringValue($_GET["id"]);
 		}
 
+		// Set up Breadcrumb
+		$this->SetupBreadcrumb();
+
 		// Process form if post back
 		if (@$_POST["a_edit"] <> "") {
 			$this->CurrentAction = $_POST["a_edit"]; // Get action code
@@ -481,9 +484,6 @@ class ctb_invoice_edit extends ctb_invoice {
 					$this->SetUpDetailParms();
 				}
 		}
-
-		// Set up Breadcrumb
-		$this->SetupBreadcrumb();
 
 		// Render the record
 		$this->RowType = EW_ROWTYPE_EDIT; // Render as Edit
@@ -714,7 +714,7 @@ class ctb_invoice_edit extends ctb_invoice {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->customer_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_customer`";
 		$sWhereWrk = "";
-		$this->customer_id->LookupFilters = array("dx1" => '`nama`');
+		$this->customer_id->LookupFilters = array("dx1" => "`nama`");
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -872,7 +872,7 @@ class ctb_invoice_edit extends ctb_invoice {
 			}
 			$sSqlWrk = "SELECT `id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `tb_customer`";
 			$sWhereWrk = "";
-			$this->customer_id->LookupFilters = array("dx1" => '`nama`');
+			$this->customer_id->LookupFilters = array("dx1" => "`nama`");
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1259,8 +1259,8 @@ class ctb_invoice_edit extends ctb_invoice {
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `id` AS `LinkFld`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_customer`";
 			$sWhereWrk = "{filter}";
-			$this->customer_id->LookupFilters = array("dx1" => '`nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$this->customer_id->LookupFilters = array("dx1" => "`nama`");
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => "`id` = {filter_value}", "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1661,7 +1661,6 @@ ew_CreateCalendar("ftb_invoiceedit", "x_tgl_invoice", 7);
 <input type="hidden" data-table="tb_invoice" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($tb_invoice->id->CurrentValue) ?>">
 <?php if ($tb_invoice->getCurrentDetailTable() <> "") { ?>
 <?php
-	$tb_invoice_edit->DetailPages->ValidKeys = explode(",", $tb_invoice->getCurrentDetailTable());
 	$FirstActiveDetailTable = $tb_invoice_edit->DetailPages->ActivePageIndex();
 ?>
 <div class="ewDetailPages">

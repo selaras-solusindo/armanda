@@ -11,7 +11,6 @@ class crReport4 extends crTableBase {
 	var $nama;
 	var $no_kuitansi;
 	var $no_referensi;
-	var $ppn_nilai;
 	var $total_ppn;
 	var $id;
 	var $customer_id;
@@ -69,14 +68,6 @@ class crReport4 extends crTableBase {
 		$this->no_referensi->DateFilter = "";
 		$this->no_referensi->SqlSelect = "";
 		$this->no_referensi->SqlOrderBy = "";
-
-		// ppn_nilai
-		$this->ppn_nilai = new crField('Report4', 'Report4', 'x_ppn_nilai', 'ppn_nilai', '`ppn_nilai`', 5, EWR_DATATYPE_NUMBER, -1);
-		$this->ppn_nilai->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
-		$this->fields['ppn_nilai'] = &$this->ppn_nilai;
-		$this->ppn_nilai->DateFilter = "";
-		$this->ppn_nilai->SqlSelect = "";
-		$this->ppn_nilai->SqlOrderBy = "";
 
 		// total_ppn
 		$this->total_ppn = new crField('Report4', 'Report4', 'x_total_ppn', 'total_ppn', '`total_ppn`', 4, EWR_DATATYPE_NUMBER, -1);
@@ -357,7 +348,7 @@ class crReport4 extends crTableBase {
 	var $_SqlSelectAgg = "";
 
 	function getSqlSelectAgg() {
-		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT SUM(`ppn_nilai`) AS `sum_ppn_nilai`, SUM(`total_ppn`) AS `sum_total_ppn` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT SUM(`total_ppn`) AS `sum_total_ppn` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelectAgg() { // For backward compatibility

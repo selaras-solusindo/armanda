@@ -743,7 +743,7 @@ class ctb_invoice_add extends ctb_invoice {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->customer_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_customer`";
 		$sWhereWrk = "";
-		$this->customer_id->LookupFilters = array("dx1" => '`nama`');
+		$this->customer_id->LookupFilters = array("dx1" => "`nama`");
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -901,7 +901,7 @@ class ctb_invoice_add extends ctb_invoice {
 			}
 			$sSqlWrk = "SELECT `id`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `tb_customer`";
 			$sWhereWrk = "";
-			$this->customer_id->LookupFilters = array("dx1" => '`nama`');
+			$this->customer_id->LookupFilters = array("dx1" => "`nama`");
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1286,8 +1286,8 @@ class ctb_invoice_add extends ctb_invoice {
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `id` AS `LinkFld`, `nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `tb_customer`";
 			$sWhereWrk = "{filter}";
-			$this->customer_id->LookupFilters = array("dx1" => '`nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$this->customer_id->LookupFilters = array("dx1" => "`nama`");
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => "`id` = {filter_value}", "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1674,7 +1674,6 @@ ew_CreateCalendar("ftb_invoiceadd", "x_tgl_invoice", 7);
 </div>
 <?php if ($tb_invoice->getCurrentDetailTable() <> "") { ?>
 <?php
-	$tb_invoice_add->DetailPages->ValidKeys = explode(",", $tb_invoice->getCurrentDetailTable());
 	$FirstActiveDetailTable = $tb_invoice_add->DetailPages->ActivePageIndex();
 ?>
 <div class="ewDetailPages">

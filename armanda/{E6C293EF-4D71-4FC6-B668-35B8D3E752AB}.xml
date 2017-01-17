@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<configuration date="2017/01/10" author="e.World Technology Ltd.">
-  <project id="{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}" file="D:\xampp\htdocs\armanda\armanda.pmp" name="armanda" product="PHPMaker" version="13.0" datetime="2017/01/10 10:37:32" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
+<configuration date="2017/01/17" author="e.World Technology Ltd.">
+  <project id="{E6C293EF-4D71-4FC6-B668-35B8D3E752AB}" file="D:\xampp\htdocs\armanda\armanda.pmp" name="armanda" product="PHPMaker" version="13.0" datetime="2017/01/17 16:06:11" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
     <table id="tb_customer" name="tb_customer" caption="Customer" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,40" priv="1" />
     <table id="tb_fee" name="tb_fee" caption="Fee" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,40" priv="1" />
     <table id="tb_invoice" name="tb_invoice" caption="Invoice" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,40" priv="1" />

@@ -124,11 +124,11 @@ $mquery = mysql_query($msql);
 $row = mysql_fetch_array($mquery);
 $html = '';
 $html .= '<table border="0" width="300">';
-$html .= '<tr><td>'.$row["nama"].'</td></tr>';
-$html .= '<tr><td>'.$row["alamat"].'</td></tr>';
-$html .= '<tr><td>'.$row["kota"].' - '.$row["kodepos"].'</td></tr>';
-$html .= '<tr><td>&nbsp;</td></tr>';
-$html .= '<tr><td>'.$row["no_npwp"].'</td></tr>';
+$html .= '<tr><td>'.$row["nama"].'</td></tr>'; 
+$html .= '<tr><td>'.$row["alamat"].'</td></tr>'; 
+$html .= '<tr><td>'.$row["kota"].' - '.$row["kodepos"].'</td></tr>'; 
+$html .= '<tr><td>&nbsp;</td></tr>'; 
+$html .= '<tr><td>'.$row["no_npwp"].'</td></tr>'; 
 $html .= '<tr><td>&nbsp;</td></tr>';
 $html .= '<tr><td><h2><b>INVOICE</b></h2></td></tr>';
 $html .= '</table>';
@@ -199,7 +199,7 @@ while($row = mysql_fetch_array($mquery)) {
 		<td align="right">'.number_format($row["jumlah"]).'</td>
 	</tr>';*/
 }
-$html .= '</table>';
+$html .= '</table>'; 
 $html .= '<table border="0">';
 $html .= '
 	<tr>
@@ -337,6 +337,8 @@ $html .= '</table>';
 
 
 //echo $html;
+//echo $html2;
 $pdf->writeHTML($html, true, false, true, false, '');
+//$pdf->writeHTML($html2, true, false, true, false, '');
 $pdf->Output('Invoice.pdf', 'I');
 ?>

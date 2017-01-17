@@ -54,7 +54,7 @@
                     
                     calculatePasswordStrength.call(pStrengthElement);
                     
-                    $(pStrengthElement).data("pStrength", true).bind(settings.bind, function(){
+                    $(pStrengthElement).bind(settings.bind, function(){
                         calculatePasswordStrength.call(this, pStrengthElement); //***
                     });
                     

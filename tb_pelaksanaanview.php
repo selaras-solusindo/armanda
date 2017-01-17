@@ -491,6 +491,10 @@ class ctb_pelaksanaan_view extends ctb_pelaksanaan {
 
 		// Set up master/detail parameters
 		$this->SetUpMasterParms();
+
+		// Set up Breadcrumb
+		if ($this->Export == "")
+			$this->SetupBreadcrumb();
 		if ($this->IsPageRequest()) { // Validate request
 			if (@$_GET["pelaksanaan_id"] <> "") {
 				$this->pelaksanaan_id->setQueryStringValue($_GET["pelaksanaan_id"]);
@@ -524,10 +528,6 @@ class ctb_pelaksanaan_view extends ctb_pelaksanaan {
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
-
-		// Set up Breadcrumb
-		if ($this->Export == "")
-			$this->SetupBreadcrumb();
 
 		// Render row
 		$this->RowType = EW_ROWTYPE_VIEW;
